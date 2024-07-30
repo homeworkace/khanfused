@@ -1,24 +1,17 @@
-import logo from './logo.svg';
+import logo from "./Assets/Khanfused.svg";
 import './MainPage.css';
 
 function MainPage() {
-  return (
-    <div className="MainPage">
-      <header className="MainPage-header">
-              <img src={logo} className="MainPage-logo" alt="logo" />
-        <p>
-          Edit src/App.js and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    return (
+        <div className="global">
+            <div className="logo">
+                <img src={logo} alt="Khanfused Logo" />
+            </div>
+            <div className="button-container">
+                <button className="button">Create Room</button>
+                <button className="button">Join Room</button>
+            </div>
+        </div>
   );
 }
 
