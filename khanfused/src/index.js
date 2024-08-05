@@ -6,6 +6,8 @@ import App from './App';
 import MainPage from './MainPage';
 import reportWebVitals from './reportWebVitals';
 
+//Send the cookie to the server if it exists.
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
