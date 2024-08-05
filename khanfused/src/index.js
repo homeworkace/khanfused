@@ -5,10 +5,19 @@ import './index.css';
 import App from './App';
 import MainPage from './MainPage';
 import reportWebVitals from './reportWebVitals';
+import checkSession from './restBoilerplate';
 
 //Send the cookie to the server if it exists.
+for (let pair of document.cookie.split("; ")) {
+    if (pair.split("=")[0] === "session") {
+        //Do the sending here.
+        let result = await checkSession(pair.split("=")[1]);
+        console.log(result);
+    }
+}
+document.cookie = "session=nobruh; Secure"
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
         <Router>
