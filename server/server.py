@@ -1,7 +1,7 @@
-import random
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sqlite3
+import random
+from database import *
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -23,6 +23,7 @@ def check_session():
     if new_session :
         data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
         # Create database entry
+        db.update_session(data['session'])
     return data
 
 # Event handler for a specific URL path
@@ -37,5 +38,7 @@ def submit():
     return f'Received data: {data}'
 
 if __name__ == '__main__':
-    app.run(debug=True)
     random.seed = time.time()
+    db = khanfused_db()
+
+    app.run(debug=True)
