@@ -1,5 +1,7 @@
+import random
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import sqlite3
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -13,8 +15,15 @@ def home():
 @app.route('/check-session', methods=['POST'])
 def check_session():
     data = request.json
-    print(data)
-    return data, 200
+    new_session = False
+
+    if data['session'] == '' :
+        new_session = True
+
+    if new_session :
+        data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
+        # Create database entry
+    return data
 
 # Event handler for a specific URL path
 @app.route('/greet/<name>')
@@ -29,3 +38,4 @@ def submit():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    random.seed = time.time()

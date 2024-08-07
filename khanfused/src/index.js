@@ -7,15 +7,18 @@ import MainPage from './MainPage';
 import reportWebVitals from './reportWebVitals';
 import checkSession from './restBoilerplate';
 
-//Send the cookie to the server if it exists.
+let sessionID = "";
+//Send the sessionID to the server if it exists.
 for (let pair of document.cookie.split("; ")) {
     if (pair.split("=")[0] === "session") {
-        //Do the sending here.
-        let result = await checkSession(pair.split("=")[1]);
-        console.log(result);
+        sessionID = pair.split("=")[1];
     }
 }
-document.cookie = "session=nobruh; Secure"
+//Do the sending here.
+let sessionDetails = await checkSession(sessionID);
+console.log(sessionDetails["session"])
+//Update our session details.
+document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=10";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
