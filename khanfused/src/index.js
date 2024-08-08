@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
-import App from './App';
 import MainPage from './MainPage';
+import CreateRoomPage from './CreateRoomPage.jsx'; // import the new page component
 import reportWebVitals from './reportWebVitals';
 import checkSession from './restBoilerplate';
 
@@ -26,7 +26,7 @@ root.render(
         <Router>
             <Routes>
                 <Route path="/" element={<MainPage />} />
-                <Route path="/starterpage" element={<App />} />
+                <Route path="/create-room" element={<CreateRoomPage />} />
             </Routes>
         </Router>
   </React.StrictMode>
