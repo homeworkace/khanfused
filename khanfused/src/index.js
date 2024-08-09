@@ -6,16 +6,10 @@ import MainPage from './MainPage';
 import CreateRoomPage from './CreateRoomPage.jsx'; // import the new page component
 import reportWebVitals from './reportWebVitals';
 import checkSession from './restBoilerplate';
+import getSession from './utility';
 
-let sessionID = "";
 //Send the sessionID to the server if it exists.
-for (let pair of document.cookie.split("; ")) {
-    if (pair.split("=")[0] === "session") {
-        sessionID = pair.split("=")[1];
-    }
-}
-//Do the sending here.
-let sessionDetails = await checkSession(sessionID);
+let sessionDetails = await checkSession(getSession());
 console.log(sessionDetails["session"])
 //Update our session details.
 document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=10";

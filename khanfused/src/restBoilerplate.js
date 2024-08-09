@@ -14,3 +14,8 @@ async function checkSession(sessionValue) {
 }
 
 export default checkSession;
+
+async function startLobby() {
+    let lobbyCode = ''
+    return lobbyCode;
+}

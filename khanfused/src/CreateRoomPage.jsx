@@ -1,6 +1,11 @@
 import './CreateRoomPage.css';
 import logo from "./Assets/Khanfused.svg";
 import React, { useState } from 'react';
+import getSession from './utility';
+
+function createRoomClick() {
+
+}
 
 function CreateRoomPage(){
 

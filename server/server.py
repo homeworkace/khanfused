@@ -1,8 +1,8 @@
 from flask import Flask, request
 from flask_cors import CORS
-import random
-from database import *
 from flask_apscheduler import APScheduler
+from database import *
+from lobby import *
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -34,16 +34,24 @@ def check_session():
     return data
 
 # Event handler for form submission
-@app.route('/submit', methods=['POST'])
+@app.route('/create_lobby', methods=['POST'])
 def submit():
-    data = request.form
-    return f'Received data: {data}'
+    data = request.json
+    new_session = False
 
-# 
+    if data['session'] == '' :
+        new_session = True
+
+    if new_session :
+        data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
+        # Create database entry
+        db.update_session(data['session'])
+    return data
+
+# Routinely clear sessions whose last_active is older than 30 minutes.
 @scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
-    db.clear_sessions()
-    print('this shit works')
+    db.clear_sessions(10)
 
 if __name__ == '__main__':
     random.seed = time.time()
