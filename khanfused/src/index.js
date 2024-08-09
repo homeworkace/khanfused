@@ -5,11 +5,10 @@ import './index.css';
 import MainPage from './MainPage';
 import CreateRoomPage from './CreateRoomPage.jsx'; // import the new page component
 import reportWebVitals from './reportWebVitals';
-import checkSession from './restBoilerplate';
-import getSession from './utility';
+import { checkSession } from './restBoilerplate';
 
 //Send the sessionID to the server if it exists.
-let sessionDetails = await checkSession(getSession());
+let sessionDetails = await checkSession();
 console.log(sessionDetails["session"])
 //Update our session details.
 document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=10";

@@ -1,4 +1,6 @@
-async function checkSession(sessionValue) {
+import { getSession } from './utility';
+
+async function checkSession() {
     let response = await fetch("http://localhost:5000/check-session", {
         method: "POST",
         headers: {
@@ -6,16 +8,30 @@ async function checkSession(sessionValue) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            session: sessionValue
+            session: getSession()
         })
     });
     let json = await response.json();
     return json;
 }
 
-export default checkSession;
+async function startLobby(password = "") {
+    let response = await fetch("http://localhost:5000/create-lobby", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            session: getSession(),
+            password: password
+        })
+    });
+    let json = await response.json();
+    return json;
+}
 
-async function startLobby() {
-    let lobbyCode = ''
-    return lobbyCode;
+export {
+    checkSession,
+    startLobby
 }

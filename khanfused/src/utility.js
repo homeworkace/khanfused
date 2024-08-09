@@ -7,3 +7,7 @@ function getSession() {
     }
     return sessionID;
 }
+
+export {
+    getSession
+}

@@ -33,28 +33,27 @@ def check_session():
         db.update_session(data['session'])
     return data
 
-# Event handler for form submission
-@app.route('/create_lobby', methods=['POST'])
+# Event handler for lobby creation
+@app.route('/create-lobby', methods=['POST'])
 def submit():
     data = request.json
-    new_session = False
 
     if data['session'] == '' :
-        new_session = True
+        return data, 400
 
-    if new_session :
-        data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
-        # Create database entry
-        db.update_session(data['session'])
+    lobby_code = 'alphanumeric'
+    rooms[lobby_code] = lobby()
+    data['lobby_code'] = lobby_code
     return data
 
 # Routinely clear sessions whose last_active is older than 30 minutes.
-@scheduler.task('interval', id='clear_sessions', seconds=10)
+@scheduler.task('interval', id='clear_sessions', seconds=1800)
 def clear_sessions():
     db.clear_sessions(10)
 
 if __name__ == '__main__':
     random.seed = time.time()
     db = khanfused_db()
+    rooms = {}
 
     app.run(debug=True)
