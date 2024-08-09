@@ -33,3 +33,15 @@ class khanfused_db :
 		cursor.execute(command)
 		database.commit()
 		database.close()
+
+	def clear_sessions(self) :
+		database = sqlite3.connect('khanfused.db')
+		cursor = database.cursor()
+		cursor.execute(
+			'''DELETE FROM Sessions WHERE last_active < ?''', (
+				str(math.floor(time.time()) - 1800),
+			)
+			)
+		database.commit()
+		database.close()
+		pass
