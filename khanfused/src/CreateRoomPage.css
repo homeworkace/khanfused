@@ -1,45 +1,81 @@
 .whole-page{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: #fff;
-    font-family: 'Times New Roman', 'Verdana';
     height: 100vh;
 }
 
-.logo {
-    width: auto;
-    height: auto;
-}
-
-.page-indicator {
-    padding-left: 20px;
-    font-size: 30px;
-}
-
 .input-password-container {
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
 .password-input-box {
+    padding: 0.5rem 0.75rem;
+    font-family: arial, verdana;
     line-height: 2.5;
+    box-sizing: border-box;
 }
 
 .button-container {
     display: flex;
+    justify-content: center;
 }
 
-.button {
-    background-color: #000;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+@media (max-width: 700px), (max-height: 700px) {
+    .logo img {
+        max-height: 80vh;
+    }
+
+    .password-input-box {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.875rem;
+        line-height: 2;
+    }
 }
 
-.button:hover {
-    background-color: #333;
+@media (max-width: 500px), (max-height: 500px) {
+    .logo img {
+        max-height: 70vh;
+    }
+
+    .password-input-box {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 220px), (max-height: 200px) {
+    .logo img {
+        max-height: 60vh;
+    }
+
+    .password-input-box {
+        padding: 0.25rem 0.45rem;
+        font-size: 0.65rem;
+        line-height: 1.4;
+    }
+}
+
+@media (max-width: 182px), (max-height: 135px) {
+    .logo img {
+        max-height: 50vh;
+    }
+
+    .password-input-box {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.5rem;
+        line-height: 1.25;
+    }
+}
+
+@media (max-width: 100px), (max-height:100px) {
+    .logo img {
+        max-height: 20vh;
+    }
+
+    .password-input-box {
+        padding: 0.05rem 0.1rem;
+        font-size: 0.25rem;
+        line-height: 1;
+    }
 }

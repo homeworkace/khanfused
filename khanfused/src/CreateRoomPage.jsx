@@ -7,9 +7,13 @@ function CreateRoomPage(){
     // ren shyuen: state to manage input value
     const [password, setPassword] = useState("");
 
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    }
+
     return (
         <div>
-            <p className="page-indicator">CREATE A PASSWORD</p>
+
             <div className="whole-page">
                 <div className="logo">
                     <img src={logo} alt="Khanfused Logo" />
@@ -17,13 +21,13 @@ function CreateRoomPage(){
                 <div className="input-password-container">
                     <input 
                     className="password-input-box"
-                    type="password"
-                    placeholder="Create a password"
+                    placeholder="create a password"
+                    onChange={handlePasswordChange}
                     value={password}
                     />
                 </div>
                 <div className="button-container">
-                    <button className="button">Join Game</button>
+                    <button className="button">join game</button>
                 </div>
             </div>
         </div>
