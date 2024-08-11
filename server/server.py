@@ -46,17 +46,23 @@ def submit():
 
     lobby_code = 'alphanumeric'
     rooms[lobby_code] = lobby()
+    db.update_lobby(data['session'], lobby_code)
     data['lobby_code'] = lobby_code
     return data
 
 # Routinely clear sessions whose last_active is older than 30 minutes.
 @scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
-    db.clear_sessions(1800)
+    removed_sessions = db.clear_sessions(1800)
+    for session, lobby_code in removed_sessions :
+        rooms[lobby_code].players.remove(session)
+        if len(rooms[lobby_code].players) < 1 :
+            del rooms[lobby_code]
 
 if __name__ == '__main__':
     random.seed = time.time()
     db = khanfused_db()
     rooms = {}
 
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
+    
