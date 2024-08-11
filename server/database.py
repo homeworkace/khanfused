@@ -9,7 +9,7 @@ class khanfused_db :
 			"id" INTEGER NOT NULL UNIQUE,
 			"last_active"	INTEGER NOT NULL,
 			"name" STRING,
-			"lobby" STRING
+			"lobby" STRING,
 			PRIMARY KEY("id")
 			);'''
 			)
@@ -30,7 +30,7 @@ class khanfused_db :
 
 	def clear_sessions(self, age_in_seconds) :
 		result = self.write(
-			'''SELECT (id, lobby) FROM Sessions WHERE last_active < ?''', (
+			'''SELECT id, lobby FROM Sessions WHERE last_active < ?''', (
 				math.floor(time.time()) - age_in_seconds,
 				)
 			)
@@ -49,6 +49,8 @@ class khanfused_db :
 			)
 		
 	def query_session(self, session_id) :
+		if not session_id.isnumeric() :
+			return None
 		result = self.write(
 			'''SELECT * FROM Sessions WHERE id = ?''', (
 				int(session_id),

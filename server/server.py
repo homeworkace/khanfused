@@ -3,6 +3,9 @@ from flask_cors import CORS
 from flask_apscheduler import APScheduler
 from database import *
 from lobby import *
+import json
+import jsonpickle
+from pathlib import Path
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -23,8 +26,8 @@ def home():
 @app.route('/check-session', methods=['POST'])
 def check_session():
     data = request.json
-
     result = db.query_session(data['session'])
+    
     if result is None :
         data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
         # Create database entry
@@ -46,6 +49,7 @@ def submit():
 
     lobby_code = 'alphanumeric'
     rooms[lobby_code] = lobby()
+    rooms[lobby_code].players.append(int(data['session']))
     db.update_lobby(data['session'], lobby_code)
     data['lobby_code'] = lobby_code
     return data
@@ -63,6 +67,17 @@ if __name__ == '__main__':
     random.seed = time.time()
     db = khanfused_db()
     rooms = {}
-
-    app.run(debug=True, use_reloader=False)
+    
+    if Path('rooms.json').exists() :
+        rooms_file = open('rooms.json', 'r')
+        rooms = jsonpickle.decode(rooms_file.read())
+        rooms_file.close()
+    try :
+        app.run(debug=True, use_reloader=False)
+    except Exception as e :
+        print(e.message)
+        print(e.args)
+    rooms_file = open('rooms.json', 'w')
+    rooms_file.write(jsonpickle.encode(rooms))
+    rooms_file.close()
     

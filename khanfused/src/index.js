@@ -10,7 +10,7 @@ import { checkSession } from './restBoilerplate';
 async function heartbeat() {
     //Send the sessionID to the server if it exists.
     let sessionDetails = await checkSession();
-    console.log(sessionDetails["session"])
+
     //Update our session details.
     document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=1800";
     let nameToUpdate = "";
