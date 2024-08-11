@@ -22,15 +22,16 @@ def home():
 @app.route('/check-session', methods=['POST'])
 def check_session():
     data = request.json
-    new_session = False
 
-    if data['session'] == '' :
-        new_session = True
-
-    if new_session :
+    result = db.query_session(data['session'])
+    if result is None :
         data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
         # Create database entry
-        db.update_session(data['session'])
+        db.new_session(data['session'])
+    else :
+        db.refresh_session(data['session'])
+        if not result[2] is None :
+            data['name'] = result[2]
     return data
 
 # Event handler for lobby creation
@@ -47,9 +48,9 @@ def submit():
     return data
 
 # Routinely clear sessions whose last_active is older than 30 minutes.
-@scheduler.task('interval', id='clear_sessions', seconds=1800)
+@scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
-    db.clear_sessions(10)
+    db.clear_sessions(1800)
 
 if __name__ == '__main__':
     random.seed = time.time()

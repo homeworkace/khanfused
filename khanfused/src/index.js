@@ -11,7 +11,7 @@ import { checkSession } from './restBoilerplate';
 let sessionDetails = await checkSession();
 console.log(sessionDetails["session"])
 //Update our session details.
-document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=10";
+document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=1800";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

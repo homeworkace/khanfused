@@ -8,14 +8,22 @@ class khanfused_db :
 			'''CREATE TABLE IF NOT EXISTS "Sessions" (
 			"id" INTEGER NOT NULL UNIQUE,
 			"last_active"	INTEGER NOT NULL,
+			"name" STRING,
 			PRIMARY KEY("id")
 			);'''
 			)
 		
-	def update_session(self, session_id) :
+	def new_session(self, session_id) :
 		self.write(
 			'''INSERT INTO Sessions (id, last_active) VALUES (?, ?)''', (
 				session_id, math.floor(time.time())
+				)
+			)
+		
+	def refresh_session(self, session_id) :
+		self.write(
+			'''UPDATE Sessions SET last_active = ? WHERE id = ?''', (
+				math.floor(time.time()), session_id
 				)
 			)
 
@@ -26,16 +34,21 @@ class khanfused_db :
 				)
 			)
 		
-	def query(self, session_id) :
-		self.write(
-			'''SELECT COUNT(*) FROM Sessions WHERE session_id = ?''', (
+	def query_session(self, session_id) :
+		result = self.write(
+			'''SELECT * FROM Sessions WHERE id = ?''', (
 				session_id,
 				)
 			)
+		if len(result) < 1 :
+			return None
+		return result[0]
 
 	def write(self, command, parameters = ()) :
 		database = sqlite3.connect('khanfused.db')
 		cursor = database.cursor()
 		cursor.execute(command, parameters)
+		result = cursor.fetchall()
 		database.commit()
 		database.close()
+		return result
