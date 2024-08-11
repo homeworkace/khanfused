@@ -1,140 +1,68 @@
-.global {
-    background-color: #fff;
+.main-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
 }
 
-.logo img {
-    height: auto;
-    max-height: 90vh;
-    width: 100%;
+.logo-main img {
+    width: 100vw;
+    max-width: 700px;
+    height: 85vh;
 }
 
-.button-container {
+.main-button-container {
     display: flex;
-    gap: 20px;
+    gap: 0.5rem;
 }
 
-.button {
-    background-color: #000;
-    color: #fff;
-    padding: 1rem 2rem;
+
+.main-button {
+    background-color: black;
+    color: white;
     border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-family: arial, verdana;
+    border-radius: 3px;
+    padding: 0.75rem 1.75rem;
     font-size: 1rem;
+    cursor: pointer;
 }
 
-.button:hover {
-    background-color: #333;
+.main-button:hover {
+    background-color: rgb(54, 54, 54);
 }
 
-@media (max-width: 700px), (max-height: 700px) {
-    .logo img {
-        max-height: 85vh;
-    }
-    
-    .button-container {
+@media (max-width: 400px) {
+    .main-button-container {
         display: flex;
-        gap: 15px;
+        flex-direction: column;
+        margin-bottom: 2rem;
     }
-    
-    .button {
-        background-color: #000;
-        color: #fff;
-        padding: 0.75rem 1.75rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-family: arial, verdana;
+
+    .main-button {
+        padding: 0.5rem 1.5rem;
         font-size: 0.75rem;
     }
 }
 
-@media (max-width: 350px), (max-height: 350px) {
-    .logo img {
-        max-height: 80vh;
+@media (max-height: 600px) {
+    .main-button-container {
+        margin-bottom: 2rem;
     }
 
-    .button-container {
-        display: flex;
-        gap: 10px;
-    }
-    
-    .button {
-        background-color: #000;
-        color: #fff;
+    .main-button {
         padding: 0.5rem 1.5rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-family: arial, verdana;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 150px), (max-height: 400px) {
+    .main-button-container {
+        margin-bottom: 3.5rem;
+    }
+
+    .main-button {
+        padding: 0.35rem 1.35rem;
         font-size: 0.5rem;
-    }
-}
-
-@media (max-width: 220px), (max-height: 200px) {
-    .logo img {
-        max-height: 75vh;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 5px;
-    }
-    
-    .button {
-        background-color: #000;
-        color: #fff;
-        padding: 0.4rem 1.4rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-family: arial, verdana;
-        font-size: 0.4rem;
-    }
-}
-
-@media (max-width: 182px), (max-height: 135px) {
-    .logo img {
-        max-height: 70vh;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 5px;
-    }
-    
-    .button {
-        background-color: #000;
-        color: #fff;
-        padding: 0.25rem 1.25rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-family: arial, verdana;
-        font-size: 0.25rem;
-    }
-}
-
-@media (max-width: 145px), (max-height:100px) {
-    .logo img {
-        max-height: 65vh;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 1.5px;
-    }
-    
-    .button {
-        background-color: #000;
-        color: #fff;
-        padding: 0.05rem 0.75rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-family: arial, verdana;
-        font-size: 0.05rem;
     }
 }

@@ -12,23 +12,20 @@ function CreateRoomPage(){
     }
 
     return (
-        <div>
-
-            <div className="whole-page">
-                <div className="logo">
-                    <img src={logo} alt="Khanfused Logo" />
-                </div>
-                <div className="input-password-container">
-                    <input 
-                    className="password-input-box"
-                    placeholder="create a password"
-                    onChange={handlePasswordChange}
-                    value={password}
-                    />
-                </div>
-                <div className="button-container">
-                    <button className="button">join game</button>
-                </div>
+        <div className="createRoom-page">
+            <div className="logo-createRoom">
+                <img src={logo} alt="Khanfused Logo" />
+            </div>
+            <div className="input-password-container">
+                <input 
+                className="password-input-box"
+                placeholder="create a password"
+                onChange={handlePasswordChange}
+                value={password}
+                />
+            </div>
+            <div className="createRoom-button-container">
+                <button className="createRoom-button">join game</button>
             </div>
         </div>
     );
