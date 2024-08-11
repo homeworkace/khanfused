@@ -29,7 +29,14 @@ def check_session():
     result = db.query_session(data['session'])
     
     if result is None :
+        # Create a random session ID
         data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
+        # Increment this ID until it doesn't collide with an existing ID
+        while not db.query_session(data['session']) is None :
+            session_id = int(data['session']) + 1
+            if session_id > 999999999 :
+                session_id = 0
+            data['session'] = str(session_id).rjust(9, '0')
         # Create database entry
         db.new_session(data['session'])
         data['redirect'] = '/'
@@ -47,7 +54,7 @@ def submit():
     if data['session'] == '' :
         return data, 400
 
-    lobby_code = 'alphanumeric'
+    lobby_code = generate_lobby_code([code for code in rooms])
     rooms[lobby_code] = lobby()
     rooms[lobby_code].players.append(int(data['session']))
     db.update_lobby(data['session'], lobby_code)
