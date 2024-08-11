@@ -7,11 +7,22 @@ import CreateRoomPage from './CreateRoomPage.jsx'; // import the new page compon
 import reportWebVitals from './reportWebVitals';
 import { checkSession } from './restBoilerplate';
 
-//Send the sessionID to the server if it exists.
-let sessionDetails = await checkSession();
-console.log(sessionDetails["session"])
-//Update our session details.
-document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=1800";
+async function heartbeat() {
+    //Send the sessionID to the server if it exists.
+    let sessionDetails = await checkSession();
+    console.log(sessionDetails["session"])
+    //Update our session details.
+    document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=1800";
+    let nameToUpdate = "";
+    if ("name" in sessionDetails) {
+        nameToUpdate = sessionDetails["name"];
+    }
+    document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800";
+
+    setTimeout(heartbeat, 60000);
+}
+
+await heartbeat();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

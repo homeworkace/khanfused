@@ -19,6 +19,7 @@ scheduler.start()
 def home():
     return 'Hello, World!'
 
+# Event handler for the home page
 @app.route('/check-session', methods=['POST'])
 def check_session():
     data = request.json
@@ -28,6 +29,7 @@ def check_session():
         data['session'] = str(random.randint(0, 999999999)).rjust(9, '0')
         # Create database entry
         db.new_session(data['session'])
+        data['redirect'] = '/'
     else :
         db.refresh_session(data['session'])
         if not result[2] is None :
