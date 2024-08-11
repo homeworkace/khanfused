@@ -1,38 +1,68 @@
-.global {
+.main-page {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     height: 100vh;
-    background-color: #fff;
-    font-family: 'Times New Roman', serif;
 }
 
-.logo {
-    width: auto;
-    height: auto;
+.logo-main img {
+    width: 100vw;
+    max-width: 700px;
+    height: 85vh;
 }
 
-h1 {
-    font-size: 36px;
-    margin: 20px 0;
-}
-
-.button-container {
+.main-button-container {
     display: flex;
-    gap: 20px;
+    gap: 0.5rem;
 }
 
-.button {
-    background-color: #000;
-    color: #fff;
-    padding: 10px 20px;
+
+.main-button {
+    background-color: black;
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 3px;
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
     cursor: pointer;
-    font-size: 16px;
 }
 
-.button:hover {
-    background-color: #333;
+.main-button:hover {
+    background-color: rgb(54, 54, 54);
+}
+
+@media (max-width: 400px) {
+    .main-button-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 2rem;
+    }
+
+    .main-button {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-height: 600px) {
+    .main-button-container {
+        margin-bottom: 2rem;
+    }
+
+    .main-button {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 150px), (max-height: 400px) {
+    .main-button-container {
+        margin-bottom: 3.5rem;
+    }
+
+    .main-button {
+        padding: 0.35rem 1.35rem;
+        font-size: 0.5rem;
+    }
 }

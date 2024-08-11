@@ -15,9 +15,8 @@ function CreateRoomPage() {
 
     return (
         <div>
-            {/*<p className="page-indicator">CREATE A PASSWORD</p>*/}
-            <div className="whole-page">
-                <div className="logo">
+            <div className="createRoom-page">
+                <div className="logo-createRoom">
                     <img src={logo} alt="Khanfused Logo" />
                 </div>
                 <div className="input-password-container">
@@ -27,8 +26,8 @@ function CreateRoomPage() {
                         placeholder="Create a password"
                     />
                 </div>
-                <div className="button-container">
-                    <button className="button" onClick={ createRoomClick }>Create Room</button>
+                <div className="createRoom-button-container">
+                    <button className="createRoom-button" onClick={ createRoomClick }>Create Room</button>
                 </div>
             </div>
         </div>

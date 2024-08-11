@@ -12,13 +12,13 @@ function MainPage() {
     }
 
     return (
-        <div className="global">
-            <div className="logo">
+        <div className="main-page">
+            <div className="logo-main">
                 <img src={logo} alt="Khanfused Logo" />
             </div>
-            <div className="button-container">
-                <button className="button" onClick={handleCreateRoomClick}>Create Room</button>
-                <button className="button">Join Room</button>
+            <div className="main-button-container">
+                <button className="main-button" onClick={handleCreateRoomClick}>create room</button>
+                <button className="main-button">join room</button>
             </div>
         </div>
   );

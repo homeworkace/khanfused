@@ -1,45 +1,83 @@
-.whole-page{
+.createRoom-page {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    background-color: #fff;
-    font-family: 'Times New Roman', 'Verdana';
+    align-items: center;
     height: 100vh;
 }
 
-.logo {
-    width: auto;
-    height: auto;
-}
-
-.page-indicator {
-    padding-left: 20px;
-    font-size: 30px;
+.logo-createRoom img {
+    width: 100vw;
+    max-width: 700px;
+    height: 85vh;
 }
 
 .input-password-container {
-    margin-bottom: 10px;
+    margin-bottom: 0.25rem;
 }
 
 .password-input-box {
     line-height: 2.5;
+    padding: 0.25rem 0.5rem;
+    width: 10rem;
+    height: 2.5rem;
 }
 
-.button-container {
-    display: flex;
-}
-
-.button {
-    background-color: #000;
-    color: #fff;
-    padding: 10px 20px;
+.createRoom-button {
+    background-color: black;
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 3px;
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
     cursor: pointer;
-    font-size: 16px;
 }
 
-.button:hover {
-    background-color: #333;
+.createRoom-button:hover {
+    background-color: rgb(54, 54, 54);
+}
+
+
+@media (max-width: 500px) {   
+    .password-input-box {
+        width: 8rem;
+        height: 2.25rem;
+    }
+    
+    .createRoom-button {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-height: 850px) {
+    .password-input-box {
+        width: 8rem;
+        height: 2.25rem;
+    }
+    
+    .createRoom-button {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+    }
+
+    .createRoom-button-container {
+        margin-bottom: 2.5rem;
+    }
+}
+
+@media (max-width: 300px), (max-height: 500px) {
+    .password-input-box {
+        width: 6rem;
+        height: 2rem;
+    }
+    
+    .createRoom-button {
+        padding: 0.25rem 1.25rem;
+        font-size: 0.5rem;
+    }
+
+    .createRoom-button-container {
+        margin-bottom: 3.5rem;
+    }
 }
