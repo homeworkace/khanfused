@@ -6,11 +6,14 @@ import { startLobby } from './restBoilerplate'
 
 function CreateRoomPage() {
 
+    const navigate = useNavigate();
     const password = useRef();
 
     const createRoomClick = async () => {
         let result = await startLobby(password.current.value);
-        console.log(result);
+        if ("redirect" in result) {
+            navigate(result["redirect"]);
+        }
     }
 
     return (
