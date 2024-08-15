@@ -78,6 +78,10 @@ def clear_sessions():
         if len(rooms[lobby_code].players) < 1 :
             del rooms[lobby_code]
 
+#@socket_app.on('connect')
+#def socket_on_join():
+#    pass
+
 @socket_app.on('join')
 def socket_on_join():
     emit('join', {'marco': 'polo'})
@@ -93,10 +97,10 @@ if __name__ == '__main__':
         rooms = jsonpickle.decode(rooms_file.read())
         rooms_file.close()
     try :
-        app.run(debug=True, use_reloader=False)
+        # app.run(debug=True, use_reloader=False)
+        socket_app.run(app)
     except Exception as e :
-        print(e.message)
-        print(e.args)
+        print(e)
     rooms_file = open('rooms.json', 'w')
     rooms_file.write(jsonpickle.encode(rooms))
     rooms_file.close()

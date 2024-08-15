@@ -9,24 +9,27 @@ function RoomPage() {
     const navigate = useNavigate();
     const { code } = useParams();
     const [hasConnected, setHasConnected] = useState(false);
-    const socket = io("http://localhost:5000/join", {autoConnect: false});
+    const socket = io("http://localhost:5000", {autoConnect: false});
 
     socket.on("connect", async (data) => {
-        console.log(data);
         setHasConnected(true);
+    });
+
+    socket.on("join", async (data) => {
+        console.log(data);
     });
 
     socket.connect();
     socket.emit("join");
 
-    return ( <> hasConnected && 
+    return (<> {hasConnected &&
         <div className="roomPage">
             <div className="logo">
                 <img src={logo} alt="Khanfused Logo" />
             </div>
             <div className="code-section">
                 <p className="instruction-text">Key in the code below:</p>
-                <h1 className="room-code">BAPX2</h1>
+                <h1 className="room-code">{code}</h1>
             </div>
             <div className="players-section">
                 <h2>Players:</h2>
@@ -42,7 +45,7 @@ function RoomPage() {
                 </ul>
             </div>
             <button className="start-button" disabled>Start Game</button>
-        </div>
+        </div>}
     </> );
 }
 

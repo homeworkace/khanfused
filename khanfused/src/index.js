@@ -31,7 +31,7 @@ root.render(
         <Router>
             <Routes>
                 <Route path="/create-room" element={<CreateRoomPage />} />
-                <Route path="/lobby/:code" element={<RoomPage />} />
+                <Route path="/room/:code" element={<RoomPage />} />
                 <Route path="/" element={<MainPage />} />
             </Routes>
         </Router>
