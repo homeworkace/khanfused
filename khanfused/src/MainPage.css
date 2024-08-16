@@ -14,11 +14,8 @@
 .mainPage-container {
     display: flex;
     gap: 0.5rem;
-
     width: 100%;
     max-width: 250px;
-
-    border: 1px solid black;
 }
 
 .mainPage-container button {
