@@ -1,68 +1,52 @@
-.main-page {
+.mainPage {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
 .logo-main img {
-    width: 100vw;
-    max-width: 700px;
-    height: 85vh;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    max-height: 85vh;
 }
 
-.main-button-container {
+.mainPage-container {
     display: flex;
     gap: 0.5rem;
+    width: 100%;
+    max-width: 250px;
 }
 
-
-.main-button {
+.mainPage-container button {
     background-color: black;
     color: white;
     border: none;
     border-radius: 3px;
-    padding: 0.75rem 1.75rem;
-    font-size: 1rem;
+    padding: 0.5rem 0.5rem;
+    width: 100%;
+    text-align: center;
     cursor: pointer;
 }
 
-.main-button:hover {
+.mainPage-container button:hover {
     background-color: rgb(54, 54, 54);
 }
 
+@media (max-height: 400px) {
+    .logo-main img {
+        height: 80vh;
+    }
+}
+
 @media (max-width: 400px) {
-    .main-button-container {
-        display: flex;
+    .mainPage-container {
         flex-direction: column;
-        margin-bottom: 2rem;
-    }
-
-    .main-button {
-        padding: 0.5rem 1.5rem;
-        font-size: 0.75rem;
     }
 }
 
-@media (max-height: 600px) {
-    .main-button-container {
-        margin-bottom: 2rem;
-    }
-
-    .main-button {
-        padding: 0.5rem 1.5rem;
-        font-size: 0.75rem;
-    }
-}
-
-@media (max-width: 150px), (max-height: 400px) {
-    .main-button-container {
-        margin-bottom: 3.5rem;
-    }
-
-    .main-button {
-        padding: 0.35rem 1.35rem;
-        font-size: 0.5rem;
+@media (max-height: 650px) and (max-width: 400px) {
+    .logo-main img {
+        height: 75vh;
     }
 }

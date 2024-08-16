@@ -11,14 +11,18 @@ function MainPage() {
         navigate('/create-room');
     }
 
+    const handleJoinRoomClick = () => {
+        navigate('/join-room');
+    }
+
     return (
-        <div className="main-page">
+        <div className="mainPage">
             <div className="logo-main">
                 <img src={logo} alt="Khanfused Logo" />
             </div>
-            <div className="main-button-container">
-                <button className="main-button" onClick={handleCreateRoomClick}>create room</button>
-                <button className="main-button">join room</button>
+            <div className="mainPage-container">
+                <button onClick={handleCreateRoomClick}>create room</button>
+                <button onClick={handleJoinRoomClick}>join room</button>
             </div>
         </div>
   );

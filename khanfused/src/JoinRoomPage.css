@@ -1,53 +1,52 @@
-.createRoom-page {
+.joinRoom-page {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
-.logo-createRoom img {
-    width: 100vw;
+.logo-joinRoom img {
+    width: 100%;
     max-width: 600px;
     height: auto;
-    max-height: 85vh;
+    max-height: 80vh;
 }
 
-.createRoom-container {
+.joinRoom-container {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
     width: 100%;
-    max-width: 250px;
+    max-width: 200px;
 }
 
-.createRoom-container input {
+.joinRoom-container input {
     border: 1px solid black;
-    padding: 0.75rem 0.75rem;
+    padding: 0.5rem 0.5rem;
 }
 
-.createRoom-container button {
+.joinRoom-container button {
     background-color: black;
     color: white;
     border: none;
     border-radius: 3px;
-    padding: 0.75rem 0.75rem;
+    padding: 0.5rem 0.5rem;
     text-align: center;
     cursor: pointer;
 }
 
-.createRoom-container button:hover {
+.joinRoom-container button:hover {
     background-color: rgb(54, 54, 54);
 }
 
-@media (max-height: 700px) {
-    .logo-createRoom img {
+@media (max-height: 650px) {
+    .logo-joinRoom img {
         height: 70vh;
     }
 }
 
-@media (max-width: 300px) {
-    .createRoom-container {
+@media (max-width: 250px) {
+    .joinRoom-container {
         max-width: 150px;
     }
 }
