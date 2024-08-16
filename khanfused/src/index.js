@@ -5,6 +5,7 @@ import './index.css';
 import MainPage from './MainPage';
 import CreateRoomPage from './CreateRoomPage.jsx';
 import RoomPage from './RoomPage.jsx';
+import JoinRoomPage from './JoinRoomPage.jsx'
 import reportWebVitals from './reportWebVitals';
 import { checkSession } from './restBoilerplate';
 
@@ -33,6 +34,7 @@ root.render(
                 <Route path="/create-room" element={<CreateRoomPage />} />
                 <Route path="/room/:code" element={<RoomPage />} />
                 <Route path="/" element={<MainPage />} />
+                <Route path="/join-room" element={<JoinRoomPage />} />
             </Routes>
         </Router>
   </React.StrictMode>

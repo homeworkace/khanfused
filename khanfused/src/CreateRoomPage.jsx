@@ -22,15 +22,14 @@ function CreateRoomPage() {
                 <div className="logo-createRoom">
                     <img src={logo} alt="Khanfused Logo" />
                 </div>
-                <div className="input-password-container">
+                <div className="createRoom-container">
                     <input 
                         ref={ password }
+                        type="password"
                         className="password-input-box"
                         placeholder="Create a password"
                     />
-                </div>
-                <div className="createRoom-button-container">
-                    <button className="createRoom-button" onClick={ createRoomClick }>Create Room</button>
+                    <button onClick={ createRoomClick }>Create Room</button>
                 </div>
             </div>
         </div>
