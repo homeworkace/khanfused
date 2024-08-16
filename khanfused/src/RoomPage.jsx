@@ -1,6 +1,6 @@
 import logo from "./Assets/Khanfused.svg";
 import './RoomPage.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 
@@ -9,18 +9,45 @@ function RoomPage() {
     const navigate = useNavigate();
     const { code } = useParams();
     const [hasConnected, setHasConnected] = useState(false);
-    const socket = io("http://localhost:5000", {autoConnect: false});
+    const socket = useRef(null);
 
-    socket.on("connect", async (data) => {
-        setHasConnected(true);
-    });
+    useEffect(() => {
+        // initialize socket connection
+        socket.current = io("http://localhost:5000", { autoConnect: false });
 
-    socket.on("join", async (data) => {
-        console.log(data);
-    });
+        const handleConnect = () => {
+            setHasConnected(true);
+        }
 
-    socket.connect();
-    socket.emit("join");
+        const handleJoin = (data) => {
+            console.log(data);
+        }
+
+        // setup event listeners
+        socket.current.on("connect", handleConnect);
+        socket.current.on("join", handleJoin);
+
+        // connect and emit join event
+        socket.current.connect();
+        socket.current.emit("join");
+
+        // cleanup on component mount
+        return () => {
+            socket.current.off("connect", handleConnect);
+            socket.current.off("join", handleJoin);
+            socket.current.disconnect();
+        };
+    }, []); // empty dependency array ensures this runs only on mount and unmount
+
+    // const socket = io("http://localhost:5000", {autoConnect: false});
+    // socket.on("connect", async (data) => {
+    //     setHasConnected(true);
+    // });
+    // socket.on("join", async (data) => {
+    //     console.log(data);
+    // });
+    // socket.connect();
+    // socket.emit("join");
 
     return (<> {hasConnected &&
         <div className="roomPage">
@@ -38,7 +65,7 @@ function RoomPage() {
                     <li>Rick</li>
                     <li>Tina</li>
                     <li>Zhi Yun</li>
-                    <li>Fakerayray</li>
+                    <li>Raymond</li>
                     <li className="player-input">
                         <input type="text" placeholder="Enter your name" />
                         <button>Submit</button>
