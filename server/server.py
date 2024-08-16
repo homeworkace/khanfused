@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SCHEDULER_API_ENABLED'] = True
 
-cors = CORS(app)
+cors = CORS(app)    
 
 socket_app = SocketIO(app,debug=True,cors_allowed_origins='*',async_mode='threading')
 
@@ -86,6 +86,7 @@ def clear_sessions():
 def socket_on_join():
     emit('join', {'marco': 'polo'})
     pass
+
 
 if __name__ == '__main__':
     random.seed = time.time()

@@ -7,6 +7,7 @@ import CreateRoomPage from './CreateRoomPage.jsx';
 import RoomPage from './RoomPage.jsx';
 import reportWebVitals from './reportWebVitals';
 import { checkSession } from './restBoilerplate';
+import { setCookieEnd } from './cookieEndTime.js';
 
 async function heartbeat() {
     //Send the sessionID to the server if it exists.
@@ -19,6 +20,13 @@ async function heartbeat() {
         nameToUpdate = sessionDetails["name"];
     }
     document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800";
+
+    // Calculate cookie expire time
+    let cookieStart = new Date();
+    let cookieEnd = new Date(cookieStart.getTime()+(1800*1000));
+    console.log(new Date());
+    console.log(cookieEnd.toString());
+    setCookieEnd(cookieEnd);
 
     setTimeout(heartbeat, 60000);
 }
