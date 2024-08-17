@@ -13,14 +13,6 @@ async function heartbeat() {
     //Send the sessionID to the server if it exists.
     let sessionDetails = await checkSession();
 
-    //Update our session details.
-    document.cookie = "session=" + sessionDetails["session"] + "; Secure; Max-Age=1800";
-    let nameToUpdate = "";
-    if ("name" in sessionDetails) {
-        nameToUpdate = sessionDetails["name"];
-    }
-    document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800";
-
     setTimeout(heartbeat, 60000);
 }
 

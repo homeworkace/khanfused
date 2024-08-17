@@ -42,11 +42,15 @@ def check_session():
             data['session'] = str(session_id).rjust(9, '0')
         # Create database entry
         db.new_session(data['session'])
-        data['redirect'] = '/'
     else :
         db.refresh_session(data['session'])
         if not result[2] is None :
             data['name'] = result[2]
+        
+        # If this session is also in a lobby, send a redirect key to the client.
+        if not result[3] is None :
+            if result[3] in rooms :
+                data['redirect'] = '/room/' + result[3]
     return data
 
 # Event handler for lobby creation
