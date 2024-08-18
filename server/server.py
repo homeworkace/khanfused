@@ -83,7 +83,7 @@ def clear_sessions():
 #    pass
 
 @socket_app.on('join')
-def socket_on_join():
+def socket_on_join(data):
     emit('join', {'marco': 'polo'})
     pass
 
