@@ -32,7 +32,6 @@ function RoomPage() {
         }
 
         const handleJoin = (data) => {
-            console.log(data);
         }
 
         // setup event listeners
