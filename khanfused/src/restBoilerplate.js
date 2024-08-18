@@ -14,12 +14,14 @@ async function checkSession() {
     let json = await response.json();
 
     //Update our session details.
-    document.cookie = "session=" + json["session"] + "; Secure; Max-Age=1800; path=/";
+    //document.cookie = "session=" + json["session"] + "; Secure; Max-Age=1800; path=/";
+    document.cookie = "session=" + json["session"] + "; Max-Age=1800; path=/";
     let nameToUpdate = "";
     if ("name" in json) {
         nameToUpdate = json["name"];
     }
-    document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800; path=/";
+    //document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800; path=/";
+    document.cookie = "name=" + nameToUpdate + "; Max-Age=1800; path=/";
 
     return json;
 }

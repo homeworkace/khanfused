@@ -14,5 +14,6 @@ if %PORT_COUNT% gtr 0 (
 )
 
 :: Start the React client on the free port
+set HOST=app%PORT%
 echo Starting React client on port %PORT%
 npm start
