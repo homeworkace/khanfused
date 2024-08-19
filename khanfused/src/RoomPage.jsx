@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession } from './restBoilerplate';
+import { getSession } from './utility.js';
 
 function RoomPage() {
 
@@ -14,11 +15,10 @@ function RoomPage() {
 
     let promise = checkSession();
     promise.then((sessionDetails) => {
-        console.log(sessionDetails["redirect"]);
         if (!("redirect" in sessionDetails)) {
             navigate("/", { replace: true });
         }
-        else if (sessionDetails["redirect"] != window.location.pathname) {
+        else if (sessionDetails["redirect"] !== window.location.pathname) {
                 navigate(sessionDetails["redirect"], { replace: true });
         }
     });
@@ -41,7 +41,9 @@ function RoomPage() {
 
         // connect and emit join event
         socket.current.connect();
-        socket.current.emit("join");
+        socket.current.emit("join", {
+            session: getSession()
+        });
 
         // cleanup on component mount
         return () => {

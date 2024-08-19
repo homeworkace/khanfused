@@ -1,4 +1,4 @@
-import { getSession } from './utility';
+import { getSession, getName } from './utility';
 
 async function checkSession() {
     let response = await fetch("http://localhost:5000/check-session", {
@@ -8,7 +8,8 @@ async function checkSession() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            session: getSession()
+            session: getSession(),
+            name: getName()
         })
     });
     let json = await response.json();
@@ -19,9 +20,9 @@ async function checkSession() {
     let nameToUpdate = "";
     if ("name" in json) {
         nameToUpdate = json["name"];
+        //document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800; path=/";
+        document.cookie = "name=" + nameToUpdate + "; Max-Age=1800; path=/";
     }
-    //document.cookie = "name=" + nameToUpdate + "; Secure; Max-Age=1800; path=/";
-    document.cookie = "name=" + nameToUpdate + "; Max-Age=1800; path=/";
 
     return json;
 }

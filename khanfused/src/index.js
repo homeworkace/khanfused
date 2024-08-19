@@ -11,7 +11,7 @@ import { checkSession } from './restBoilerplate';
 
 async function heartbeat() {
     //Send the sessionID to the server if it exists.
-    let sessionDetails = await checkSession();
+    await checkSession();
 
     setTimeout(heartbeat, 60000);
 }

@@ -11,9 +11,8 @@ function JoinRoomPage() {
 
     let promise = checkSession();
     promise.then((sessionDetails) => {
-        console.log(sessionDetails["redirect"]);
         if ("redirect" in sessionDetails) {
-            if (sessionDetails["redirect"].substring(0, 6) == "/room/") {
+            if (sessionDetails["redirect"].substring(0, 6) === "/room/") {
                 navigate(sessionDetails["redirect"], { replace: true });
             }
         }

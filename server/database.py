@@ -48,6 +48,13 @@ class khanfused_db :
 				)
 			)
 		
+	def update_name(self, session_id, name = '') :
+		self.write(
+			'''UPDATE Sessions SET name = ? WHERE id = ?''', (
+				name, int(session_id)
+				)
+			)
+		
 	def query_session(self, session_id) :
 		if not session_id.isnumeric() :
 			return None

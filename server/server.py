@@ -55,7 +55,7 @@ def check_session():
 
 # Event handler for lobby creation
 @app.route('/create-lobby', methods=['POST'])
-def submit():
+def create_lobby():
     data = request.json
 
     if data['session'] == '' :
@@ -64,7 +64,7 @@ def submit():
     # Create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
     rooms[lobby_code] = lobby()
-    rooms[lobby_code].players.append(int(data['session']))
+    rooms[lobby_code].players.append((int(data['session']), db.query_session(data['session'])[2]))
     db.update_lobby(data['session'], lobby_code)
 
     # Send relevant data back
@@ -87,8 +87,13 @@ def clear_sessions():
 #    pass
 
 @socket_app.on('join')
-def socket_on_join():
-    emit('join', {'marco': 'polo'})
+def socket_on_join(data):
+    print(data)
+    print(type(data))
+    session = db.query_session(data['session'])
+
+    #lobby_info = dict(rooms[session[3]])
+    emit('join', jsonpickle.encode(rooms[session[3]]))
     pass
 
 if __name__ == '__main__':

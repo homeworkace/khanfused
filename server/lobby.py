@@ -3,9 +3,10 @@ import string
 
 class lobby :
     def __init__(self, password='') :
-        self.state = 0
+        self.state = 'waiting'
         self.password = password
         self.players = []
+        self.readies = []
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
