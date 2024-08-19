@@ -82,17 +82,10 @@ def clear_sessions():
         if len(rooms[lobby_code].players) < 1 :
             del rooms[lobby_code]
 
-#@socket_app.on('connect')
-#def socket_on_join():
-#    pass
-
 @socket_app.on('join')
 def socket_on_join(data):
-    print(data)
-    print(type(data))
     session = db.query_session(data['session'])
-
-    #lobby_info = dict(rooms[session[3]])
+    
     emit('join', jsonpickle.encode(rooms[session[3]]))
     pass
 

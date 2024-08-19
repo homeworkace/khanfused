@@ -6,7 +6,15 @@ class lobby :
         self.state = 'waiting'
         self.password = password
         self.players = []
-        self.readies = []
+
+    def start(self) :
+        if len(self.players) < 6 :
+            return
+        for player in self.players :
+            if player[1] is None :
+                return
+
+        self.state = 'instructions'
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
