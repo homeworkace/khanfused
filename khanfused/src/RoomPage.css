@@ -58,6 +58,7 @@
 }
 
 .player-input {
+    border: 1px solid black;
     margin-top: 1rem;
     display: flex;
     width: 70%;
@@ -75,4 +76,8 @@
 .start-button {
     margin-top: 1rem;
     width: 100px;
+}
+
+.spacing {
+    flex-grow: 0.5;
 }
