@@ -53,15 +53,32 @@ function RoomPage() {
         };
     }, []); // empty dependency array ensures this runs only on mount and unmount
 
-    // const socket = io("http://localhost:5000", {autoConnect: false});
-    // socket.on("connect", async (data) => {
-    //     setHasConnected(true);
-    // });
-    // socket.on("join", async (data) => {
-    //     console.log(data);
-    // });
-    // socket.connect();
-    // socket.emit("join");
+    const [players, setPlayers] = useState(["Ren Shyuen"]);
+    const [playerName, setPlayerName] = useState("");
+    const [isEditing, setIsEditing] = useState(true);
+
+    const handlePlayerNameInput = (event) => {
+        setPlayerName(event.target.value);
+    }
+
+    const handleSubmitClick = () => {
+        if (playerName.trim() !== ""){
+            setPlayers([...players, playerName]);
+
+            // set editing name mode to false after submission
+            setIsEditing(false);
+
+            // clears the input field
+            // setPlayerName("");
+        }
+    }
+
+    const handleEditClick = () => {
+        setIsEditing(true);
+
+        // remove the player name from the list to edit
+        setPlayers(players.filter(player => player !== playerName));
+    }
 
     return (<> {hasConnected &&
         <div className="roomPage">
@@ -75,14 +92,23 @@ function RoomPage() {
             <div className="players-section">
                 <h2>Players</h2>
                 <ul className="players-list">
-                    <li>Ren Shyuen</li>
-                    <li>Rick</li>
-                    <li>Tina</li>
-                    <li>Zhi Yun</li>
-                    <li>Raymond</li>
+
+                    {players.map((player, index) => (
+                        <li key={index}> {player} </li>
+                    ))}
+
                     <li className="player-input">
-                        <input type="text" placeholder="Enter your name" />
-                        <button>Submit</button>
+                        {isEditing ? (
+                            <input 
+                            type="text" 
+                            placeholder="Enter your name"
+                            value={playerName}
+                            onChange={handlePlayerNameInput}
+                            />
+                        ) : (
+                            <div className="spacing"/>
+                        )}
+                        <button onClick={isEditing ? handleSubmitClick : handleEditClick}> {isEditing ? "Submit" : "Edit"} </button>
                     </li>
                 </ul>
             </div>
