@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate';
 import { getSession } from './utility.js';
+import RoomPageView from "./RoomPageView.jsx";
 
 function RoomPage() {
 
@@ -99,44 +100,88 @@ function RoomPage() {
         setPlayers(players.filter(player => player !== playerName));
     }
 
-    return (<> {hasConnected &&
-        <div className="roomPage">
-            <div className="roomPage-logo">
-                <img src={logo} alt="Khanfused Logo" />
-            </div>
-            <div className="code-section">
-                <p>Key in the code below:</p>
-                <h1>{code}</h1>
-            </div>
-            <div className="players-section">
-                <h2>Players</h2>
-                <ul className="players-list">
+    // return (<> {hasConnected &&
+    //     <div className="roomPage">
+    //         <div className="roomPage-logo">
+    //             <img src={logo} alt="Khanfused Logo" />
+    //         </div>
+    //         <div className="code-section">
+    //             <p>Key in the code below:</p>
+    //             <h1>{code}</h1>
+    //         </div>
+    //         <div className="players-section">
+    //             <h2>Players</h2>
+    //             <ul className="players-list">
 
-                    {players.map((player, index) => (
-                        <li key={index}> {player} </li>
-                    ))}
+    //                 {players.map((player, index) => (
+    //                     <li key={index}> {player} </li>
+    //                 ))}
 
-                    <li className="player-input">
-                        {isEditing ? (
-                            <input 
-                            type="text" 
-                            placeholder="Enter your name"
-                            value={playerName}
-                            onChange={handlePlayerNameInput}
-                            />
-                        ) : (
-                            <div className="spacing"/>
-                        )}
-                        <button onClick={isEditing ? handleSubmitClick : handleEditClick}> {isEditing ? "Submit" : "Edit"} </button>
-                    </li>
-                </ul>
-            </div>
-            <div className="button-bar">
-                <button className="start-button" disabled>Start Game</button>
-                <button className="leave-button" onClick={ leaveRoomClick }>Leave Room</button>
-            </div>
-        </div>}
-    </> );
+    //                 <li className="player-input">
+    //                     {isEditing ? (
+    //                         <input 
+    //                         type="text" 
+    //                         placeholder="Enter your name"
+    //                         value={playerName}
+    //                         onChange={handlePlayerNameInput}
+    //                         />
+    //                     ) : (
+    //                         <div className="spacing"/>
+    //                     )}
+    //                     <button onClick={isEditing ? handleSubmitClick : handleEditClick}> {isEditing ? "Submit" : "Edit"} </button>
+    //                 </li>
+    //             </ul>
+    //         </div>
+    //         <div className="button-bar">
+    //             <button className="start-button" disabled>Start Game</button>
+    //             <button className="leave-button" onClick={ leaveRoomClick }>Leave Room</button>
+    //         </div>
+    //     </div>}
+    // </> );
+    // return (
+    //     <>
+    //         {hasConnected && (
+    //             <RoomPageView
+    //                 code={code}
+    //                 players={players}
+    //                 playerName={playerName}
+    //                 isEditing={isEditing}
+    //                 handlePlayerNameInput={handlePlayerNameInput}
+    //                 handleSubmitClick={handleSubmitClick}
+    //                 handleEditClick={handleEditClick}
+    //                 leaveRoomClick={leaveRoomClick}
+    //             />
+    //         )}
+    //     </>
+    // );
+    const renderPage = () => {
+        switch (true) {
+            // Different cases
+            // case Spring:
+            //     return <Spring />;
+
+            // can change to case of hasConnnected instead
+            default:
+                return (
+                    <RoomPageView
+                        code={code}
+                        players={players}
+                        playerName={playerName}
+                        isEditing={isEditing}
+                        handlePlayerNameInput={handlePlayerNameInput}
+                        handleSubmitClick={handleSubmitClick}
+                        handleEditClick={handleEditClick}
+                        leaveRoomClick={leaveRoomClick}
+                    />
+                )
+            }
+
+    };
+    return (
+        <>
+            {renderPage()}
+        </>
+    )
+
 }
-
 export default RoomPage;
