@@ -2,11 +2,12 @@ import './JoinRoomPage.css'
 import logo from './Assets/Khanfused.svg'
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkSession } from './restBoilerplate';
+import { checkSession, joinLobby } from './restBoilerplate';
 
 function JoinRoomPage() {
 
     const navigate = useNavigate();
+    const roomCode = useRef();
     const password = useRef();
 
     let promise = checkSession();
@@ -18,23 +19,39 @@ function JoinRoomPage() {
         }
     });
 
+    const joinRoomClick = async () => {
+        let result = await joinLobby(roomCode.current.value, password.current.value);
+        if ("redirect" in result) {
+            navigate(result["redirect"], { replace: true });
+        }
+    }
+
+    const backClick = () => {
+        navigate("/", { replace: true });
+    }
+
     return (
         <div className="joinRoom-page">
             <div className="logo-joinRoom">
                 <img src={logo} alt="Khanfused Logo" />
             </div>
             <div className="joinRoom-container">
-                <input 
+                <input
+                    ref={roomCode}
                     className="room-code-box"
                     type="text"
-                    placeholder="enter the room code"
+                    placeholder="Enter the room code"
                 />
-                <input 
+                <input
+                    ref={password}
                     className="room-password-box"
                     type="password"
-                    placeholder="enter the password"
+                    placeholder="Enter the password"
                 />
-                <button>join game</button>
+                <div className="button-bar">
+                    <button className="join-button" onClick={joinRoomClick}>Join Room</button>
+                    <button className="back-button" onClick={backClick}>Back</button>
+                </div>
             </div>
         </div>
     );

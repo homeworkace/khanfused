@@ -2,8 +2,7 @@ import './CreateRoomPage.css';
 import logo from './Assets/Khanfused.svg';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { startLobby } from './restBoilerplate'
-import { checkSession } from './restBoilerplate';
+import { checkSession, startLobby } from './restBoilerplate'
 
 function CreateRoomPage() {
 
@@ -26,6 +25,10 @@ function CreateRoomPage() {
         }
     }
 
+    const backClick = () => {
+        navigate("/", { replace: true });
+    }
+
     return (
         <div>
             <div className="createRoom-page">
@@ -39,7 +42,10 @@ function CreateRoomPage() {
                         className="password-input-box"
                         placeholder="Create a password"
                     />
-                    <button onClick={ createRoomClick }>Create Room</button>
+                    <div className="button-bar">
+                        <button className="join-button" onClick={createRoomClick}>Create Room</button>
+                        <button className="back-button" onClick={backClick}>Back</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -39,6 +39,16 @@
     background-color: rgb(54, 54, 54);
 }
 
+.join-button {
+    margin: 1rem;
+    width: 100px;
+}
+
+.back-button {
+    margin: 1rem;
+    width: 100px;
+}
+
 @media (max-height: 650px) {
     .logo-joinRoom img {
         height: 70vh;

@@ -43,7 +43,41 @@ async function startLobby(password = "") {
     return json;
 }
 
+async function joinLobby(lobbyCode, password = "") {
+    let response = await fetch("http://localhost:5000/join-lobby", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            session: getSession(),
+            lobby_code: lobbyCode,
+            password: password
+        })
+    });
+    let json = await response.json();
+    return json;
+}
+
+async function leaveLobby() {
+    let response = await fetch("http://localhost:5000/leave-lobby", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            session: getSession()
+        })
+    });
+    let json = await response.json();
+    return json;
+}
+
 export {
     checkSession,
-    startLobby
+    startLobby,
+    joinLobby,
+    leaveLobby
 }

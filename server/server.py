@@ -59,7 +59,7 @@ def create_lobby():
     data = request.json
 
     if data['session'] == '' :
-        return data, 400
+        return { 'message': 'No session ID provided' }, 400
 
     # Create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
@@ -68,17 +68,64 @@ def create_lobby():
     db.update_lobby(data['session'], lobby_code)
 
     # Send relevant data back
-    data['lobby_code'] = lobby_code
-    data['redirect'] = '/room/' + lobby_code
+    result = {}
+    result['redirect'] = '/room/' + lobby_code
 
-    return data
+    return result
+
+# Event handler to join a lobby
+@app.route('/join-lobby', methods=['POST'])
+def join_lobby():
+    data = request.json
+
+    if data['session'] == '' :
+        return { 'message': 'No session ID provided' }, 400
+
+    # Check if the specified lobby exists.
+    if not data['lobby_code'] in rooms :
+        return { 'message': 'No lobby with this code' }, 400
+
+    # Check if the provided password matches with the lobby's.
+    if data['password'] != rooms[data['lobby_code']].password :
+        return { 'message': 'Wrong password' }, 400
+
+    # Add the new player.
+    rooms[data['lobby_code']].players.append((int(data['session']), db.query_session(data['session'])[2]))
+    db.update_lobby(data['session'], data['lobby_code'])
+
+    # Send relevant data back
+    result = {}
+    result['redirect'] = '/room/' + data['lobby_code']
+
+    return result
+
+# Event handler to leave a lobby
+@app.route('/leave-lobby', methods=['POST'])
+def leave_lobby():
+    data = request.json
+
+    if data['session'] == '' :
+        return { 'message': 'No session ID provided' }, 400
+
+    # Add the new player.
+    lobby_code = db.query_session(data['session'])[3]
+    rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != int(data['session'])]
+    if len(rooms[lobby_code].players) < 1 :
+        del rooms[lobby_code]
+    db.update_lobby(data['session'], None)
+
+    # Send relevant data back
+    result = {}
+    result['redirect'] = '/'
+
+    return result
 
 # Routinely clear sessions whose last_active is older than 30 minutes.
 @scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
     removed_sessions = db.clear_sessions(1800)
     for session, lobby_code in removed_sessions :
-        rooms[lobby_code].players.remove(session)
+        rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != session]
         if len(rooms[lobby_code].players) < 1 :
             del rooms[lobby_code]
 
@@ -87,7 +134,6 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     
     emit('join', jsonpickle.encode(rooms[session[3]]))
-    pass
 
 if __name__ == '__main__':
     random.seed = time.time()
