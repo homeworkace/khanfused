@@ -2,8 +2,7 @@ import './CreateRoomPage.css';
 import logo from './Assets/Khanfused.svg';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { startLobby } from './restBoilerplate'
-import { checkSession } from './restBoilerplate';
+import { checkSession, startLobby } from './restBoilerplate'
 
 function CreateRoomPage() {
 
