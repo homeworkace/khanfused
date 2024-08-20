@@ -40,6 +40,16 @@
     background-color: rgb(54, 54, 54);
 }
 
+.create-button {
+    margin: 1rem;
+    width: 100px;
+}
+
+.back-button {
+    margin: 1rem;
+    width: 100px;
+}
+
 @media (max-height: 700px) {
     .logo-createRoom img {
         height: 70vh;

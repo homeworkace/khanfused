@@ -26,6 +26,10 @@ function JoinRoomPage() {
         }
     }
 
+    const backClick = () => {
+        navigate("/", { replace: true });
+    }
+
     return (
         <div className="joinRoom-page">
             <div className="logo-joinRoom">
@@ -44,7 +48,10 @@ function JoinRoomPage() {
                     type="password"
                     placeholder="Enter the password"
                 />
-                <button onClick={ joinRoomClick }>Join Room</button>
+                <div className="button-bar">
+                    <button className="join-button" onClick={joinRoomClick}>Join Room</button>
+                    <button className="back-button" onClick={backClick}>Back</button>
+                </div>
             </div>
         </div>
     );

@@ -25,6 +25,10 @@ function CreateRoomPage() {
         }
     }
 
+    const backClick = () => {
+        navigate("/", { replace: true });
+    }
+
     return (
         <div>
             <div className="createRoom-page">
@@ -38,7 +42,10 @@ function CreateRoomPage() {
                         className="password-input-box"
                         placeholder="Create a password"
                     />
-                    <button onClick={ createRoomClick }>Create Room</button>
+                    <div className="button-bar">
+                        <button className="join-button" onClick={createRoomClick}>Create Room</button>
+                        <button className="back-button" onClick={backClick}>Back</button>
+                    </div>
                 </div>
             </div>
         </div>
