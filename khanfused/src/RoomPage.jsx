@@ -11,17 +11,23 @@ function RoomPage() {
     const navigate = useNavigate();
     const { code } = useParams();
     const [hasConnected, setHasConnected] = useState(false);
+    const [shouldConnect, setShouldConnect] = useState(false);
     const socket = useRef(null);
 
-    let promise = checkSession();
-    promise.then((sessionDetails) => {
-        if (!("redirect" in sessionDetails)) {
-            navigate("/", { replace: true });
-        }
-        else if (sessionDetails["redirect"] !== window.location.pathname) {
+    useEffect(() => {
+        let promise = checkSession();
+        promise.then((sessionDetails) => {
+            if (!("redirect" in sessionDetails)) {
+                navigate("/", { replace: true });
+            }
+            else if (sessionDetails["redirect"] !== window.location.pathname) {
                 navigate(sessionDetails["redirect"], { replace: true });
-        }
-    });
+            }
+            else {
+                setShouldConnect(true);
+            }
+        });
+    }, [])
 
     const leaveRoomClick = async () => {
         let result = await leaveLobby();
@@ -31,7 +37,11 @@ function RoomPage() {
     }
 
     useEffect(() => {
+        if (!shouldConnect)
+            return
+
         // initialize socket connection
+        //socket.current = io("http://localhost:5000", { autoConnect: false, transports: ['websocket'] }); //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
         socket.current = io("http://localhost:5000", { autoConnect: false });
 
         const handleConnect = () => {
@@ -51,15 +61,16 @@ function RoomPage() {
         socket.current.emit("join", {
             session: getSession()
         });
+        //console.log("connected");
 
         // cleanup on component mount
         return () => {
             socket.current.off("connect", handleConnect);
             socket.current.off("join", handleJoin);
             socket.current.disconnect();
-            console.log("disconnected");
+            //console.log("disconnected");
         };
-    }, []); // empty dependency array ensures this runs only on mount and unmount
+    }, [shouldConnect]);
 
     const [players, setPlayers] = useState(["Ren Shyuen"]);
     const [playerName, setPlayerName] = useState("");

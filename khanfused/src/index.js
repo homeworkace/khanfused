@@ -20,16 +20,14 @@ await heartbeat();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <React.StrictMode>
-        <Router>
-            <Routes>
-                <Route path="/create-room" element={<CreateRoomPage />} />
-                <Route path="/room/:code" element={<RoomPage />} />
-                <Route path="/" element={<MainPage />} />
-                <Route path="/join-room" element={<JoinRoomPage />} />
-            </Routes>
-        </Router>
-  </React.StrictMode>
+    <Router>
+        <Routes>
+            <Route path="/create-room" element={<CreateRoomPage />} />
+            <Route path="/room/:code" element={<RoomPage />} />
+            <Route path="/" element={<MainPage />} />
+            <Route path="/join-room" element={<JoinRoomPage />} />
+        </Routes>
+    </Router>
 );
 
 // If you want to start measuring performance in your app, pass a function

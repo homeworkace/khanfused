@@ -32,7 +32,6 @@ def generate_lobby_code(existing_lobby_codes) :
 
     
     result = ''.join(result_as_a_list)
-    print(result)
     while result in existing_lobby_codes :
         numeric_code += 1
         if numeric_code > 60466175 :
