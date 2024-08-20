@@ -3,7 +3,7 @@ import './RoomPage.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
-import { checkSession } from './restBoilerplate';
+import { checkSession, leaveLobby } from './restBoilerplate';
 import { getSession } from './utility.js';
 
 function RoomPage() {
@@ -22,6 +22,13 @@ function RoomPage() {
                 navigate(sessionDetails["redirect"], { replace: true });
         }
     });
+
+    const leaveRoomClick = async () => {
+        let result = await leaveLobby();
+        if ("redirect" in result) {
+            navigate(result["redirect"], { replace: true });
+        }
+    }
 
     useEffect(() => {
         // initialize socket connection
@@ -50,6 +57,7 @@ function RoomPage() {
             socket.current.off("connect", handleConnect);
             socket.current.off("join", handleJoin);
             socket.current.disconnect();
+            console.log("disconnected");
         };
     }, []); // empty dependency array ensures this runs only on mount and unmount
 
@@ -112,7 +120,10 @@ function RoomPage() {
                     </li>
                 </ul>
             </div>
-            <button className="start-button" disabled>Start Game</button>
+            <div className="button-bar">
+                <button className="start-button" disabled>Start Game</button>
+                <button className="leave-button" onClick={ leaveRoomClick }>Leave Room</button>
+            </div>
         </div>}
     </> );
 }

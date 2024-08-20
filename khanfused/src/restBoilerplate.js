@@ -60,8 +60,24 @@ async function joinLobby(lobbyCode, password = "") {
     return json;
 }
 
+async function leaveLobby() {
+    let response = await fetch("http://localhost:5000/leave-lobby", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            session: getSession()
+        })
+    });
+    let json = await response.json();
+    return json;
+}
+
 export {
     checkSession,
     startLobby,
-    joinLobby
+    joinLobby,
+    leaveLobby
 }

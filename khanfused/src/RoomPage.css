@@ -74,7 +74,12 @@
 }
 
 .start-button {
-    margin-top: 1rem;
+    margin: 1rem;
+    width: 100px;
+}
+
+.leave-button {
+    margin: 1rem;
     width: 100px;
 }
 

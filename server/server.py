@@ -86,8 +86,6 @@ def join_lobby():
         return { 'message': 'No lobby with this code' }, 400
 
     # Check if the provided password matches with the lobby's.
-    print(data['password'])
-    print(rooms[data['lobby_code']].password)
     if data['password'] != rooms[data['lobby_code']].password :
         return { 'message': 'Wrong password' }, 400
 
@@ -101,12 +99,33 @@ def join_lobby():
 
     return result
 
+# Event handler to leave a lobby
+@app.route('/leave-lobby', methods=['POST'])
+def leave_lobby():
+    data = request.json
+
+    if data['session'] == '' :
+        return { 'message': 'No session ID provided' }, 400
+
+    # Add the new player.
+    lobby_code = db.query_session(data['session'])[3]
+    rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != int(data['session'])]
+    if len(rooms[lobby_code].players) < 1 :
+        del rooms[lobby_code]
+    db.update_lobby(data['session'], None)
+
+    # Send relevant data back
+    result = {}
+    result['redirect'] = '/'
+
+    return result
+
 # Routinely clear sessions whose last_active is older than 30 minutes.
 @scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
     removed_sessions = db.clear_sessions(1800)
     for session, lobby_code in removed_sessions :
-        rooms[lobby_code].players.remove(session)
+        rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != session]
         if len(rooms[lobby_code].players) < 1 :
             del rooms[lobby_code]
 
