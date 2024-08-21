@@ -63,7 +63,7 @@ def create_lobby():
 
     # Create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
-    rooms[lobby_code] = lobby()
+    rooms[lobby_code] = lobby(data['password'])
     rooms[lobby_code].players.append((int(data['session']), db.query_session(data['session'])[2]))
     db.update_lobby(data['session'], lobby_code)
 
