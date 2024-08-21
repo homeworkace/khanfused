@@ -6,6 +6,11 @@ import { getSession } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
+// Testing 
+import RandomTeams from "./RandomTeams.jsx";
+import SpringGamePlay from "./SpringGamePlay.jsx";
+import SpringDouble from './SpringDouble.jsx';
+
 function RoomPage() {
 
     const navigate = useNavigate();
@@ -15,9 +20,48 @@ function RoomPage() {
     const socket = useRef(null);
     const [players, setPlayers] = useState([]);
 
+    // Test switch case purposes
+    const [isRandomising, setIsRandomising] = useState(false);
+    const [isSpring,springComes] = useState(false);
+    const [springStage, setSpringStage] = useState(false);
+
+    const handleRandomiseClick = () => {
+        setIsRandomising(true);
+    }
+
+    const proceedToSpring = () => {
+        springComes(true);
+  
+    }
+
+    const handleSpringStage = () => {
+        setSpringStage(true);
+        console.log(springStage);
+    }
+
+    const leaveRoomClick = async () => {
+        let result = await leaveLobby();
+        if ("redirect" in result) {
+            navigate(result["redirect"], { replace: true });
+        }
+    }
+
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+                case springStage:
+                    return <SpringDouble />
+
+                case isSpring:
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />
+
+                case isRandomising:
+                    return <RandomTeams
+                    proceedToSpring = {proceedToSpring}
+                    />
+
                 default:
                     return (
                         <RoomPageView
@@ -29,13 +73,6 @@ function RoomPage() {
             }
         }
     };
-
-    const leaveRoomClick = async () => {
-        let result = await leaveLobby();
-        if ("redirect" in result) {
-            navigate(result["redirect"], { replace: true });
-        }
-    }
 
     useEffect(() => {
         let promise = checkSession();

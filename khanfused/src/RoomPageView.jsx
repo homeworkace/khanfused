@@ -1,4 +1,3 @@
-import React from 'react';
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
 import { useState } from 'react';
@@ -68,6 +67,9 @@ function RoomPageView({ code, players, leaveRoomClick }) {
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
+                <button onClick = {handleRandomiseClick}>
+                    Randomise
+                    </button> 
             </div>
         </div>
     );
