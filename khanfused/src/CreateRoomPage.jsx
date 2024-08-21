@@ -42,9 +42,9 @@ function CreateRoomPage() {
                         className="password-input-box"
                         placeholder="Create a password"
                     />
-                    <div className="button-bar">
-                        <button className="join-button" onClick={createRoomClick}>Create Room</button>
-                        <button className="back-button" onClick={backClick}>Back</button>
+                    <div className="createRoom-button-bar">
+                        <button onClick={createRoomClick}>Create Room</button>
+                        <button onClick={backClick}>Back</button>
                     </div>
                 </div>
             </div>

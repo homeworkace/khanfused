@@ -48,9 +48,9 @@ function JoinRoomPage() {
                     type="password"
                     placeholder="Enter the password"
                 />
-                <div className="button-bar">
-                    <button className="join-button" onClick={joinRoomClick}>Join Room</button>
-                    <button className="back-button" onClick={backClick}>Back</button>
+                <div className="joinRoom-button-bar">
+                    <button onClick={joinRoomClick}>Join Room</button>
+                    <button onClick={backClick}>Back</button>
                 </div>
             </div>
         </div>

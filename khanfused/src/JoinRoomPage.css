@@ -25,7 +25,12 @@
     padding: 0.5rem 0.5rem;
 }
 
-.joinRoom-container button {
+.joinRoom-button-bar {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.joinRoom-button-bar button {
     background-color: black;
     color: white;
     border: none;
@@ -33,20 +38,11 @@
     padding: 0.5rem 0.5rem;
     text-align: center;
     cursor: pointer;
+    flex: 1;
 }
 
-.joinRoom-container button:hover {
+.joinRoom-button-bar button:hover {
     background-color: rgb(54, 54, 54);
-}
-
-.join-button {
-    margin: 1rem;
-    width: 100px;
-}
-
-.back-button {
-    margin: 1rem;
-    width: 100px;
 }
 
 @media (max-height: 650px) {
