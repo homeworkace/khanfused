@@ -14,10 +14,6 @@
     cursor: pointer;
 }
 
-.roomPage button:hover {
-    background-color: rgb(54, 54, 54);
-}
-
 .roomPage-logo img {
     width: 100%;
     max-width: 400px;
@@ -58,7 +54,6 @@
 }
 
 .player-input {
-    border: 1px solid black;
     margin-top: 1rem;
     display: flex;
     width: 70%;
@@ -73,14 +68,19 @@
     padding: 0.5rem;
 }
 
-.start-button {
-    margin: 1rem;
-    width: 100px;
+.roomPageView-button-bar {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    width: 200px;
 }
 
-.leave-button {
-    margin: 1rem;
-    width: 100px;
+.roomPageView-button-bar button {
+    flex: 1;
+}
+
+.roomPageView-button-bar button:hover {
+    background-color: rgb(54, 54, 54);
 }
 
 .spacing {
