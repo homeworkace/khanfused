@@ -1,4 +1,3 @@
-import logo from "./Assets/Khanfused.svg";
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
@@ -14,31 +13,9 @@ function RoomPage() {
     const [hasConnected, setHasConnected] = useState(false);
     const [shouldConnect, setShouldConnect] = useState(false);
     const socket = useRef(null);
-    const [players, setPlayers] = useState(["Ren Shyuen"]);
-    const [playerName, setPlayerName] = useState("");
-    const [isEditing, setIsEditing] = useState(true);
 
-    ///////////////////////////////////////////////////////////////////////////////
-
-    const handlePlayerNameInput = (event) => {
-        setPlayerName(event.target.value);
-    }
-
-    const handleSubmitClick = () => {
-        if (playerName.trim() !== ""){
-            setPlayers([...players, playerName]);
-
-            // set editing name mode to false after submission
-            setIsEditing(false);
-        }
-    }
-
-    const handleEditClick = () => {
-        setIsEditing(true);
-
-        // remove the player name from the list to edit
-        setPlayers(players.filter(player => player !== playerName));
-    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const renderPage = () => {
         if (hasConnected) {
@@ -46,14 +23,9 @@ function RoomPage() {
                 default:
                     return (
                         <RoomPageView
-                        code={code}
-                        players={players}
-                        playerName={playerName}
-                        isEditing={isEditing}
-                        handlePlayerNameInput={handlePlayerNameInput}
-                        handleSubmitClick={handleSubmitClick}
-                        handleEditClick={handleEditClick}
-                        leaveRoomClick={leaveRoomClick}
+                        code={ code }
+                        leaveRoomClick={ leaveRoomClick }
+                        socket={ socket.current }
                         />
                     )
             }
@@ -68,7 +40,8 @@ function RoomPage() {
     }
 
 
-    ///////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     useEffect(() => {
@@ -84,7 +57,7 @@ function RoomPage() {
                 setShouldConnect(true);
             }
         });
-    }, [])
+    });
 
     useEffect(() => {
         if (!shouldConnect)
@@ -121,8 +94,8 @@ function RoomPage() {
     }, [shouldConnect]);
 
 
-    ///////////////////////////////////////////////////////////////////////////////
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     return (

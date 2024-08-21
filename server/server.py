@@ -132,7 +132,7 @@ def clear_sessions():
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
-    
+
     emit('join', jsonpickle.encode(rooms[session[3]]))
 
 if __name__ == '__main__':
