@@ -49,14 +49,15 @@ function RoomPage() {
                 default:
                     return (
                         <RoomPageView
-                        code={code}
-                        players={players}
-                        playerName={playerName}
-                        isEditing={isEditing}
-                        handlePlayerNameInput={handlePlayerNameInput}
-                        handleSubmitClick={handleSubmitClick}
-                        handleEditClick={handleEditClick}
-                        leaveRoomClick={leaveRoomClick}
+                            code={code}
+                            players={players}
+                            playerName={playerName}
+                            isEditing={isEditing}
+                            handlePlayerNameInput={handlePlayerNameInput}
+                            handleSubmitClick={handleSubmitClick}
+                            handleEditClick={handleEditClick}
+                            currentSeason={currentSeason}
+                            leaveRoomClick={leaveRoomClick}
                         />
                     )
             }

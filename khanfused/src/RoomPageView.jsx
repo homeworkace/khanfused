@@ -2,7 +2,7 @@ import React from 'react';
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
 
-function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInput, handleSubmitClick, handleEditClick, leaveRoomClick }) {
+function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInput, handleSubmitClick, handleEditClick, currentSeason, leaveRoomClick }) {
     return (
         <div className="roomPage">
             <div className="roomPage-logo">
@@ -34,6 +34,9 @@ function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInp
                         </button>
                     </li>
                 </ul>
+            </div>
+            <div className="current-season">
+                <h2>Current Season: {currentSeason}</h2>
             </div>
             <div className="roomPageView-button-bar">
                 <button disabled>
