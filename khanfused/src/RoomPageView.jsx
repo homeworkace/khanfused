@@ -1,8 +1,7 @@
-import React from 'react';
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
 
-function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInput, handleSubmitClick, handleEditClick, currentSeason, leaveRoomClick }) {
+function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInput, handleSubmitClick, handleEditClick, currentSeason, leaveRoomClick, handleRandomiseClick }) {
     return (
         <div className="roomPage">
             <div className="roomPage-logo">
@@ -45,6 +44,9 @@ function RoomPageView({code, players, playerName, isEditing, handlePlayerNameInp
                 <button onClick={leaveRoomClick}>
                     Leave Room
                 </button>
+                <button onClick = {handleRandomiseClick}>
+                    Randomise
+                    </button> 
             </div>
         </div>
     );

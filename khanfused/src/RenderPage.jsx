@@ -1,4 +1,3 @@
-import logo from "./Assets/Khanfused.svg";
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
@@ -6,6 +5,10 @@ import { checkSession, leaveLobby } from './restBoilerplate.js';
 import { getSession } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
+// Testing 
+import RandomTeams from "./RandomTeams.jsx";
+import SpringGamePlay from "./SpringGamePlay.jsx";
+import SpringDouble from './SpringDouble.jsx';
 
 function RoomPage() {
 
@@ -20,8 +23,26 @@ function RoomPage() {
     const [players, setPlayers] = useState(["Ren Shyuen"]);
     const [playerName, setPlayerName] = useState("");
     const [isEditing, setIsEditing] = useState(true);
+    // Test switch case purposes
+    const [isRandomising, setIsRandomising] = useState(false);
+    const [isSpring,springComes] = useState(false);
+    const [springStage, setSpringStage] = useState(false);
 
     ///////////////////////////////////////////////////////////////////////////////
+
+    const handleRandomiseClick = () => {
+        setIsRandomising(true);
+    }
+
+    const proceedToSpring = () => {
+        springComes(true);
+  
+    }
+
+    const handleSpringStage = () => {
+        setSpringStage(true);
+        console.log(springStage);
+    }
 
     const handlePlayerNameInput = (event) => {
         setPlayerName(event.target.value);
@@ -43,9 +64,24 @@ function RoomPage() {
         setPlayers(players.filter(player => player !== playerName));
     }
 
+// Order of rendering matters
+
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+                case springStage:
+                    return <SpringDouble />
+
+                case isSpring:
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />
+
+                case isRandomising:
+                    return <RandomTeams
+                    proceedToSpring = {proceedToSpring}
+                    />
+
                 default:
                     return (
                         <RoomPageView
@@ -58,6 +94,7 @@ function RoomPage() {
                             handleEditClick={handleEditClick}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
+                            handleRandomiseClick={handleRandomiseClick}
                         />
                     )
             }

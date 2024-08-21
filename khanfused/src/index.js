@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import MainPage from './MainPage';
 import CreateRoomPage from './CreateRoomPage.jsx';
-import RoomPage from './RoomPage.jsx';
+import RoomPage from './RenderPage.jsx';
 import JoinRoomPage from './JoinRoomPage.jsx'
 import reportWebVitals from './reportWebVitals';
 import { checkSession } from './restBoilerplate';
