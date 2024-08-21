@@ -15,22 +15,6 @@ function RoomPageView({ code, players, leaveRoomClick }) {
         setPlayerName(event.target.value)
     };
 
-    /**
-     *  { players.map( (player, index) => ( 
-     *      <li key={ index }>
-     *          { editMode ? ( 
-     *              <div>
-     *                  <input />
-     *                  <button />
-     *              </div> 
-     *          ) : ( 
-     *              <div> 
-     *                  <span />
-     *                  <button />
-     *              </div> 
-     *          ) }   
-     *      </li> ) ) }
-     */
 
     return (
         <div className="roomPageView">
