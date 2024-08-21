@@ -1,4 +1,3 @@
-import logo from "./Assets/Khanfused.svg";
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
@@ -6,6 +5,9 @@ import { checkSession, leaveLobby } from './restBoilerplate.js';
 import { getSession } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
+// Testing 
+import RandomTeams from "./RandomTeams.jsx";
+import SpringGamePlay from "./SpringGamePlay.jsx";
 
 function RoomPage() {
 
@@ -17,8 +19,20 @@ function RoomPage() {
     const [players, setPlayers] = useState(["Ren Shyuen"]);
     const [playerName, setPlayerName] = useState("");
     const [isEditing, setIsEditing] = useState(true);
+    // Test switch case purposes
+    const [isRandomising, setIsRandomising] = useState(false);
+    const [isSpring,springComes] = useState(false);
 
     ///////////////////////////////////////////////////////////////////////////////
+
+    const handleRandomiseClick = () => {
+        setIsRandomising(true);
+    }
+
+    const proceedToSpring = () => {
+        springComes(true);
+        console.log(isSpring)
+    }
 
     const handlePlayerNameInput = (event) => {
         setPlayerName(event.target.value);
@@ -43,6 +57,12 @@ function RoomPage() {
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+                case isSpring:
+                    return <SpringGamePlay />
+                case isRandomising:
+                    return <RandomTeams
+                    proceedToSpring = {proceedToSpring}
+                    />
                 default:
                     return (
                         <RoomPageView
@@ -54,6 +74,7 @@ function RoomPage() {
                         handleSubmitClick={handleSubmitClick}
                         handleEditClick={handleEditClick}
                         leaveRoomClick={leaveRoomClick}
+                        handleRandomiseClick={handleRandomiseClick}
                         />
                     )
             }
