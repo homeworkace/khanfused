@@ -5,6 +5,7 @@ import { checkSession, leaveLobby } from './restBoilerplate.js';
 import { getSession } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
+
 // Testing 
 import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
@@ -20,15 +21,12 @@ function RoomPage() {
     const [currentSeason, setCurrentSeason] = useState("waiting");
     //
     const socket = useRef(null);
-    const [players, setPlayers] = useState(["Ren Shyuen"]);
-    const [playerName, setPlayerName] = useState("");
-    const [isEditing, setIsEditing] = useState(true);
+    const [players, setPlayers] = useState([]);
+
     // Test switch case purposes
     const [isRandomising, setIsRandomising] = useState(false);
     const [isSpring,springComes] = useState(false);
     const [springStage, setSpringStage] = useState(false);
-
-    ///////////////////////////////////////////////////////////////////////////////
 
     const handleRandomiseClick = () => {
         setIsRandomising(true);
@@ -44,27 +42,12 @@ function RoomPage() {
         console.log(springStage);
     }
 
-    const handlePlayerNameInput = (event) => {
-        setPlayerName(event.target.value);
-    }
-
-    const handleSubmitClick = () => {
-        if (playerName.trim() !== ""){
-            setPlayers([...players, playerName]);
-
-            // set editing name mode to false after submission
-            setIsEditing(false);
+    const leaveRoomClick = async () => {
+        let result = await leaveLobby();
+        if ("redirect" in result) {
+            navigate(result["redirect"], { replace: true });
         }
     }
-
-    const handleEditClick = () => {
-        setIsEditing(true);
-
-        // remove the player name from the list to edit
-        setPlayers(players.filter(player => player !== playerName));
-    }
-
-// Order of rendering matters
 
     const renderPage = () => {
         if (hasConnected) {
@@ -86,31 +69,14 @@ function RoomPage() {
                     return (
                         <RoomPageView
                             code={code}
-                            players={players}
-                            playerName={playerName}
-                            isEditing={isEditing}
-                            handlePlayerNameInput={handlePlayerNameInput}
-                            handleSubmitClick={handleSubmitClick}
-                            handleEditClick={handleEditClick}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
-                            handleRandomiseClick={handleRandomiseClick}
+                            players={players}
                         />
                     )
             }
         }
     };
-
-    const leaveRoomClick = async () => {
-        let result = await leaveLobby();
-        if ("redirect" in result) {
-            navigate(result["redirect"], { replace: true });
-        }
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////
-
 
     useEffect(() => {
         let promise = checkSession();
@@ -125,7 +91,7 @@ function RoomPage() {
                 setShouldConnect(true);
             }
         });
-    }, [])
+    }, [navigate]);
 
     useEffect(() => {
         if (!shouldConnect) {
@@ -141,15 +107,18 @@ function RoomPage() {
         }
 
         const handleJoin = (data) => {
-            console.log(data);
+            // console.log(data.name);
+            // console.log(data.session)
         }
 
         const handleNewPlayer = (data) => {
             console.log(data);
+            setPlayers(p => [...p, { session: data.session, name: data.name }]);
         }
 
         const handlePlayerLeft = (data) => {
             console.log(data);
+            setPlayers(p => p.filter(player => player.session !== data.session));
         }
 
         //fakerayray
