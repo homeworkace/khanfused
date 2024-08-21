@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SpringGamePlay.css';
 
-function SpringGamePlay() {
+function SpringGamePlay( {handleSpringStage}) {
     const [isChatOpen, setIsChatOpen] = useState(false);
 
     const toggleChat = () => {
@@ -21,7 +21,7 @@ function SpringGamePlay() {
                     <button onClick={toggleChat} className="chat-button">
                         Chat
                     </button>
-                    <button>
+                    <button onClick={handleSpringStage}> 
                         Proceed
                     </button>
                 </div>

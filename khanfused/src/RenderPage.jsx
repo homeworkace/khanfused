@@ -8,6 +8,7 @@ import './RoomPageView.css';
 // Testing 
 import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
+import SpringDouble from './SpringDouble.jsx';
 
 function RoomPage() {
 
@@ -22,6 +23,7 @@ function RoomPage() {
     // Test switch case purposes
     const [isRandomising, setIsRandomising] = useState(false);
     const [isSpring,springComes] = useState(false);
+    const [springStage, setSpringStage] = useState(false);
 
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +33,12 @@ function RoomPage() {
 
     const proceedToSpring = () => {
         springComes(true);
-        console.log(isSpring)
+  
+    }
+
+    const handleSpringStage = () => {
+        setSpringStage(true);
+        console.log(springStage);
     }
 
     const handlePlayerNameInput = (event) => {
@@ -54,15 +61,24 @@ function RoomPage() {
         setPlayers(players.filter(player => player !== playerName));
     }
 
+// Order of rendering matters
+
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+                case springStage:
+                    return <SpringDouble />
+
                 case isSpring:
-                    return <SpringGamePlay />
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />
+
                 case isRandomising:
                     return <RandomTeams
                     proceedToSpring = {proceedToSpring}
                     />
+
                 default:
                     return (
                         <RoomPageView
