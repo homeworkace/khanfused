@@ -51,7 +51,7 @@ function RoomPageView({ code, players, leaveRoomClick }) {
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
-                <button onClick = {handleRandomiseClick}>
+                <button>
                     Randomise
                     </button> 
             </div>

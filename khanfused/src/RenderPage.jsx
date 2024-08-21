@@ -102,12 +102,23 @@ function RoomPage() {
         }
 
         const handleJoin = (data) => {
-            console.log(data);
+            console.log(data.name);
+            console.log(data.session)
+        }
+
+        const handleNewPlayer = (data) => {
+            setPlayers(p => [...p, { session: data.session, name: data.name }]);
+        }
+
+        const handlePlayerLeave = (data) => {
+            setPlayers(p => p.filter(player => player.session !== data.session));
         }
 
         // setup event listeners
         socket.current.on("connect", handleConnect);
         socket.current.on("join", handleJoin);
+        socket.current.on("new_player", handleNewPlayer);
+        socket.current.on("player_left", handlePlayerLeave);
 
         // connect and emit join event
         socket.current.connect();
@@ -119,6 +130,8 @@ function RoomPage() {
         return () => {
             socket.current.off("connect", handleConnect);
             socket.current.off("join", handleJoin);
+            socket.current.off("new_player", handleNewPlayer);
+            socket.current.off("player_left", handlePlayerLeave);
             socket.current.disconnect();
         };
     }, [shouldConnect]);
