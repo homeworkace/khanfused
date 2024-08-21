@@ -9,6 +9,7 @@ flask-cors = "*"
 flask-apscheduler = "*"
 jsonpickle = "*"
 flask-socketio = "*"
+transitions = "*"
 
 [dev-packages]
 

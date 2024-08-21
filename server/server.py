@@ -6,7 +6,7 @@ from lobby import *
 import json
 import jsonpickle
 from pathlib import Path
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -61,10 +61,13 @@ def create_lobby():
     if data['session'] == '' :
         return { 'message': 'No session ID provided' }, 400
 
-    # Create a new lobby in the backend.
+    # Generate a lobby code and create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
-    rooms[lobby_code] = lobby()
+    rooms[lobby_code] = lobby(data['password'])
+    
+    # Add the player into the lobby.
     rooms[lobby_code].players.append((int(data['session']), db.query_session(data['session'])[2]))
+
     db.update_lobby(data['session'], lobby_code)
 
     # Send relevant data back
@@ -93,9 +96,12 @@ def join_lobby():
     rooms[data['lobby_code']].players.append((int(data['session']), db.query_session(data['session'])[2]))
     db.update_lobby(data['session'], data['lobby_code'])
 
-    # Send relevant data back
+    # Send the client a redirect.
     result = {}
     result['redirect'] = '/room/' + data['lobby_code']
+    
+    # Notify other players.
+    emit('new_player', { 'session' : rooms[data['lobby_code']].players[-1][0], 'name' : rooms[data['lobby_code']].players[-1][1] }, room = data['lobby_code'], namespace = '/')
 
     return result
 
@@ -107,14 +113,20 @@ def leave_lobby():
     if data['session'] == '' :
         return { 'message': 'No session ID provided' }, 400
 
-    # Add the new player.
+    # Retrieve the lobby code and remove the player from said lobby.
     lobby_code = db.query_session(data['session'])[3]
     rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != int(data['session'])]
+    
+    # If this results in an empty lobby, remove the lobby too.
     if len(rooms[lobby_code].players) < 1 :
         del rooms[lobby_code]
+    else: 
+        # Otherwise, notify other players.
+        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/')
+        
     db.update_lobby(data['session'], None)
 
-    # Send relevant data back
+    # Send the client a redirect.
     result = {}
     result['redirect'] = '/'
 
@@ -132,8 +144,61 @@ def clear_sessions():
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
-    
     emit('join', jsonpickle.encode(rooms[session[3]]))
+    join_room(session[3])
+
+@socket_app.on('leave')
+def socket_on_leave(data):
+    session = db.query_session(data['session'])
+    leave_room(session[3])
+
+@socket_app.on('start_instructions')
+def socket_start_instructions(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    if lobby_code in rooms:
+        rooms[lobby_code].start_instructions()
+        emit('state_changed', {'state': 'instructions'}, broadcast=True)
+
+@socket_app.on('transition_season')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.transition_season()  # Trigger the season transition
+        emit('state_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
+
+# Route to handle season transitions
+@app.route('/transition-season', methods=['POST'])
+def transition_season():
+    data = request.json
+    session = data.get('session')
+    if not session:
+        return {'message': 'Session ID not provided'}, 400
+
+    lobby = get_lobby_from_session(session)
+    if lobby is None:
+        return {'message': 'Lobby not found'}, 400
+
+    # Use the transition_season method to handle the transition
+    lobby.transition_season()
+
+    # Retrieve the current state after transition
+    current_season = lobby.get_state()
+
+    return {'message': f'Transitioned to {current_season}', 'currentSeason': current_season}
+
+
+def get_lobby_from_session(session):
+    lobby_code = db.query_session(session)[3]
+    return rooms.get(lobby_code)
+
+
+
 
 if __name__ == '__main__':
     random.seed = time.time()
