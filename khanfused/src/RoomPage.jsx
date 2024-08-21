@@ -12,6 +12,9 @@ function RoomPage() {
     const { code } = useParams();
     const [hasConnected, setHasConnected] = useState(false);
     const [shouldConnect, setShouldConnect] = useState(false);
+    //fakerayray
+    const [currentSeason, setCurrentSeason] = useState("waiting");
+    //
     const socket = useRef(null);
 
     useEffect(() => {
@@ -46,15 +49,25 @@ function RoomPage() {
 
         const handleConnect = () => {
             setHasConnected(true);
+            
         }
 
         const handleJoin = (data) => {
             console.log(data);
         }
 
+        //fakerayray
+        const handleSeasonChange = (data) => {
+            console.log("Season change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        
+
         // setup event listeners
         socket.current.on("connect", handleConnect);
         socket.current.on("join", handleJoin);
+        //fakerayray
+        socket.current.on("state_changed", handleSeasonChange);
 
         // connect and emit join event
         socket.current.connect();
@@ -67,6 +80,8 @@ function RoomPage() {
         return () => {
             socket.current.off("connect", handleConnect);
             socket.current.off("join", handleJoin);
+            //fakerayray
+            socket.current.off("state_changed", handleSeasonChange);
             socket.current.disconnect();
             //console.log("disconnected");
         };
@@ -98,6 +113,25 @@ function RoomPage() {
         // remove the player name from the list to edit
         setPlayers(players.filter(player => player !== playerName));
     }
+
+    //fakerayray
+    
+    const handleStartInstructionsClick = () => {
+        socket.current.emit('start_instructions', {
+            session: getSession()
+        });
+    };
+    const handleChangeSeasonClick = () => {
+        socket.current.emit('transition_season', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    //
+
+
 
     return (<> {hasConnected &&
         <div className="roomPage">
@@ -131,9 +165,25 @@ function RoomPage() {
                     </li>
                 </ul>
             </div>
+            <div className="current-season">
+                <h2>Current Season: {currentSeason}</h2>
+            </div>
+            
             <div className="button-bar">
                 <button className="start-button" disabled>Start Game</button>
                 <button className="leave-button" onClick={ leaveRoomClick }>Leave Room</button>
+                
+                {/* fakerayray */}
+                {currentSeason === "waiting" ? (
+                        <button className="start-instructions-button" onClick={handleStartInstructionsClick}>
+                            Start Instructions
+                        </button>
+                    ) : (
+                        <button className="change-season-button" onClick={handleChangeSeasonClick}>
+                            Change Season
+                        </button>
+                    )}
+
             </div>
         </div>}
     </> );

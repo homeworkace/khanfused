@@ -152,6 +152,54 @@ def socket_on_leave(data):
     session = db.query_session(data['session'])
     leave_room(session[3])
 
+@socket_app.on('start_instructions')
+def socket_start_instructions(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    if lobby_code in rooms:
+        rooms[lobby_code].start_instructions()
+        emit('state_changed', {'state': 'instructions'}, broadcast=True)
+
+@socket_app.on('transition_season')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.transition_season()  # Trigger the season transition
+        emit('state_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
+
+# Route to handle season transitions
+@app.route('/transition-season', methods=['POST'])
+def transition_season():
+    data = request.json
+    session = data.get('session')
+    if not session:
+        return {'message': 'Session ID not provided'}, 400
+
+    lobby = get_lobby_from_session(session)
+    if lobby is None:
+        return {'message': 'Lobby not found'}, 400
+
+    # Use the transition_season method to handle the transition
+    lobby.transition_season()
+
+    # Retrieve the current state after transition
+    current_season = lobby.get_state()
+
+    return {'message': f'Transitioned to {current_season}', 'currentSeason': current_season}
+
+
+def get_lobby_from_session(session):
+    lobby_code = db.query_session(session)[3]
+    return rooms.get(lobby_code)
+
+
+
+
 if __name__ == '__main__':
     random.seed = time.time()
     db = khanfused_db()
