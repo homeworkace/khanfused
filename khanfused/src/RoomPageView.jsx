@@ -1,16 +1,12 @@
 import React from 'react';
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
-function RoomPageView({ code, leaveRoomClick, socket }) {
+function RoomPageView({ code, players, leaveRoomClick }) {
 
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
-    const [players, setPlayers] = useState([]);
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const handleEditClick = () => {
         setEditMode(!editMode);
@@ -20,24 +16,22 @@ function RoomPageView({ code, leaveRoomClick, socket }) {
         setPlayerName(event.target.value)
     };
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    useEffect(() => {
-        // Listen for player list updates
-        socket.on("player_list_update", (data) => {
-            const updatedPlayers = JSON.parse(data);
-            setPlayers(updatedPlayers);
-        });
-
-        return() => {
-            socket.off("player_list_update");
-        };
-
-    }, [socket]);
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *  { players.map( (player, index) => ( 
+     *      <li key={ index }>
+     *          { editMode ? ( 
+     *              <div>
+     *                  <input />
+     *                  <button />
+     *              </div> 
+     *          ) : ( 
+     *              <div> 
+     *                  <span />
+     *                  <button />
+     *              </div> 
+     *          ) }   
+     *      </li> ) ) }
+     */
 
     return (
         <div className="roomPageView">
