@@ -101,7 +101,7 @@ def join_lobby():
     result['redirect'] = '/room/' + data['lobby_code']
     
     # Notify other players.
-    emit('new_player', { 'session' : rooms[data['lobby_code']].players[0], 'name' : rooms[data['lobby_code']][0] }, to = data['lobby_code'])
+    emit('new_player', { 'session' : rooms[data['lobby_code']].players[-1][0], 'name' : rooms[data['lobby_code']].players[-1][1] }, room = data['lobby_code'], namespace = '/')
 
     return result
 
@@ -116,14 +116,13 @@ def leave_lobby():
     # Retrieve the lobby code and remove the player from said lobby.
     lobby_code = db.query_session(data['session'])[3]
     rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != int(data['session'])]
-    leave_room(lobby_code)
     
     # If this results in an empty lobby, remove the lobby too.
     if len(rooms[lobby_code].players) < 1 :
         del rooms[lobby_code]
     else: 
         # Otherwise, notify other players.
-        emit('player_left', { 'session' : rooms[data['lobby_code']].players[0] }, to = data['lobby_code'])
+        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/')
         
     db.update_lobby(data['session'], None)
 
@@ -145,6 +144,7 @@ def clear_sessions():
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
+    emit('join', jsonpickle.encode(rooms[session[3]]))
     join_room(session[3])
 
 @socket_app.on('leave')
