@@ -9,6 +9,22 @@ class lobby :
         self.players = []
         self.ready = []
 
+    def minified(self) :
+        result = {}
+        result['state'] = self.state
+        result['password'] = self.password
+        result['players'] = self.players
+        result['ready'] = self.ready
+        return result
+
+    def unminified(lobby_to_copy) :
+        result = lobby()
+        result.state = lobby_to_copy['state']
+        result.password = lobby_to_copy['password']
+        result.players = lobby_to_copy['players']
+        result.ready = lobby_to_copy['ready']
+        return result
+
         # Define states and transitions
         self.states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
                        'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
@@ -32,8 +48,8 @@ class lobby :
     def start(self) :
         if len(self.players) < 6 :
             return
-        for player in self.players :
-            if player[1] is None :
+        for ready in self.players :
+            if ready is False :
                 return
 
         self.start_role_assignment()
