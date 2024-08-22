@@ -6,6 +6,7 @@ class lobby :
         self.state = 'waiting'
         self.password = password
         self.players = []
+        self.ready = []
 
     def start(self) :
         if len(self.players) < 6 :

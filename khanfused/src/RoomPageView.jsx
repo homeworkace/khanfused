@@ -7,6 +7,7 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRole
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
 
+    // Please see the similar handler in RenderPage.jsx.
     const handleEditClick = () => {
         setEditMode(!editMode);
     };

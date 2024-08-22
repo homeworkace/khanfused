@@ -7,6 +7,7 @@ class lobby :
         self.state = 'waiting'
         self.password = password
         self.players = []
+        self.ready = []
 
         # Define states and transitions
         self.states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 

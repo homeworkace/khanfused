@@ -79,28 +79,52 @@ function RoomPage() {
             return;
         }
 
-        // initialize socket connection
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
         socket.current = io("http://localhost:5000", { autoConnect: false });
 
+        // Makes the decision to load the lobby pages when the server returns acknowledgement.
         const handleConnect = () => {
             setHasConnected(true);
         }
+        socket.current.on("connect", handleConnect);
 
+        // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
             // console.log(data.name);
             // console.log(data.session)
+            console.log(data);
         }
+        socket.current.on("join", handleJoin);
 
+        /*
+         * ALL RoomPageView COMMANDS ARE BELOW.
+         * Consider porting page-specific handlers to their respective .jsx files.
+         */
+        // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
             console.log(data);
             setPlayers(p => [...p, { session: data.session, name: data.name }]);
         }
+        socket.current.on("new_player", handleNewPlayer);
 
+        // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
             console.log(data);
             setPlayers(p => p.filter(player => player.session !== data.session));
         }
+        socket.current.on("player_left", handlePlayerLeft);
+
+        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        const handleReady = (data) => {
+            console.log(data);
+        }
+        socket.current.on("ready", handleReady);
+
+        // Receives the session ID ("session", integer) of the player who has unreadied.
+        const handleUnready = (data) => {
+            console.log(data);
+        }
+        socket.current.on("unready", handleUnready);
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role assignment change received:", data);  // Debugging
@@ -112,16 +136,7 @@ function RoomPage() {
         const handleSpringChange = (data) => {
             console.log("Spring change received:", data);  // Debugging
             setCurrentSeason(data.state);
-            
         };
-        socket.current.on("spring_changed", handleSpringChange);
-
-        const handleDoubleHarvestChange = (data) => {
-            console.log("Double Harvest change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-            
-        };
-        socket.current.on("double_harvest_changed", handleDoubleHarvestChange);
 
         const handleSummerChange = (data) => {
             console.log("Summer change received:", data);  // Debugging
@@ -142,7 +157,6 @@ function RoomPage() {
             setCurrentSeason(data.state);
             
         };
-        socket.current.on("winter_changed", handleWinterChange);
         
 
         // setup event listeners
@@ -150,7 +164,12 @@ function RoomPage() {
         socket.current.on("join", handleJoin);
         socket.current.on("new_player", handleNewPlayer);
         socket.current.on("player_left", handlePlayerLeft);
-        
+        //fakerayray
+        socket.current.on("spring_changed", handleSpringChange);
+        socket.current.on("summer_changed", handleSummerChange);
+        socket.current.on("autumn_changed", handleAutumnChange);
+        socket.current.on("winter_changed", handleWinterChange);
+
         // connect and emit join event
         socket.current.connect();
         socket.current.emit("join", {
@@ -167,6 +186,8 @@ function RoomPage() {
             socket.current.off("join", handleJoin);
             socket.current.off("new_player", handleNewPlayer);
             socket.current.off("player_left", handlePlayerLeft);
+            socket.current.off("ready", handleReady);
+            socket.current.off("unready", handleUnready);
             //fakerayray
             socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
             socket.current.off("spring_changed", handleSpringChange);
@@ -190,6 +211,9 @@ function RoomPage() {
 
 
     ///////////////////////////////////////////////////////////////////////////////
+
+
+    //fakerayray
 
     const handleStartInstructionsClick = () => {
         socket.current.emit('start_instructions', {
