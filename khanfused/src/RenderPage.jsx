@@ -126,10 +126,11 @@ function RoomPage() {
         }
         socket.current.on("unready", handleUnready);
 
+        //fakerayray
+
         const handleRoleAssignmentChange = (data) => {
-            console.log("Role assignment change received:", data);  // Debugging
+            console.log("Role Assignment change received:", data);  // Debugging
             setCurrentSeason(data.state);
-            
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
 
@@ -137,6 +138,13 @@ function RoomPage() {
             console.log("Spring change received:", data);  // Debugging
             setCurrentSeason(data.state);
         };
+        socket.current.on("spring_changed", handleSpringChange);
+
+        const handleDoubleHarvestChange = (data) => {
+            console.log("Double Harvest change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("double_harvest_changed", handleDoubleHarvestChange);
 
         const handleSummerChange = (data) => {
             console.log("Summer change received:", data);  // Debugging
@@ -157,17 +165,6 @@ function RoomPage() {
             setCurrentSeason(data.state);
             
         };
-        
-
-        // setup event listeners
-        socket.current.on("connect", handleConnect);
-        socket.current.on("join", handleJoin);
-        socket.current.on("new_player", handleNewPlayer);
-        socket.current.on("player_left", handlePlayerLeft);
-        //fakerayray
-        socket.current.on("spring_changed", handleSpringChange);
-        socket.current.on("summer_changed", handleSummerChange);
-        socket.current.on("autumn_changed", handleAutumnChange);
         socket.current.on("winter_changed", handleWinterChange);
 
         // connect and emit join event
@@ -212,6 +209,24 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////
 
+    const handleEditButtonClick = () => {
+        // If in edit mode, this click is to confirm the name.
+            // Do input sanitisation check and reject if it doesn't meet the criteria.
+
+            // Reject if someone else in the room already has the name.
+
+            // Emit the event and ready yourself.
+            //socket.current.emit("confirm_name", {
+            //    session: getSession(),
+            //    name: ""
+            //});
+
+        // If not in edit mode, this click is to edit the name.
+            // Emit the event and unready yourself.
+            //socket.current.emit("edit_name", {
+            //    session: getSession()
+            //});
+    }
 
     //fakerayray
 
