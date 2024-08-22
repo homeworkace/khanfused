@@ -66,7 +66,9 @@ def create_lobby():
     rooms[lobby_code] = lobby(data['password'])
     
     # Add the player into the lobby.
-    rooms[lobby_code].players.append((int(data['session']), db.query_session(data['session'])[2]))
+    the_lobby = rooms[lobby_code]
+    the_lobby.players.append((int(data['session']), db.query_session(data['session'])[2]))
+    the_lobby.ready.append(not the_lobby.players[-1][1] is None) # If the player already has a name in the database, they are ready.
 
     db.update_lobby(data['session'], lobby_code)
 
