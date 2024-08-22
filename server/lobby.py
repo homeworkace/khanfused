@@ -15,6 +15,7 @@ class lobby :
         result['password'] = self.password
         result['players'] = self.players
         result['ready'] = self.ready
+        return result
 
     def start(self) :
         if len(self.players) < 6 :

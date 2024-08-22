@@ -115,8 +115,11 @@ function RoomPage() {
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            // console.log(data.name);
-            // console.log(data.session)
+            const sessionID = data['players'][0][0];
+            const name = data['players'][0][1];
+            console.log(sessionID); 
+            // populate players
+            setPlayers(p => [...p, { session: sessionID, name: name }]);
             console.log(data);
         }
         socket.current.on("join", handleJoin);
@@ -127,15 +130,15 @@ function RoomPage() {
          */
         // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
-            console.log(data);
-            setPlayers(p => [...p, { session: data.session, name: data.name }]);
+            console.log("new player", data['session']);
+            setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
         }
         socket.current.on("new_player", handleNewPlayer);
 
         // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
             console.log(data);
-            setPlayers(p => p.filter(player => player.session !== data.session));
+            setPlayers(p => p.filter(player => player.session !== data['session']));
         }
         socket.current.on("player_left", handlePlayerLeft);
 
@@ -154,7 +157,7 @@ function RoomPage() {
 
         // Makes the decision to reverse the name change because the server has detected that someone else has this name.
         const handleEditNameNameExists = () => {
-            print("edit_name_name_exists");
+            console.log("edit_name_name_exists");
             // Return to edit mode and restore your old name.
         }
 
@@ -224,6 +227,7 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////
 
+    // pass socket to roompageview
     const handleEditButtonClick = () => {
         // If in edit mode, this click is to confirm the name.
             // Do input sanitisation check and reject if it doesn't meet the criteria.

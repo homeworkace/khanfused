@@ -101,8 +101,8 @@ def join_lobby():
         new_player_name = None
         db.update_name(data['session'], None)
 
-    # Add the new player.
-    the_lobby.players.append((int(data['session']), new_player_name)
+    # Add the new player. 
+    the_lobby.players.append((int(data['session']), new_player_name))
     the_lobby.ready.append(not new_player_name is None) # If the player already has a non-conflicting name in the database, they are ready.
     db.update_lobby(data['session'], data['lobby_code'])
 
@@ -169,6 +169,8 @@ def socket_on_join(data):
     emit('join', rooms[session[3]].minified())
     join_room(session[3])
 
+    # 
+
 @socket_app.on('leave')
 def socket_on_leave(data):
     session = db.query_session(data['session'])
@@ -191,9 +193,10 @@ def socket_on_confirm_name(data):
         if the_lobby.players[player][0] != int(data['session']) :
             continue
 
-        if the_lobby.players[player][1] == data['name'] :
+        if the_lobby.players[player][1] == data['name']:
             name_is_different = True
-        else the_lobby.players[player][1] = data['name']
+        else: 
+            the_lobby.players[player][1] = data['name']
         the_lobby.ready[player] = True
         break
 
