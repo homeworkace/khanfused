@@ -106,18 +106,19 @@ function RoomPage() {
         }
 
         const handleJoin = (data) => {
-            // console.log(data.name);
-            // console.log(data.session)
+            console.log("handle join?", data.players); 
+            // populate players
+            // setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
         }
 
         const handleNewPlayer = (data) => {
-            console.log(data);
-            setPlayers(p => [...p, { session: data.session, name: data.name }]);
+            console.log("new player", data['session']);
+            setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
         }
 
         const handlePlayerLeft = (data) => {
             console.log(data);
-            setPlayers(p => p.filter(player => player.session !== data.session));
+            setPlayers(p => p.filter(player => player.session !== data['session']));
         }
 
         //fakerayray

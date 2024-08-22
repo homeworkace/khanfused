@@ -1,6 +1,7 @@
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
 import { useState } from 'react';
+import { getSession } from './utility.js';
 
 function RoomPageView({ code, players, leaveRoomClick }) {
 
@@ -12,9 +13,32 @@ function RoomPageView({ code, players, leaveRoomClick }) {
     };
 
     const handleInputChange = (event) => {
-        setPlayerName(event.target.value)
+
+        setPlayerName(event.target.value);
     };
 
+    const displayPlayerList = () => {
+
+        // players not populated
+        console.log(players);
+
+        return players.map((player, index) => (
+            <li key={ index }>
+                {  player.session === getSession() && editMode ? 
+                    (
+                        <div>
+                            <input placeholder="Enter your name" value={ playerName } onChange={ handleInputChange } />
+                            <button onClick={ handleEditClick }> Submit </button>
+                        </div>
+                    ):(
+                        <div>
+                            <span> { playerName } </span>
+                            <button onClick={ handleEditClick }> Edit </button>
+                        </div>
+                    ) }
+            </li>
+        ));
+    }
 
     return (
         <div className="roomPageView">
@@ -28,20 +52,7 @@ function RoomPageView({ code, players, leaveRoomClick }) {
             <div className="roomPageView-container">
                 <h2>Players</h2>
                 <ul>
-                    <li>
-                        { editMode ? 
-                            ( 
-                                <div>
-                                    <input placeholder="Enter your name" value={ playerName } onChange={ handleInputChange } />
-                                    <button onClick={ handleEditClick }> Submit </button>
-                                </div> 
-                            ) : ( 
-                                <div>
-                                    <span> { playerName } </span>
-                                    <button onClick={ handleEditClick }> Edit </button>
-                                </div> 
-                            ) }
-                    </li>
+                    { displayPlayerList() }
                 </ul>
             </div>
             <div className="roomPageView-button-bar">
