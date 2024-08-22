@@ -32,10 +32,10 @@ function RoomPage() {
         setIsRandomising(true);
     }
 
-    const proceedToSpring = () => {
+    /*const proceedToSpring = () => {
         springComes(true);
   
-    }
+    }*/
 
     const handleSpringStage = () => {
         setSpringStage(true);
@@ -54,23 +54,30 @@ function RoomPage() {
             switch (true) {
                 case springStage:
                     return <SpringDouble />
-
-                case isSpring:
+                
+                case currentSeason == "spring":
                     return <SpringGamePlay
                     handleSpringStage = {handleSpringStage} 
-                    />
+                />
+
+                /*case isSpring:
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />*/
 
                 case isRandomising:
                     return <RandomTeams
-                    proceedToSpring = {proceedToSpring}
+                    handleSpringChangeClick = {handleSpringChangeClick}
+                    //proceedToSpring = {proceedToSpring}
                     />
 
                 default:
                     return (
                         <RoomPageView
-                        code={ code }
-                        leaveRoomClick={ leaveRoomClick }
-                        players={ players }
+                            code={code}
+                            currentSeason={currentSeason}
+                            leaveRoomClick={leaveRoomClick}
+                            players={players}
                         />
                     )
             }
@@ -97,44 +104,88 @@ function RoomPage() {
             return;
         }
 
-        // initialize socket connection
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
         socket.current = io("http://localhost:5000", { autoConnect: false });
 
+        // Makes the decision to load the lobby pages when the server returns acknowledgement.
         const handleConnect = () => {
             setHasConnected(true);
         }
+        socket.current.on("connect", handleConnect);
 
+        // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            console.log("handle join?", data.players); 
+            const sessionID = data['players'][0][0];
+            const name = data['players'][0][1];
+            console.log(sessionID); 
             // populate players
-            // setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
+            setPlayers(p => [...p, { session: sessionID, name: name }]);
+            console.log(data);
         }
+        socket.current.on("join", handleJoin);
 
+        /*
+         * ALL RoomPageView COMMANDS ARE BELOW.
+         * Consider porting page-specific handlers to their respective .jsx files.
+         */
+        // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
             console.log("new player", data['session']);
             setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
         }
+        socket.current.on("new_player", handleNewPlayer);
 
+        // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
             console.log(data);
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
+        socket.current.on("player_left", handlePlayerLeft);
+
+        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        const handleReady = (data) => {
+            console.log(data);
+            // If the player is yourself, then forget the old name.
+        }
+        socket.current.on("ready", handleReady);
+
+        // Receives the session ID ("session", integer) of the player who has unreadied.
+        const handleUnready = (data) => {
+            console.log(data);
+        }
+        socket.current.on("unready", handleUnready);
+
+        // Makes the decision to reverse the name change because the server has detected that someone else has this name.
+        const handleEditNameNameExists = () => {
+            console.log("edit_name_name_exists");
+            // Return to edit mode and restore your old name.
+        }
 
         //fakerayray
-        const handleSeasonChange = (data) => {
-            console.log("Season change received:", data);  // Debugging
+
+        const handleSpringChange = (data) => {
+            console.log("Spring change received:", data);  // Debugging
             setCurrentSeason(data.state);
         };
-        
+        socket.current.on("spring_changed", handleSpringChange);
 
-        // setup event listeners
-        socket.current.on("connect", handleConnect);
-        socket.current.on("join", handleJoin);
-        socket.current.on("new_player", handleNewPlayer);
-        socket.current.on("player_left", handlePlayerLeft);
-        //fakerayray
-        socket.current.on("state_changed", handleSeasonChange);
+        const handleSummerChange = (data) => {
+            console.log("Summer change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("summer_changed", handleSummerChange);
+
+        const handleAutumnChange = (data) => {
+            console.log("Autumn change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("autumn_changed", handleAutumnChange);
+
+        const handleWinterChange = (data) => {
+            console.log("Winter change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("winter_changed", handleWinterChange);
 
         // connect and emit join event
         socket.current.connect();
@@ -152,8 +203,13 @@ function RoomPage() {
             socket.current.off("join", handleJoin);
             socket.current.off("new_player", handleNewPlayer);
             socket.current.off("player_left", handlePlayerLeft);
+            socket.current.off("ready", handleReady);
+            socket.current.off("unready", handleUnready);
             //fakerayray
-            socket.current.off("state_changed", handleSeasonChange);
+            socket.current.off("spring_changed", handleSpringChange);
+            socket.current.off("summer_changed", handleSummerChange);
+            socket.current.off("autumn_changed", handleAutumnChange);
+            socket.current.off("winter_changed", handleWinterChange);
             socket.current.disconnect();
             //console.log("disconnected");
         }
@@ -171,6 +227,27 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////
 
+    // pass socket to roompageview
+    const handleEditButtonClick = () => {
+        // If in edit mode, this click is to confirm the name.
+            // Do input sanitisation check and reject if it doesn't meet the criteria.
+
+            // Reject if someone else in the room already has the name.
+
+            // Emit the event and ready yourself.
+            //socket.current.emit("confirm_name", {
+            //    session: getSession(),
+            //    name: ""
+            //});
+
+        // If not in edit mode, this click is to edit the name.
+            // Write the previous name to another variable.
+
+            // Emit the event and unready yourself.
+            //socket.current.emit("edit_name", {
+            //    session: getSession()
+            //});
+    }
 
     //fakerayray
 
@@ -179,8 +256,33 @@ function RoomPage() {
             session: getSession()
         });
     };
-    const handleChangeSeasonClick = () => {
-        socket.current.emit('transition_season', {
+
+    const handleSpringChangeClick = () => {
+        socket.current.emit('spring_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleSummerChangeClick = () => {
+        socket.current.emit('summer_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleAutumnChangeClick = () => {
+        socket.current.emit('autumn_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleWinterChangeClick = () => {
+        socket.current.emit('winter_transition', {
             session: getSession()
         });
         console.log(currentSeason);

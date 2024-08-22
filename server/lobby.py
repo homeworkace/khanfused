@@ -6,6 +6,16 @@ class lobby :
         self.state = 'waiting'
         self.password = password
         self.players = []
+        self.ready = []
+
+    def minified(self) :
+        result = {}
+        # result = dict()
+        result['state'] = self.state
+        result['password'] = self.password
+        result['players'] = self.players
+        result['ready'] = self.ready
+        return result
 
     def start(self) :
         if len(self.players) < 6 :

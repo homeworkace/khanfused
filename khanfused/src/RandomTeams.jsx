@@ -1,6 +1,6 @@
 import './RandomTeams.css';
 
-function RandomTeams ( {proceedToSpring}) {
+function RandomTeams ( {handleSpringChangeClick}) {
     return (
         <div className="randomTeams">
             <div className="randomTeams-container">
@@ -8,7 +8,7 @@ function RandomTeams ( {proceedToSpring}) {
                     <button>
                         Randomise Teams
                     </button>
-                    <button onClick = {proceedToSpring}>
+                    <button onClick = {handleSpringChangeClick}>
                         Proceed
                     </button>
                 </div>

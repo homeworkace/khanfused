@@ -3,11 +3,12 @@ import './RoomPageView.css';
 import { useState } from 'react';
 import { getSession } from './utility.js';
 
-function RoomPageView({ code, players, leaveRoomClick }) {
+function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRandomiseClick }) {
 
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
 
+    // Please see the similar handler in RenderPage.jsx.
     const handleEditClick = () => {
         setEditMode(!editMode);
     };
@@ -19,8 +20,7 @@ function RoomPageView({ code, players, leaveRoomClick }) {
 
     const displayPlayerList = () => {
 
-        // players not populated
-        console.log(players);
+        console.log(players); // so far this the latest changes right?
 
         return players.map((player, index) => (
             <li key={ index }>
@@ -55,6 +55,9 @@ function RoomPageView({ code, players, leaveRoomClick }) {
                     { displayPlayerList() }
                 </ul>
             </div>
+            <div className="current-season">
+                <h2>Current Season: {currentSeason}</h2>
+            </div>
             <div className="roomPageView-button-bar">
                 <button disabled>
                     Start Game
@@ -62,10 +65,13 @@ function RoomPageView({ code, players, leaveRoomClick }) {
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
-                <button>
+                <button onClick={ handleRandomiseClick }>
                     Randomise
-                    </button> 
+                </button>
+                
+
             </div>
+           
         </div>
     );
 }

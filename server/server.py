@@ -66,7 +66,9 @@ def create_lobby():
     rooms[lobby_code] = lobby(data['password'])
     
     # Add the player into the lobby.
-    rooms[lobby_code].players.append((int(data['session']), db.query_session(data['session'])[2]))
+    the_lobby = rooms[lobby_code]
+    the_lobby.players.append((int(data['session']), db.query_session(data['session'])[2]))
+    the_lobby.ready.append(not the_lobby.players[-1][1] is None) # If the player already has a name in the database, they are ready.
 
     db.update_lobby(data['session'], lobby_code)
 
@@ -92,8 +94,16 @@ def join_lobby():
     if data['password'] != rooms[data['lobby_code']].password :
         return { 'message': 'Wrong password' }, 400
 
-    # Add the new player.
-    rooms[data['lobby_code']].players.append((int(data['session']), db.query_session(data['session'])[2]))
+    the_lobby = rooms[data['lobby_code']]
+    # If the player's name in the database matches someone else's, remove their name.
+    new_player_name = db.query_session(data['session'])[2]
+    if new_player_name in [player[1] for player in the_lobby.players] :
+        new_player_name = None
+        db.update_name(data['session'], None)
+
+    # Add the new player. 
+    the_lobby.players.append((int(data['session']), new_player_name))
+    the_lobby.ready.append(not new_player_name is None) # If the player already has a non-conflicting name in the database, they are ready.
     db.update_lobby(data['session'], data['lobby_code'])
 
     # Send the client a redirect.
@@ -115,14 +125,20 @@ def leave_lobby():
 
     # Retrieve the lobby code and remove the player from said lobby.
     lobby_code = db.query_session(data['session'])[3]
-    rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != int(data['session'])]
+    the_lobby = rooms[lobby_code]
+    for player in range(len(the_lobby.players)) :
+        if the_lobby.players[player][0] != int(data['session']) :
+            continue
+        the_lobby.players.pop(player)
+        the_lobby.ready.pop(player)
+        break
     
     # If this results in an empty lobby, remove the lobby too.
     if len(rooms[lobby_code].players) < 1 :
         del rooms[lobby_code]
     else: 
         # Otherwise, notify other players.
-        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/')
+        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/', include_self = False)
         
     db.update_lobby(data['session'], None)
 
@@ -137,14 +153,20 @@ def leave_lobby():
 def clear_sessions():
     removed_sessions = db.clear_sessions(1800)
     for session, lobby_code in removed_sessions :
-        rooms[lobby_code].players = [player for player in rooms[lobby_code].players if player[0] != session]
+        the_lobby = rooms[lobby_code]
+        for player in range(len(the_lobby.players)) :
+            if the_lobby.players[player][0] != int(data['session']) :
+                continue
+            the_lobby.players.pop(player)
+            the_lobby.ready.pop(player)
+            break
         if len(rooms[lobby_code].players) < 1 :
             del rooms[lobby_code]
 
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
-    emit('join', rooms[session[3]])
+    emit('join', rooms[session[3]].minified())
     join_room(session[3])
 
     # 
@@ -154,46 +176,113 @@ def socket_on_leave(data):
     session = db.query_session(data['session'])
     leave_room(session[3])
 
+@socket_app.on('confirm_name')
+def socket_on_confirm_name(data):
+    session = db.query_session(data['session'])
+    the_lobby = room[session[3]]
+
+    # Check if someone else has this name.
+    if data['name'] in [player[1] for player in the_lobby.players if player[0] != int(data['session'])] :
+        emit('confirm_name_name_exists')
+        return
+    
+    name_is_different = False
+
+    # Update the name and ready the player in the lobby instance.
+    for player in range(len(the_lobby.players)) :
+        if the_lobby.players[player][0] != int(data['session']) :
+            continue
+
+        if the_lobby.players[player][1] == data['name']:
+            name_is_different = True
+        else: 
+            the_lobby.players[player][1] = data['name']
+        the_lobby.ready[player] = True
+        break
+
+    if name_is_different :
+        # Update the name in the database.
+        db.update_name(data['name'])
+
+        # Notify all players that this player is ready.
+        emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3])
+    else :
+        emit('ready', { 'session' : int(data['session']) }, room = session[3])
+
+
+@socket_app.on('edit_name')
+def socket_on_edit_name(data):
+    session = db.query_session(data['session'])
+
+    # Unready the player in the lobby instance.
+    the_lobby = room[session[3]]
+    for player in range(len(the_lobby.players)) :
+        if the_lobby.players[player][0] != int(data['session']) :
+            continue
+        the_lobby.ready[player] = False
+        break
+
+    # Notify other players that this player is unready.
+    emit('unready', { 'session' : int(data['session']) }, room = session[3], include_self = False)
+
 @socket_app.on('start_instructions')
 def socket_start_instructions(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     if lobby_code in rooms:
-        rooms[lobby_code].start_instructions()
-        emit('state_changed', {'state': 'instructions'}, broadcast=True)
+        lobby = rooms[lobby_code]
+        lobby.start_instructions()
+        emit('instructions_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-@socket_app.on('transition_season')
+@socket_app.on('spring_transition')
 def socket_transition_season(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
     if lobby_code in rooms:
         lobby = rooms[lobby_code]
-        lobby.transition_season()  # Trigger the season transition
-        emit('state_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+        lobby.spring_transition()  # Trigger the season transition
+        emit('spring_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
     else:
         print("Lobby not found.")
 
-# Route to handle season transitions
-@app.route('/transition-season', methods=['POST'])
-def transition_season():
-    data = request.json
-    session = data.get('session')
-    if not session:
-        return {'message': 'Session ID not provided'}, 400
+@socket_app.on('summer_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.summer_transition()  # Trigger the season transition
+        emit('summer_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-    lobby = get_lobby_from_session(session)
-    if lobby is None:
-        return {'message': 'Lobby not found'}, 400
+@socket_app.on('autumn_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.autumn_transition()  # Trigger the season transition
+        emit('autumn_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-    # Use the transition_season method to handle the transition
-    lobby.transition_season()
-
-    # Retrieve the current state after transition
-    current_season = lobby.get_state()
-
-    return {'message': f'Transitioned to {current_season}', 'currentSeason': current_season}
-
+@socket_app.on('winter_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.winter_transition()  # Trigger the season transition
+        emit('winter_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
 def get_lobby_from_session(session):
     lobby_code = db.query_session(session)[3]

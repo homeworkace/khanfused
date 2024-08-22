@@ -7,21 +7,21 @@ class lobby :
         self.state = 'waiting'
         self.password = password
         self.players = []
+        self.ready = []
 
         # Define states and transitions
         self.states = ['waiting', 'instructions', 'spring', 'summer', 'autumn', 'winter', 
                        'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
 
         self.transitions = [
-            {'trigger': 'start_instructions', 'source': 'waiting', 'dest': 'instructions'},
-            {'trigger': 'start_spring', 'source': 'instructions', 'dest': 'spring'},
-            {'trigger': 'start_summer', 'source': 'spring', 'dest': 'summer'},
-            {'trigger': 'start_autumn', 'source': 'summer', 'dest': 'autumn'},
-            {'trigger': 'start_winter', 'source': 'autumn', 'dest': 'winter'},
-            {'trigger': 'restart_spring', 'source': 'winter', 'dest': 'spring'},
-            {'trigger': 'transition_to_insufficient_food', 'source': 'autumn', 'dest': 'insufficient_food'},
-            {'trigger': 'transition_to_khans_pillaged', 'source': 'autumn', 'dest': 'khans_pillaged'},
-            {'trigger': 'transition_to_lords_killed', 'source': 'winter', 'dest': 'lords_killed'},
+            {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
+            {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
+            {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
+            {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
+            {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
+            {'trigger': 'transition_to_insufficient_food', 'source': '*', 'dest': 'insufficient_food'},
+            {'trigger': 'transition_to_khans_pillaged', 'source': '*', 'dest': 'khans_pillaged'},
+            {'trigger': 'transition_to_lords_killed', 'source': '*', 'dest': 'lords_killed'},
             {'trigger': 'end_game', 'source': '*', 'dest': 'end_game'}
         ]
 
@@ -35,36 +35,34 @@ class lobby :
                 return
 
         self.start_instructions()
-
-
-    def transition_season(self):
-        """Handle all season transitions with specific conditions for each season."""
-        if self.state == 'waiting' and self._can_start_instructions():
-            self.start_instructions()
-            print("Transitioned to Instructions.")
-
-        elif self.state == 'instructions' and self._can_start_spring():
+    
+    def spring_transition(self):
+        if self._can_start_spring():
             self.start_spring()
             print("Transitioned to Spring.")
+        else:
+            print("Spring transition failed.")
 
-        elif self.state == 'spring' and self._can_start_summer():
+    def summer_transition(self):
+        if self._can_start_summer():
             self.start_summer()
             print("Transitioned to Summer.")
-
-        elif self.state == 'summer' and self._can_start_autumn():
+        else:
+            print("Summer transition failed.")
+    
+    def autumn_transition(self):
+        if self._can_start_autumn():
             self.start_autumn()
             print("Transitioned to Autumn.")
+        else:
+            print("Autumn transition failed.")
 
-        elif self.state == 'autumn' and self._can_start_winter():
+    def winter_transition(self):
+        if self._can_start_winter():
             self.start_winter()
             print("Transitioned to Winter.")
-        
-        elif self.state == 'winter' and self._can_start_spring():
-            self.restart_spring()
-            print("Transitioned to Spring.")
-
         else:
-            print("Cannot transition season from current state.")
+            print("Winter transition failed.")
 
     def _can_start_instructions(self):
         # Example condition to start instructions; modify based on your game logic
