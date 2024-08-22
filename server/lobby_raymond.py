@@ -9,12 +9,14 @@ class lobby :
         self.players = []
 
         # Define states and transitions
-        self.states = ['waiting', 'instructions', 'spring', 'summer', 'autumn', 'winter', 
+        self.states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
                        'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
 
         self.transitions = [
             {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
+            {'trigger': 'start_role_assignment', 'source': '*', 'dest': 'role_assignment'},
             {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
+            {'trigger': 'start_double_harvest', 'source': '*', 'dest': 'double_harvest'},
             {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
             {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
             {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
@@ -33,7 +35,14 @@ class lobby :
             if player[1] is None :
                 return
 
-        self.start_instructions()
+        self.start_role_assignment()
+
+    def role_assignment_transition(self):
+        if self._can_start_role_assignment():
+            self.start_role_assignment()
+            print("Transitioned to Role Assignment.")
+        else:
+            print("Role Assignment transition failed.")
     
     def spring_transition(self):
         if self._can_start_spring():
@@ -41,6 +50,13 @@ class lobby :
             print("Transitioned to Spring.")
         else:
             print("Spring transition failed.")
+
+    def double_harvest_transition(self):
+        if self._can_start_double_harvest():
+            self.start_double_harvest()
+            print("Transitioned to Double Harvest.")
+        else:
+            print("Double Harvest transition failed.")
 
     def summer_transition(self):
         if self._can_start_summer():
@@ -66,9 +82,17 @@ class lobby :
     def _can_start_instructions(self):
         # Example condition to start instructions; modify based on your game logic
         return True
+    
+    def _can_start_role_assignment(self):
+        # Example condition to start instructions; modify based on your game logic
+        return True
 
     def _can_start_spring(self):
         # Example condition to start spring; modify based on your game logic
+        return True
+    
+    def _can_start_double_harvest(self):
+        # Example condition to start instructions; modify based on your game logic
         return True
 
     def _can_start_summer(self):
