@@ -32,10 +32,10 @@ function RoomPage() {
         setIsRandomising(true);
     }
 
-    const proceedToSpring = () => {
+    /*const proceedToSpring = () => {
         springComes(true);
   
-    }
+    }*/
 
     const handleSpringStage = () => {
         setSpringStage(true);
@@ -54,15 +54,21 @@ function RoomPage() {
             switch (true) {
                 case springStage:
                     return <SpringDouble />
-
-                case isSpring:
+                
+                case currentSeason == "spring":
                     return <SpringGamePlay
                     handleSpringStage = {handleSpringStage} 
-                    />
+                />
+
+                /*case isSpring:
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />*/
 
                 case isRandomising:
                     return <RandomTeams
-                    proceedToSpring = {proceedToSpring}
+                    handleSpringChangeClick = {handleSpringChangeClick}
+                    //proceedToSpring = {proceedToSpring}
                     />
 
                 default:
@@ -72,11 +78,6 @@ function RoomPage() {
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
-                            //handleChangeSeasonClick = {handleChangeSeasonClick}
-                            handleSpringChangeClick = {handleSpringChangeClick}
-                            handleSummerChangeClick = {handleSummerChangeClick}
-                            handleAutumnChangeClick = {handleAutumnChangeClick}
-                            handleWinterChangeClick = {handleWinterChangeClick}
                         />
                     )
             }
