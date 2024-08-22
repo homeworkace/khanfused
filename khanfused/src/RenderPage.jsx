@@ -97,42 +97,58 @@ function RoomPage() {
             return;
         }
 
-        // initialize socket connection
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
         socket.current = io("http://localhost:5000", { autoConnect: false });
 
+        // Makes the decision to load the lobby pages when the server returns acknowledgement.
         const handleConnect = () => {
             setHasConnected(true);
         }
+        socket.current.on("connect", handleConnect);
 
+        // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
             // console.log(data.name);
             // console.log(data.session)
+            console.log(data);
         }
+        socket.current.on("join", handleJoin);
 
+        /*
+         * ALL RoomPageView COMMANDS ARE BELOW.
+         * Consider porting page-specific handlers to their respective .jsx files.
+         */
+        // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
             console.log(data);
             setPlayers(p => [...p, { session: data.session, name: data.name }]);
         }
+        socket.current.on("new_player", handleNewPlayer);
 
+        // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
             console.log(data);
             setPlayers(p => p.filter(player => player.session !== data.session));
         }
+        socket.current.on("player_left", handlePlayerLeft);
+
+        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        const handleReady = (data) => {
+            console.log(data);
+        }
+        socket.current.on("ready", handleReady);
+
+        // Receives the session ID ("session", integer) of the player who has unreadied.
+        const handleUnready = (data) => {
+            console.log(data);
+        }
+        socket.current.on("unready", handleUnready);
 
         //fakerayray
         const handleSeasonChange = (data) => {
             console.log("Season change received:", data);  // Debugging
             setCurrentSeason(data.state);
         };
-        
-
-        // setup event listeners
-        socket.current.on("connect", handleConnect);
-        socket.current.on("join", handleJoin);
-        socket.current.on("new_player", handleNewPlayer);
-        socket.current.on("player_left", handlePlayerLeft);
-        //fakerayray
         socket.current.on("state_changed", handleSeasonChange);
 
         // connect and emit join event
@@ -151,6 +167,8 @@ function RoomPage() {
             socket.current.off("join", handleJoin);
             socket.current.off("new_player", handleNewPlayer);
             socket.current.off("player_left", handlePlayerLeft);
+            socket.current.off("ready", handleReady);
+            socket.current.off("unready", handleUnready);
             //fakerayray
             socket.current.off("state_changed", handleSeasonChange);
             socket.current.disconnect();
@@ -170,6 +188,24 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////
 
+    const handleEditButtonClick = () => {
+        // If in edit mode, this click is to confirm the name.
+            // Do input sanitisation check and reject if it doesn't meet the criteria.
+
+            // Reject if someone else in the room already has the name.
+
+            // Emit the event and ready yourself.
+            //socket.current.emit("confirm_name", {
+            //    session: getSession(),
+            //    name: ""
+            //});
+
+        // If not in edit mode, this click is to edit the name.
+            // Emit the event and unready yourself.
+            //socket.current.emit("edit_name", {
+            //    session: getSession()
+            //});
+    }
 
     //fakerayray
 
