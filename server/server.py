@@ -166,7 +166,7 @@ def clear_sessions():
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
-    emit('join', jsonpickle.encode(rooms[session[3]]))
+    emit('join', rooms[session[3]].minified())
     join_room(session[3])
 
 @socket_app.on('leave')
