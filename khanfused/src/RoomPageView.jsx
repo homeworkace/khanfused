@@ -2,7 +2,7 @@ import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
 import { useState } from 'react';
 
-function RoomPageView({ code, currentSeason, players, leaveRoomClick }) {
+function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleSpringChangeClick, handleSummerChangeClick, handleAutumnChangeClick, handleWinterChangeClick }) {
 
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
@@ -56,7 +56,30 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick }) {
                 </button>
                 <button>
                     Randomise
-                    </button> 
+                </button>
+                <button onClick={ handleWinterChangeClick }>
+                    BE SPRING
+                </button>
+
+            </div>
+            <div className="roomPageView-button-bar">
+                
+                <button onClick={ handleSpringChangeClick }>
+                    SPRING
+                </button>
+
+                <button onClick={ handleSummerChangeClick }>
+                    SUMMER
+                </button>
+                
+                <button onClick={ handleAutumnChangeClick }>
+                    AUTUMN
+                </button>
+
+                <button onClick={ handleWinterChangeClick }>
+                    WINTER
+                </button>
+
             </div>
         </div>
     );

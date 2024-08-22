@@ -157,41 +157,59 @@ def socket_start_instructions(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     if lobby_code in rooms:
-        rooms[lobby_code].start_instructions()
-        emit('state_changed', {'state': 'instructions'}, broadcast=True)
+        lobby = rooms[lobby_code]
+        lobby.start_instructions()
+        emit('instructions_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-@socket_app.on('transition_season')
+@socket_app.on('spring_transition')
 def socket_transition_season(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
     if lobby_code in rooms:
         lobby = rooms[lobby_code]
-        lobby.transition_season()  # Trigger the season transition
-        emit('state_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+        lobby.spring_transition()  # Trigger the season transition
+        emit('spring_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
     else:
         print("Lobby not found.")
 
-# Route to handle season transitions
-@app.route('/transition-season', methods=['POST'])
-def transition_season():
-    data = request.json
-    session = data.get('session')
-    if not session:
-        return {'message': 'Session ID not provided'}, 400
+@socket_app.on('summer_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.summer_transition()  # Trigger the season transition
+        emit('summer_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-    lobby = get_lobby_from_session(session)
-    if lobby is None:
-        return {'message': 'Lobby not found'}, 400
+@socket_app.on('autumn_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.autumn_transition()  # Trigger the season transition
+        emit('autumn_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
-    # Use the transition_season method to handle the transition
-    lobby.transition_season()
-
-    # Retrieve the current state after transition
-    current_season = lobby.get_state()
-
-    return {'message': f'Transitioned to {current_season}', 'currentSeason': current_season}
-
+@socket_app.on('winter_transition')
+def socket_transition_season(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.winter_transition()  # Trigger the season transition
+        emit('winter_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
 
 def get_lobby_from_session(session):
     lobby_code = db.query_session(session)[3]

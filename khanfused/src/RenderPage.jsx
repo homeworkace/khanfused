@@ -72,6 +72,11 @@ function RoomPage() {
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
+                            //handleChangeSeasonClick = {handleChangeSeasonClick}
+                            handleSpringChangeClick = {handleSpringChangeClick}
+                            handleSummerChangeClick = {handleSummerChangeClick}
+                            handleAutumnChangeClick = {handleAutumnChangeClick}
+                            handleWinterChangeClick = {handleWinterChangeClick}
                         />
                     )
             }
@@ -122,8 +127,24 @@ function RoomPage() {
         }
 
         //fakerayray
-        const handleSeasonChange = (data) => {
-            console.log("Season change received:", data);  // Debugging
+
+        const handleSpringChange = (data) => {
+            console.log("Spring change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+
+        const handleSummerChange = (data) => {
+            console.log("Summer change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+
+        const handleAutumnChange = (data) => {
+            console.log("Autumn change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+
+        const handleWinterChange = (data) => {
+            console.log("Winter change received:", data);  // Debugging
             setCurrentSeason(data.state);
         };
         
@@ -134,7 +155,10 @@ function RoomPage() {
         socket.current.on("new_player", handleNewPlayer);
         socket.current.on("player_left", handlePlayerLeft);
         //fakerayray
-        socket.current.on("state_changed", handleSeasonChange);
+        socket.current.on("spring_changed", handleSpringChange);
+        socket.current.on("summer_changed", handleSummerChange);
+        socket.current.on("autumn_changed", handleAutumnChange);
+        socket.current.on("winter_changed", handleWinterChange);
 
         // connect and emit join event
         socket.current.connect();
@@ -153,7 +177,10 @@ function RoomPage() {
             socket.current.off("new_player", handleNewPlayer);
             socket.current.off("player_left", handlePlayerLeft);
             //fakerayray
-            socket.current.off("state_changed", handleSeasonChange);
+            socket.current.off("spring_changed", handleSpringChange);
+            socket.current.off("summer_changed", handleSummerChange);
+            socket.current.off("autumn_changed", handleAutumnChange);
+            socket.current.off("winter_changed", handleWinterChange);
             socket.current.disconnect();
             //console.log("disconnected");
         }
@@ -179,8 +206,33 @@ function RoomPage() {
             session: getSession()
         });
     };
-    const handleChangeSeasonClick = () => {
-        socket.current.emit('transition_season', {
+
+    const handleSpringChangeClick = () => {
+        socket.current.emit('spring_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleSummerChangeClick = () => {
+        socket.current.emit('summer_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleAutumnChangeClick = () => {
+        socket.current.emit('autumn_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleWinterChangeClick = () => {
+        socket.current.emit('winter_transition', {
             session: getSession()
         });
         console.log(currentSeason);
