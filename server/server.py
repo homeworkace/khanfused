@@ -4,7 +4,6 @@ from flask_apscheduler import APScheduler
 from database import *
 from lobby import *
 import json
-import jsonpickle
 from pathlib import Path
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
@@ -20,7 +19,7 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-# Event handler for the home page
+# Dummy event
 @app.route('/')
 def home():
     return 'Hello, World!'
@@ -137,8 +136,8 @@ def leave_lobby():
     if len(rooms[lobby_code].players) < 1 :
         del rooms[lobby_code]
     else: 
-        # Otherwise, notify other players.
-        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/', include_self = False)
+        # Otherwise, notify remaining players.
+        emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/')
         
     db.update_lobby(data['session'], None)
 
@@ -168,8 +167,6 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
     join_room(session[3])
-
-    # 
 
 @socket_app.on('leave')
 def socket_on_leave(data):
@@ -298,14 +295,19 @@ if __name__ == '__main__':
     
     if Path('rooms.json').exists() :
         rooms_file = open('rooms.json', 'r')
-        rooms = jsonpickle.decode(rooms_file.read())
+        rooms = json.load(rooms_file)
         rooms_file.close()
+        for code in rooms :
+            rooms[code] = lobby.unminified(rooms[code])
     try :
         # app.run(debug=True, use_reloader=False)
         socket_app.run(app)
     except Exception as e :
         print(e)
+    for code in rooms :
+        rooms[code] = rooms[code].minified()
     rooms_file = open('rooms.json', 'w')
-    rooms_file.write(jsonpickle.encode(rooms))
+    #rooms_file.write(json.dump(rooms))
+    json.dump(rooms, rooms_file)
     rooms_file.close()
     
