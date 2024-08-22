@@ -42,13 +42,11 @@
 }
 
 .roomPageView-container ul {
-    border: 1px solid black;
     list-style-type: none;
     padding: 0;
 }
 
 .roomPageView-container li {
-    border: 1px solid black;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -8,6 +8,22 @@ class lobby :
         self.players = []
         self.ready = []
 
+    def minified(self) :
+        result = {}
+        result['state'] = self.state
+        result['password'] = self.password
+        result['players'] = self.players
+        result['ready'] = self.ready
+        return result
+
+    def unminified(lobby_to_copy) :
+        result = lobby()
+        result.state = lobby_to_copy['state']
+        result.password = lobby_to_copy['password']
+        result.players = lobby_to_copy['players']
+        result.ready = lobby_to_copy['ready']
+        return result
+
     def start(self) :
         if len(self.players) < 6 :
             return
