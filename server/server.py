@@ -94,11 +94,16 @@ def join_lobby():
     if data['password'] != rooms[data['lobby_code']].password :
         return { 'message': 'Wrong password' }, 400
 
-    # Add the new player.
     the_lobby = rooms[data['lobby_code']]
-    the_lobby.players.append((int(data['session']), db.query_session(data['session'])[2]))
-    # TODO: Add a check for if a player's name conflicts with anyone else's in the lobby.
-    the_lobby.ready.append(not the_lobby.players[-1][1] is None) # If the player already has a name in the database, they are ready.
+    # If the player's name in the database matches someone else's, remove their name.
+    new_player_name = db.query_session(data['session'])[2]
+    if new_player_name in [player[1] for player in the_lobby.players] :
+        new_player_name = None
+        db.update_name(data['session'], None)
+
+    # Add the new player.
+    the_lobby.players.append((int(data['session']), new_player_name)
+    the_lobby.ready.append(not new_player_name is None) # If the player already has a non-conflicting name in the database, they are ready.
     db.update_lobby(data['session'], data['lobby_code'])
 
     # Send the client a redirect.
@@ -172,24 +177,35 @@ def socket_on_leave(data):
 @socket_app.on('confirm_name')
 def socket_on_confirm_name(data):
     session = db.query_session(data['session'])
+    the_lobby = room[session[3]]
 
     # Check if someone else has this name.
-
-    # Update the name in the database.
-    db.update_name(data['name'])
+    if data['name'] in [player[1] for player in the_lobby.players if player[0] != int(data['session'])] :
+        emit('confirm_name_name_exists')
+        return
     
+    name_is_different = False
+
     # Update the name and ready the player in the lobby instance.
-    players = room[session[3]].players
-    the_lobby = room[session[3]]
     for player in range(len(the_lobby.players)) :
         if the_lobby.players[player][0] != int(data['session']) :
             continue
-        the_lobby.players[player][1] = data['name']
+
+        if the_lobby.players[player][1] == data['name'] :
+            name_is_different = True
+        else the_lobby.players[player][1] = data['name']
         the_lobby.ready[player] = True
         break
 
-    # Notify other players that this player is ready.
-    emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3], include_self = False)
+    if name_is_different :
+        # Update the name in the database.
+        db.update_name(data['name'])
+
+        # Notify all players that this player is ready.
+        emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3])
+    else :
+        emit('ready', { 'session' : int(data['session']) }, room = session[3])
+
 
 @socket_app.on('edit_name')
 def socket_on_edit_name(data):

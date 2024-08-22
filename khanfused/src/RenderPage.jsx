@@ -142,6 +142,7 @@ function RoomPage() {
         // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
         const handleReady = (data) => {
             console.log(data);
+            // If the player is yourself, then forget the old name.
         }
         socket.current.on("ready", handleReady);
 
@@ -150,6 +151,12 @@ function RoomPage() {
             console.log(data);
         }
         socket.current.on("unready", handleUnready);
+
+        // Makes the decision to reverse the name change because the server has detected that someone else has this name.
+        const handleEditNameNameExists = () => {
+            print("edit_name_name_exists");
+            // Return to edit mode and restore your old name.
+        }
 
         //fakerayray
 
@@ -230,6 +237,8 @@ function RoomPage() {
             //});
 
         // If not in edit mode, this click is to edit the name.
+            // Write the previous name to another variable.
+
             // Emit the event and unready yourself.
             //socket.current.emit("edit_name", {
             //    session: getSession()
