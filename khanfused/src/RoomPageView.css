@@ -21,6 +21,10 @@
     max-height: 40vh;
 }
 
+.roomPageView-tick img {
+    height: 20px;
+}
+
 .code-section p {
     margin: 0;
 }
@@ -48,12 +52,14 @@
 
 .roomPageView-container li {
     display: flex;
+    flex-flow: row;
     justify-content: center;
     align-items: center;
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
+    max-height: 2rem;
 }
 
 .roomPageView-container input, span {

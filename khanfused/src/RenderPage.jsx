@@ -169,13 +169,14 @@ function RoomPage() {
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            const receivedPlayersData = data['players'];
-            const _players = receivedPlayersData.map(playerData => {
-                const sessionID = playerData[0]; // session of the player
-                const sessionName = playerData[1]; // name of the player
-
-                return { session: sessionID, name: sessionName };
-            });
+            let _players = [];
+            for (let i = 0; i < data['players'].length; ++i) {
+                _players.push({
+                    session: data['players'][i][0],
+                    name: data['players'][i][1],
+                    ready: data['ready'][i]
+                });
+            }
 
             setPlayers(_players);
         }
@@ -192,7 +193,7 @@ function RoomPage() {
             console.log(`Player ${sessionID} ${sessionName} joined`);
             const _player = players.find(p => p.session === sessionID);
             if (!_player){
-                setPlayers(p => [...p, { session: sessionID, name: sessionName }]);
+                setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
         }
         socket.current.on("new_player", handleNewPlayer);

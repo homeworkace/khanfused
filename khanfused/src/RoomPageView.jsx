@@ -1,12 +1,13 @@
 import logo from "./Assets/Khanfused.svg";
+import tick from "./Assets/tick.svg";
 import './RoomPageView.css';
 import { useState } from 'react';
 import { getSession, getName } from './utility.js';
 
 function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRoleAssignmentChangeClick }) {
 
-    const [playerName, setPlayerName] = useState(getName() ? getName() : "");
-    const [editMode, setEditMode] = useState(playerName === "");
+    const [myName, setMyName] = useState(getName() ? getName() : "");
+    const [editMode, setEditMode] = useState(myName === "");
     const placeholderNames = [
         "Anonymous Serf", "Anonymous Nomad", "Anonymous Bandit", "Anonymous Burgher", "Anonymous Tanner",
         "Anonymous Hunter", "Anonymous Farmer", "Anonymous Sailor", "Anonymous Miller", "Anonymous Merchant",
@@ -37,7 +38,7 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRole
 
     const handleInputChange = (event) => {
 
-        setPlayerName(event.target.value);
+        setMyName(event.target.value);
     };
 
     const displayPlayerList = () => {
@@ -49,25 +50,32 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRole
 
             return (
                 <li key={index}>
-                    {(player.session === Number(getSession())) ?
-                        (
-                            editMode ?
-                                (
-                                    <div>
-                                        <input placeholder="Enter your name" value={playerName} onChange={handleInputChange} />
-                                        <button onClick={handleEditClick}> Submit </button>
+                    {player.session === Number(getSession()) ?
+                        (editMode ?
+                            (
+                                <div>
+                                    <input placeholder="Enter your name" value={myName} onChange={handleInputChange} />
+                                    <button onClick={handleEditClick}> Submit </button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <span> {myName} </span>
+                                    <button onClick={handleEditClick}> Edit </button>
+                                    <div className="roomPageView-tick">
+                                        <img src={tick} />
                                     </div>
-                                ) : (
-                                    <div>
-                                        <span> {playerName} </span>
-                                        <button onClick={handleEditClick}> Edit </button>
-                                    </div>
-                                )
+                                </div>
+                            )
                         ) : (
                             <div>
-                                <span className={ player.name ? "" : "grayed-out" }>
-                                    { player.name ? player.name : placeholderNames[player.session % 100] }
+                                <span className={player.name ? "" : "grayed-out"}>
+                                    {player.name ? player.name : placeholderNames[player.session % 100]}
                                 </span>
+                                {player.ready && (
+                                    <div className="roomPageView-tick">
+                                        <img src={tick} />
+                                    </div>
+                                )}
                             </div>
                         )
                     }
