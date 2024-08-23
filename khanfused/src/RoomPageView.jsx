@@ -1,12 +1,35 @@
 import logo from "./Assets/Khanfused.svg";
+import tick from "./Assets/tick.svg";
 import './RoomPageView.css';
 import { useEffect, useState } from 'react';
 import { getSession, getName } from './utility.js';
 
 function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveRoomClick, handleRoleAssignmentChangeClick }) {
 
-    const [playerName, setPlayerName] = useState("");
-    const [editMode, setEditMode] = useState(true);
+    const [myName, setMyName] = useState(getName() ? getName() : "");
+    const [editMode, setEditMode] = useState(myName === "");
+    const placeholderNames = [
+        "Anonymous Serf", "Anonymous Nomad", "Anonymous Bandit", "Anonymous Burgher", "Anonymous Tanner",
+        "Anonymous Hunter", "Anonymous Farmer", "Anonymous Sailor", "Anonymous Miller", "Anonymous Merchant",
+        "Anonymous Blacksmith", "Anonymous Fisher", "Anonymous Miner", "Anonymous Brewer", "Anonymous Baker",
+        "Anonymous Knight", "Anonymous Scribe", "Anonymous Alchemist", "Anonymous Shepherd", "Anonymous Carpenter",
+        "Anonymous Guard", "Anonymous Soldier", "Anonymous Spy", "Anonymous Archer", "Anonymous Healer",
+        "Anonymous Monk", "Anonymous Priest", "Anonymous Seer", "Anonymous Sage", "Anonymous Scholar",
+        "Anonymous Ranger", "Anonymous Rogue", "Anonymous Wanderer", "Anonymous Vagabond", "Anonymous Troubadour",
+        "Anonymous Peasant", "Anonymous Noble", "Anonymous Page", "Anonymous Jester", "Anonymous Herald",
+        "Anonymous Thief", "Anonymous Mercenary", "Anonymous Outlaw", "Anonymous Pilgrim", "Anonymous Merchant",
+        "Anonymous Noblewoman", "Anonymous Warlord", "Anonymous Shaman", "Anonymous Witch", "Anonymous Warlock",
+        "Anonymous Bard", "Anonymous Cleric", "Anonymous Druid", "Anonymous Barbarian", "Anonymous Berserker",
+        "Anonymous Chieftain", "Anonymous Gladiator", "Anonymous Artisan", "Anonymous Weaver", "Anonymous Potioneer",
+        "Anonymous Cook", "Anonymous Falconer", "Anonymous Navigator", "Anonymous Astrologer", "Anonymous Magician",
+        "Anonymous Artisan", "Anonymous Cartographer", "Anonymous Envoy", "Anonymous Diplomat", "Anonymous Courier",
+        "Anonymous Marshal", "Anonymous General", "Anonymous Admiral", "Anonymous Cavalier", "Anonymous Footman",
+        "Anonymous Squire", "Anonymous Artisan", "Anonymous Vintner", "Anonymous Smuggler", "Anonymous Apprentice",
+        "Anonymous Seafarer", "Anonymous Lorekeeper", "Anonymous Apothecary", "Anonymous Conjurer", "Anonymous Necromancer",
+        "Anonymous Warden", "Anonymous Sentinel", "Anonymous Ward", "Anonymous Mason", "Anonymous Fencer",
+        "Anonymous Gunslinger", "Anonymous Duelist", "Anonymous Engineer", "Anonymous Scout", "Anonymous Explorer",
+        "Anonymous Cartwright", "Anonymous Clockmaker", "Anonymous Stonecutter", "Anonymous Gardener", "Anonymous Chandler"
+    ];
 
     // Please see the similar handler in RenderPage.jsx.
     const handleEditClick = () => {
@@ -52,35 +75,51 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
     };
 
     const handleInputChange = (event) => {
-        setPlayerName(event.target.value);
+
+        setMyName(event.target.value);
     };
 
     const displayPlayerList = () => {
 
-        return players.map((player, index) => (
-            <li key={ index }>
-                { (player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0')) ? 
-                    (
-                        editMode ? 
-                        (
-                            <div>
-                                <input placeholder="Enter your name" value={ playerName } onChange={ handleInputChange } />
-                                <button onClick={ handleEditClick }> Submit </button>
-                            </div>
+        return players.map((player, index) => {
+            console.log(player.session);
+            console.log(Number(getSession()));
+
+
+            return (
+                <li key={index}>
+                    {player.session === Number(getSession()) ?
+                        (editMode ?
+                            (
+                                <div>
+                                    <input placeholder="Enter your name" value={myName} onChange={handleInputChange} />
+                                    <button onClick={handleEditClick}> Submit </button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <span> {myName} </span>
+                                    <button onClick={handleEditClick}> Edit </button>
+                                    <div className="roomPageView-tick">
+                                        <img src={tick} />
+                                    </div>
+                                </div>
+                            )
                         ) : (
                             <div>
-                            <span> { player.name } </span>
-                            <button onClick={ handleEditClick }> Edit </button>
+                                <span className={player.name ? "" : "grayed-out"}>
+                                    {player.name ? player.name : placeholderNames[player.session % 100]}
+                                </span>
+                                {player.ready && (
+                                    <div className="roomPageView-tick">
+                                        <img src={tick} />
+                                    </div>
+                                )}
                             </div>
-                        ) 
-                    ) : (
-                        <div>
-                            <span> { player.name } </span>
-                        </div>
-                    ) 
-                }
-            </li>
-        ));
+                        )
+                    }
+                </li>
+            )
+        });
     }
 
     console.log(`getSession() returns ${getSession().toString()}`);

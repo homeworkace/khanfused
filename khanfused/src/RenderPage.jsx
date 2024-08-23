@@ -95,14 +95,14 @@ function RoomPage() {
                     handleSummerStage = {handleSummerStage}
                 />
 
-                case springStage:
+                case currentSeason == "double_harvest":
                     return <SpringDouble
                     handleSummerChangeClick={handleSummerChangeClick} 
                 />
                 
-                case "spring":
+                case currentSeason == "spring":
                     return <SpringGamePlay
-                    handleSpringStage = {handleSpringStage} 
+                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
                 /*case isSpring:
@@ -134,7 +134,7 @@ function RoomPage() {
         }
     };
 
-    useEffect(() => {
+    useEffect(() => {   
         let promise = checkSession();
         promise.then((sessionDetails) => {
             if (!("redirect" in sessionDetails)) {
@@ -176,6 +176,7 @@ function RoomPage() {
             const _players = receivedPlayersData.map(playerData => {
                 const sessionID = playerData[0]; // session of the player
                 let sessionName = playerData[1]; // name of the player
+                // let readyState = playerData['ready'];
 
                 return { session: sessionID, name: sessionName };
             });
@@ -196,7 +197,7 @@ function RoomPage() {
             console.log(`Player ${sessionID} ${sessionName} joined`);
             const _player = players.find(p => p.session === sessionID);
             if (!_player){
-                setPlayers(p => [...p, { session: sessionID, name: sessionName }]);
+                setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
         }
         socket.current.on("new_player", handleNewPlayer);
@@ -231,6 +232,7 @@ function RoomPage() {
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role Assignment change received:", data);  // Debugging
+            setIsRandomising(true);
             setCurrentSeason(data.state);
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
