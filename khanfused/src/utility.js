@@ -16,9 +16,9 @@ function getName() {
         }
     }
     if (name === "") {
-        return null
+        return null;
     }
-    return name
+    return name;
 }
 
 export {

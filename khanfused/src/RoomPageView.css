@@ -78,3 +78,7 @@
 .spacing {
     flex-grow: 0.5;
 }
+
+.grayed-out {
+    color: grey;
+}

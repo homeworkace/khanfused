@@ -8,8 +8,7 @@ async function checkSession() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            session: getSession(),
-            name: getName()
+            session: getSession()
         })
     });
     let json = await response.json();
