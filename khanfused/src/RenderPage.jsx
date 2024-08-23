@@ -11,6 +11,11 @@ import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
 import SpringDouble from './SpringDouble.jsx';
 import SummerDouble from './SummerDouble.jsx';
+import SummerGamePlay from './SummerGamePlay.jsx';
+import AutumnGamePlay from './AutumnGamePlay.jsx';
+import AutumnDouble from './AutumnDouble.jsx';
+import WinterGamePlay from './WinterGamePlay.jsx';
+import WinterDouble from './WinterDouble.jsx';
 
 function RoomPage() {
 
@@ -62,7 +67,7 @@ function RoomPage() {
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
-                
+
                 case winterStage:
                     return <WinterDouble
                 />
