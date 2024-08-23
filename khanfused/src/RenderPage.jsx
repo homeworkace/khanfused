@@ -16,7 +16,6 @@ import AutumnGamePlay from './AutumnGamePlay.jsx';
 import AutumnDouble from './AutumnDouble.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
-
 function RoomPage() {
 
     const navigate = useNavigate();

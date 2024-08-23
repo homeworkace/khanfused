@@ -1,3 +1,6 @@
+import React from 'react';
+import Lottie from 'lottie-react';
+import animationData from './Assets/questionMark-animation.json';
 import './RandomTeams.css';
 
 function RandomTeams ( {handleSpringChangeClick}) {
@@ -12,6 +15,7 @@ function RandomTeams ( {handleSpringChangeClick}) {
                         Proceed
                     </button>
                 </div>
+                <Lottie animationData={animationData} />
             </div>
         </div>
     );
