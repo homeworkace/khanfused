@@ -39,6 +39,7 @@ function RoomPage() {
 
     const handleRandomiseClick = () => {
         setIsRandomising(true);
+        console.log(isRandomising);
     }
 
     const handleSpringStage = () => {
@@ -121,6 +122,7 @@ function RoomPage() {
                 default:
                     return (
                         <RoomPageView
+                            handleRandomiseClick={handleRandomiseClick}
                             code={code}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
