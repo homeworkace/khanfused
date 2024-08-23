@@ -154,7 +154,7 @@ def clear_sessions():
     for session, lobby_code in removed_sessions :
         the_lobby = rooms[lobby_code]
         for player in range(len(the_lobby.players)) :
-            if the_lobby.players[player][0] != int(data['session']) :
+            if the_lobby.players[player][0] != session :
                 continue
             the_lobby.players.pop(player)
             the_lobby.ready.pop(player)
