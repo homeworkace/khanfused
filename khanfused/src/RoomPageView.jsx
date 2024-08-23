@@ -1,20 +1,57 @@
 import logo from "./Assets/Khanfused.svg";
 import './RoomPageView.css';
-import { useState } from 'react';
-import { getSession } from './utility.js';
+import { useEffect, useState } from 'react';
+import { getSession, getName } from './utility.js';
 
-function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRoleAssignmentChangeClick }) {
+function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveRoomClick, handleRoleAssignmentChangeClick }) {
 
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
 
     // Please see the similar handler in RenderPage.jsx.
     const handleEditClick = () => {
-        setEditMode(!editMode);
+        let maxCharacters = 8;
+
+        if (editMode) {
+            const sanitizedInput = playerName.trim();
+
+            if (!sanitizedInput || sanitizedInput.length > maxCharacters) {
+                alert(`Name can only be maximum ${ maxCharacters } characters long`);
+                return;
+            }
+
+            const nameExists = players.some(player => player.name === sanitizedInput);
+            if (nameExists) {
+                alert(`This name is already taken. Please choose a different one`);
+                return;
+            }
+
+            // register existence of player object
+            setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0') ? 
+            { ...player, name: sanitizedInput } : player));
+
+            socket.emit("confirm_name", 
+            {
+                session: getSession(),
+                name: sanitizedInput
+            });
+
+            setEditMode(false);
+        } else {
+            // clear the name property of player object 
+            setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0')? { ...player, name: "" } : player
+            ));
+
+            socket.emit("edit_name", 
+            {
+                session: getSession()
+            });
+
+            setEditMode(true);
+        }
     };
 
     const handleInputChange = (event) => {
-
         setPlayerName(event.target.value);
     };
 
@@ -32,13 +69,13 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRole
                             </div>
                         ) : (
                             <div>
-                            <span> { playerName } </span>
+                            <span> { player.name } </span>
                             <button onClick={ handleEditClick }> Edit </button>
                             </div>
                         ) 
                     ) : (
                         <div>
-                            <span> New Player </span>
+                            <span> { player.name } </span>
                         </div>
                     ) 
                 }

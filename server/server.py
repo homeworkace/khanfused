@@ -166,6 +166,7 @@ def clear_sessions():
 def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
+    print("Room Data on Join:", rooms[session[3]].minified()) 
     join_room(session[3])
 
 @socket_app.on('leave')
@@ -175,8 +176,12 @@ def socket_on_leave(data):
 
 @socket_app.on('confirm_name')
 def socket_on_confirm_name(data):
+    print(f"Received name confirmation: {data['name']} for session {data['session']}")
+
     session = db.query_session(data['session'])
-    the_lobby = room[session[3]]
+    the_lobby = rooms[session[3]]
+    
+    print(f"Existing players: {the_lobby.players}")
 
     # Check if someone else has this name.
     if data['name'] in [player[1] for player in the_lobby.players if player[0] != int(data['session'])] :
@@ -193,7 +198,8 @@ def socket_on_confirm_name(data):
         if the_lobby.players[player][1] == data['name']:
             name_is_different = True
         else: 
-            the_lobby.players[player][1] = data['name']
+            # the_lobby.players[player][1] = data['name']
+            the_lobby.players[player] = (int(data['session']), data['name'])
         the_lobby.ready[player] = True
         break
 
@@ -212,7 +218,7 @@ def socket_on_edit_name(data):
     session = db.query_session(data['session'])
 
     # Unready the player in the lobby instance.
-    the_lobby = room[session[3]]
+    the_lobby = rooms[session[3]]
     for player in range(len(the_lobby.players)) :
         if the_lobby.players[player][0] != int(data['session']) :
             continue

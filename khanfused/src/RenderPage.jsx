@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
-import { getSession } from './utility.js';
+import { getSession, getName } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
@@ -124,7 +124,10 @@ function RoomPage() {
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
+                            setPlayers={setPlayers}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
+                            socket={socket.current}
+                            
                         />
                     )
             }
@@ -172,7 +175,7 @@ function RoomPage() {
             const receivedPlayersData = data['players'];
             const _players = receivedPlayersData.map(playerData => {
                 const sessionID = playerData[0]; // session of the player
-                const sessionName = playerData[1]; // name of the player
+                let sessionName = playerData[1]; // name of the player
 
                 return { session: sessionID, name: sessionName };
             });
@@ -187,6 +190,7 @@ function RoomPage() {
          */
         // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
+            console.log("Data received on join:", data);
             const sessionID = data['session'];
             let sessionName = data['name'];
             console.log(`Player ${sessionID} ${sessionName} joined`);
@@ -326,6 +330,7 @@ function RoomPage() {
             //socket.current.emit("edit_name", {
             //    session: getSession()
             //});
+            
     }
 
     //fakerayray
