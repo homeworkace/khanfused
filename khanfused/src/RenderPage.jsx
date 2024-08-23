@@ -22,9 +22,7 @@ function RoomPage() {
     const { code } = useParams();
     const [hasConnected, setHasConnected] = useState(false);
     const [shouldConnect, setShouldConnect] = useState(false);
-    //fakerayray
     const [currentSeason, setCurrentSeason] = useState("waiting");
-    //
     const socket = useRef(null);
     const [players, setPlayers] = useState([]);
 
@@ -102,7 +100,7 @@ function RoomPage() {
                     handleSummerChangeClick={handleSummerChangeClick} 
                 />
                 
-                case currentSeason == "spring":
+                case "spring":
                     return <SpringGamePlay
                     handleSpringStage = {handleSpringStage} 
                 />  
@@ -126,6 +124,7 @@ function RoomPage() {
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
+                            handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                         />
                     )
             }
@@ -226,27 +225,42 @@ function RoomPage() {
 
         //fakerayray
 
+        const handleRoleAssignmentChange = (data) => {
+            console.log("Role Assignment change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
+
         const handleSpringChange = (data) => {
             console.log("Spring change received:", data);  // Debugging
             setCurrentSeason(data.state);
         };
         socket.current.on("spring_changed", handleSpringChange);
 
+        const handleDoubleHarvestChange = (data) => {
+            console.log("Double Harvest change received:", data);  // Debugging
+            setCurrentSeason(data.state);
+        };
+        socket.current.on("double_harvest_changed", handleDoubleHarvestChange);
+
         const handleSummerChange = (data) => {
             console.log("Summer change received:", data);  // Debugging
             setCurrentSeason(data.state);
+            
         };
         socket.current.on("summer_changed", handleSummerChange);
 
         const handleAutumnChange = (data) => {
             console.log("Autumn change received:", data);  // Debugging
             setCurrentSeason(data.state);
+            
         };
         socket.current.on("autumn_changed", handleAutumnChange);
 
         const handleWinterChange = (data) => {
             console.log("Winter change received:", data);  // Debugging
             setCurrentSeason(data.state);
+            
         };
         socket.current.on("winter_changed", handleWinterChange);
 
@@ -269,7 +283,9 @@ function RoomPage() {
             socket.current.off("ready", handleReady);
             socket.current.off("unready", handleUnready);
             //fakerayray
+            socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
             socket.current.off("spring_changed", handleSpringChange);
+            socket.current.off("double_harvest_changed", handleDoubleHarvestChange);
             socket.current.off("summer_changed", handleSummerChange);
             socket.current.off("autumn_changed", handleAutumnChange);
             socket.current.off("winter_changed", handleWinterChange);
@@ -320,8 +336,24 @@ function RoomPage() {
         });
     };
 
+    const handleRoleAssignmentChangeClick = () => {
+        socket.current.emit('role_assignment_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
     const handleSpringChangeClick = () => {
         socket.current.emit('spring_transition', {
+            session: getSession()
+        });
+        console.log(currentSeason);
+
+    };
+
+    const handleDoubleHarvestChangeClick = () => {
+        socket.current.emit('double_harvest_transition', {
             session: getSession()
         });
         console.log(currentSeason);

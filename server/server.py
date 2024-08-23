@@ -233,8 +233,19 @@ def socket_start_instructions(data):
     else:
         print("Lobby not found.")
 
+@socket_app.on('role_assignment_transition')
+def socket_start_role_assignment(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.role_assignment_transition()
+        emit('role_assignment_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
+
 @socket_app.on('spring_transition')
-def socket_transition_season(data):
+def socket_spring_transition(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
@@ -245,8 +256,19 @@ def socket_transition_season(data):
     else:
         print("Lobby not found.")
 
+@socket_app.on('double_harvest_transition')
+def socket_double_harvest_transition(data):
+    session = db.query_session(data['session'])
+    lobby_code = session[3]
+    if lobby_code in rooms:
+        lobby = rooms[lobby_code]
+        lobby.double_harvest_transition()
+        emit('double_harvest_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+    else:
+        print("Lobby not found.")
+
 @socket_app.on('summer_transition')
-def socket_transition_season(data):
+def socket_summer_transition(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
@@ -258,7 +280,7 @@ def socket_transition_season(data):
         print("Lobby not found.")
 
 @socket_app.on('autumn_transition')
-def socket_transition_season(data):
+def socket_autumn_transition(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
@@ -270,7 +292,7 @@ def socket_transition_season(data):
         print("Lobby not found.")
 
 @socket_app.on('winter_transition')
-def socket_transition_season(data):
+def socket_winter_transition(data):
     session = db.query_session(data['session'])
     lobby_code = session[3]
     
@@ -280,13 +302,6 @@ def socket_transition_season(data):
         emit('winter_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
     else:
         print("Lobby not found.")
-
-def get_lobby_from_session(session):
-    lobby_code = db.query_session(session)[3]
-    return rooms.get(lobby_code)
-
-
-
 
 if __name__ == '__main__':
     random.seed = time.time()

@@ -3,7 +3,7 @@ import './RoomPageView.css';
 import { useState } from 'react';
 import { getSession } from './utility.js';
 
-function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRandomiseClick }) {
+function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRoleAssignmentChangeClick }) {
 
     const [playerName, setPlayerName] = useState("");
     const [editMode, setEditMode] = useState(true);
@@ -73,7 +73,7 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRand
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
-                <button onClick={ handleRandomiseClick }>
+                <button onClick={ handleRoleAssignmentChangeClick }>
                     Randomise
                 </button>
                 
