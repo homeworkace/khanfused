@@ -1,9 +1,11 @@
 import React from 'react';
-import Lottie from 'lottie-react';
+import Lottie, {LottieRefCurrentProps} from 'lottie-react';
 import animationData from './Assets/questionMark-animation.json';
+import { useRef } from 'react';
 import './RandomTeams.css';
 
 function RandomTeams ( {handleSpringChangeClick}) {
+    const questionRef = useRef<LottieRefCurrentProps>(null);
     return (
         <div className="randomTeams">
             <div className="randomTeams-container">
@@ -15,10 +17,10 @@ function RandomTeams ( {handleSpringChangeClick}) {
                         Proceed
                     </button>
                 </div>
-                <Lottie animationData={animationData} />
+                <Lottie lottieRef = {questionRef} animationData={animationData} />
             </div>
         </div>
     );
 }       
 
-export default RandomTeams;
+export default RandomTeams; 
