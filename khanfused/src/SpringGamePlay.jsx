@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import './SpringGamePlay.css';
+import Timer from './Timer';
 
 function SpringGamePlay( {handleDoubleHarvestChangeClick}) {
     const [isChatOpen, setIsChatOpen] = useState(false);
 
     const toggleChat = () => {
         setIsChatOpen(!isChatOpen);
+    }
+
+    const handleTimeUp = () => {
+        handleDoubleHarvestChangeClick();
     }
 
     return (
@@ -25,6 +30,7 @@ function SpringGamePlay( {handleDoubleHarvestChangeClick}) {
                         Proceed
                     </button>
                 </div>
+                <Timer duration={10} onTimeUp={handleTimeUp} />
             </div>
         </div>
     );

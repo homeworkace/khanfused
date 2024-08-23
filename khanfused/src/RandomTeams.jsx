@@ -3,9 +3,15 @@ import Lottie, {LottieRefCurrentProps} from 'lottie-react';
 import animationData from './Assets/questionMark-animation.json';
 import { useRef } from 'react';
 import './RandomTeams.css';
+import Timer from './Timer';
 
 function RandomTeams ( {handleSpringChangeClick}) {
     const questionRef = useRef<LottieRefCurrentProps>(null);
+    
+    const handleTimeUp = () => {
+        handleSpringChangeClick();
+    }
+
     return (
         <div className="randomTeams">
             <div className="randomTeams-container">
@@ -16,6 +22,7 @@ function RandomTeams ( {handleSpringChangeClick}) {
                     <button onClick = {handleSpringChangeClick}>
                         Proceed
                     </button>
+                    <Timer duration={10} onTimeUp={handleTimeUp} />
                 </div>
                 <Lottie lottieRef = {questionRef} animationData={animationData} />
             </div>
