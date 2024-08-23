@@ -9,6 +9,24 @@ class lobby :
         self.players = []
         self.ready = []
 
+        # Define states and transitions
+        self.states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
+                        'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
+
+        self.transitions = [
+            {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
+            {'trigger': 'start_role_assignment', 'source': '*', 'dest': 'role_assignment'},
+            {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
+            {'trigger': 'start_double_harvest', 'source': '*', 'dest': 'double_harvest'},
+            {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
+            {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
+            {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
+            {'trigger': 'transition_to_insufficient_food', 'source': '*', 'dest': 'insufficient_food'},
+            {'trigger': 'transition_to_khans_pillaged', 'source': '*', 'dest': 'khans_pillaged'},
+            {'trigger': 'transition_to_lords_killed', 'source': '*', 'dest': 'lords_killed'},
+            {'trigger': 'end_game', 'source': '*', 'dest': 'end_game'}
+        ]
+
     def minified(self) :
         result = {}
         result['state'] = self.state
@@ -24,24 +42,6 @@ class lobby :
         result.players = lobby_to_copy['players']
         result.ready = lobby_to_copy['ready']
         return result
-
-    # Define states and transitions
-    self.states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
-                    'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
-
-    self.transitions = [
-        {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
-        {'trigger': 'start_role_assignment', 'source': '*', 'dest': 'role_assignment'},
-        {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
-        {'trigger': 'start_double_harvest', 'source': '*', 'dest': 'double_harvest'},
-        {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
-        {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
-        {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
-        {'trigger': 'transition_to_insufficient_food', 'source': '*', 'dest': 'insufficient_food'},
-        {'trigger': 'transition_to_khans_pillaged', 'source': '*', 'dest': 'khans_pillaged'},
-        {'trigger': 'transition_to_lords_killed', 'source': '*', 'dest': 'lords_killed'},
-        {'trigger': 'end_game', 'source': '*', 'dest': 'end_game'}
-    ]
 
     self.machine = Machine(model=self, states=self.states, transitions=self.transitions, initial='waiting')
 
