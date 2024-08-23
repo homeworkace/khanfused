@@ -274,6 +274,10 @@ function RoomPage() {
             session: getSession()
         });
 
+        
+
+
+
         // A reference to the cleanup function
         const cleanup = () => {
             socket.current.emit("leave", {
