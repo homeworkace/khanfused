@@ -10,6 +10,7 @@ import './RoomPageView.css';
 import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
 import SpringDouble from './SpringDouble.jsx';
+import SummerDouble from './SummerDouble.jsx';
 
 function RoomPage() {
 
@@ -27,19 +28,28 @@ function RoomPage() {
     const [isRandomising, setIsRandomising] = useState(false);
     const [isSpring,springComes] = useState(false);
     const [springStage, setSpringStage] = useState(false);
+    const [summerStage, setSummerStage] = useState(false);
+    const [autumnStage, setAutumnStage] = useState(false);
+    const [winterStage, setWinterStage] = useState(false);
 
     const handleRandomiseClick = () => {
         setIsRandomising(true);
     }
 
-    /*const proceedToSpring = () => {
-        springComes(true);
-  
-    }*/
-
     const handleSpringStage = () => {
         setSpringStage(true);
-        console.log(springStage);
+    }
+
+    const handleSummerStage = () => {
+        setSummerStage(true);
+    }
+
+    const handleAutumnStage = () => {
+        setAutumnStage(true);
+    }
+
+    const handleWinterStage = () => { 
+        setWinterStage(true);
     }
 
     const leaveRoomClick = async () => {
@@ -52,20 +62,52 @@ function RoomPage() {
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+                
+                case winterStage:
+                    return <WinterDouble
+                />
+
+                case currentSeason == "winter":
+                    return <WinterGamePlay
+                    handleWinterStage = {handleWinterStage}
+                />
+
+                case autumnStage:
+                    return <AutumnDouble
+                    handleWinterChangeClick={handleWinterChangeClick}
+                />
+
+                case currentSeason == "autumn":
+                    return <AutumnGamePlay 
+                    handleAutumnStage = {handleAutumnStage}
+                />
+
+                case summerStage:
+                    return <SummerDouble
+                    handleAutumnChangeClick={handleAutumnChangeClick}
+                />
+
+                case currentSeason == "summer":
+                    return <SummerGamePlay
+                    handleSummerStage = {handleSummerStage}
+                />
+
                 case springStage:
-                    return <SpringDouble />
+                    return <SpringDouble
+                    handleSummerChangeClick={handleSummerChangeClick} 
+                />
                 
                 case currentSeason == "spring":
                     return <SpringGamePlay
                     handleSpringStage = {handleSpringStage} 
-                />
+                />  
 
                 /*case isSpring:
                     return <SpringGamePlay
                     handleSpringStage = {handleSpringStage} 
                     />*/
 
-                case isRandomising:
+                case isRandomising: 
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
                     //proceedToSpring = {proceedToSpring}
