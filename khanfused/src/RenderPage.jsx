@@ -148,6 +148,13 @@ function RoomPage() {
     }, [navigate]);
 
     useEffect(() => {
+            console.log("Players array", players);
+            players.forEach(player => {
+                console.log(`Session: ${player.session}, Name: ${player.name}`);
+            });
+    }, [players]);
+
+    useEffect(() => {
         if (!shouldConnect) {
             return;
         }
@@ -163,12 +170,15 @@ function RoomPage() {
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            const sessionID = data['players'][0][0];
-            const name = data['players'][0][1];
-            console.log(sessionID); 
-            // populate players
-            setPlayers(p => [...p, { session: sessionID, name: name }]);
-            console.log(data);
+            const receivedPlayersData = data['players'];
+            const _players = receivedPlayersData.map(playerData => {
+                const sessionID = playerData[0]; // session of the player
+                const sessionName = playerData[1]; // name of the player
+
+                return { session: sessionID, name: sessionName };
+            });
+
+            setPlayers(_players);
         }
         socket.current.on("join", handleJoin);
 
@@ -178,8 +188,13 @@ function RoomPage() {
          */
         // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
-            console.log("new player", data['session']);
-            setPlayers(p => [...p, { session: data['session'], name: data['name'] }]);
+            const sessionID = data['session'];
+            let sessionName = data['name'];
+            console.log(`Player ${sessionID} ${sessionName} joined`);
+            const _player = players.find(p => p.session === sessionID);
+            if (!_player){
+                setPlayers(p => [...p, { session: sessionID, name: sessionName }]);
+            }
         }
         socket.current.on("new_player", handleNewPlayer);
 
