@@ -95,14 +95,14 @@ function RoomPage() {
                     handleSummerStage = {handleSummerStage}
                 />
 
-                case springStage:
+                case currentSeason == "double_harvest":
                     return <SpringDouble
                     handleSummerChangeClick={handleSummerChangeClick} 
                 />
                 
-                case "spring":
+                case currentSeason == "spring":
                     return <SpringGamePlay
-                    handleSpringStage = {handleSpringStage} 
+                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
                 /*case isSpring:
@@ -131,7 +131,7 @@ function RoomPage() {
         }
     };
 
-    useEffect(() => {
+    useEffect(() => {   
         let promise = checkSession();
         promise.then((sessionDetails) => {
             if (!("redirect" in sessionDetails)) {
@@ -227,6 +227,7 @@ function RoomPage() {
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role Assignment change received:", data);  // Debugging
+            setIsRandomising(true);
             setCurrentSeason(data.state);
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
