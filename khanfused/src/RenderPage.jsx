@@ -53,7 +53,7 @@ function RoomPage() {
                 default:
                     return (
                         <RoomPageView
-                            handleRandomiseClick={handleRandomiseClick}
+                            //handleRandomiseClick={handleRandomiseClick}
                             code={code}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
