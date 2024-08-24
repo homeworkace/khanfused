@@ -48,13 +48,15 @@ class lobby :
     
 
     def start(self) :
-        if len(self.players) < 6 :
-            return
+        if len(self.players) < 1 : # Change to 6 when needed
+            return "Not enough players!"
         for ready in self.players :
             if ready is False :
-                return
+                return "Not all players are ready!"
 
+        # state = 'instructions'
         self.start_role_assignment()
+        return None
 
     def role_assignment_transition(self):
         if self._can_start_role_assignment():

@@ -214,7 +214,6 @@ def socket_on_confirm_name(data):
     else :
         emit('ready', { 'session' : int(data['session']) }, room = session[3])
 
-
 @socket_app.on('edit_name')
 def socket_on_edit_name(data):
     session = db.query_session(data['session'])
@@ -229,6 +228,19 @@ def socket_on_edit_name(data):
 
     # Notify other players that this player is unready.
     emit('unready', { 'session' : int(data['session']) }, room = session[3], include_self = False)
+
+@socket_app.on('start_game')
+def socket_on_start_game(data):
+    session = db.query_session(data['session'])
+
+    # Attempt to start the game in the lobby.
+    the_lobby = rooms[session[3]]
+    result = the_lobby.start()
+    if result is None :
+        # Notify other players that this player is unready.
+        emit('start_game', room = session[3])
+    else :
+        emit('start_game', { 'message' : result })
 
 @socket_app.on('start_instructions')
 def socket_start_instructions(data):
