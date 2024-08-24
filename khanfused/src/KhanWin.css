@@ -1,0 +1,40 @@
+
+.khan-win-container {
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+    text-align: center;
+  }
+  
+  .fade-in-text {
+    opacity: 0;
+    animation: fadeIn 3s ease-in forwards; 
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .highlight {
+    color: red; 
+    font-weight: bold;
+  }
+  
+  h2 {
+    opacity: 0;
+    animation: fadeIn 3s ease-in 1s forwards;
+    font-size: 3rem;
+    margin-top: 20px;
+  }
+  

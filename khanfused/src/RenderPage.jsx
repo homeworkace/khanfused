@@ -16,6 +16,7 @@ import AutumnGamePlay from './AutumnGamePlay.jsx';
 import AutumnDouble from './AutumnDouble.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
+import KhanWin from './KhanWin.jsx';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,27 +33,16 @@ function RoomPage() {
     const socket = useRef(null);
     const [players, setPlayers] = useState([{session: 0, name: "bruh", ready: true}]);
 
-    // Test switch case purposes
-    const [isRandomising, setIsRandomising] = useState(false);
-    const [isSpring,springComes] = useState(false);
-    const [springStage, setSpringStage] = useState(false);
+    // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
     const [autumnStage, setAutumnStage] = useState(false);
     const [winterStage, setWinterStage] = useState(false);
+    const [khanWin, setKhanWin] = useState(false);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    const handleRandomiseClick = () => {
-        setIsRandomising(true);
-        console.log(isRandomising);
-    }
-
-    const handleSpringStage = () => {
-        setSpringStage(true);
-    }
 
     const handleSummerStage = () => {
         setSummerStage(true);
@@ -64,6 +54,11 @@ function RoomPage() {
 
     const handleWinterStage = () => { 
         setWinterStage(true);
+    }
+
+    const handleKhanWin = () => {
+        setKhanWin(true);
+        console.log(khanWin);
     }
 
     const leaveRoomClick = async () => {
@@ -81,6 +76,10 @@ function RoomPage() {
     const renderPage = () => {
         if (hasConnected) {
             switch (true) {
+
+                case khanWin:
+                    return <KhanWin
+                />
 
                 case winterStage:
                     return <WinterDouble
@@ -121,21 +120,15 @@ function RoomPage() {
                     handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
-                /*case isSpring:
-                    return <SpringGamePlay
-                    handleSpringStage = {handleSpringStage} 
-                    />*/
-
-                case isRandomising: 
+                case currentSeason == "role_assignment": 
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
-                    //proceedToSpring = {proceedToSpring}
-                    />
+                    handleKhanWin = {handleKhanWin}
+                />
 
                 default:
                     return (
                         <RoomPageView
-                            handleRandomiseClick={handleRandomiseClick}
                             code={code}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
@@ -366,7 +359,6 @@ function RoomPage() {
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role Assignment change received:", data);  // Debugging
-            setIsRandomising(true);
             setCurrentSeason(data.state);
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
