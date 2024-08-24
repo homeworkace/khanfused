@@ -52,7 +52,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             const nameExists = players.some(player => player.name === sanitizedInput && player.session !== Number(getSession()));
             if (nameExists) {
                 alert(`This name is already taken. Please choose a different one`);
-                // return;
+                return;
             }
 
 
@@ -90,8 +90,8 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
     const displayPlayerList = () => {
 
         return players.map((player, index) => {
-            // console.log(player.session);
-            // console.log(Number(getSession()));
+            console.log(player.session);
+            console.log(Number(getSession()));
 
 
             return (
@@ -130,27 +130,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         });
     }
 
-    // useEffect(() => {
-
-    //     // reflect updated players list
-    //     const handlePlayerListUpdate = (data) => {
-    //         console.log(data);
-
-    //         setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0') ? 
-    //         { ...player, name: data['name'] } : player));
-
-
-    //     };
-
-    //     socket.current.on("confirm_name", handlePlayerListUpdate);
-
-    //     return () => {
-    //         socket.current.off("confirm_name", handlePlayerListUpdate);
-    //     };
-
-    // }, [socket]);
-
-    // console.log(`getSession() returns ${getSession().toString()}`);
+    console.log(`getSession() returns ${getSession().toString()}`);
 
     return (
         <div className="roomPageView">
