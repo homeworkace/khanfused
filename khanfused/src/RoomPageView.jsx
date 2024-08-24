@@ -117,8 +117,8 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                                 </div>
                             )
                         ) : (
-                            <div key={player.session}>
-                                <span className={player.name ? "" : "grayed-out"}>
+                            <div>
+                                <span key={player.name} className={player.name ? "" : "grayed-out"}>
                                     {player.name ? player.name : placeholderNames[player.session % 100]}
                                 </span>
                                 {player.ready && (
@@ -155,7 +155,8 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             <div className="roomPageView-button-bar">
                 {players.length > 0 && players[0]["session"] == Number(getSession()) &&
                     (
-                        <button disabled={players.length > 5 && players.some(player => !player["ready"])} onClick={startGameClick}>
+                        // Set to 5 when needed
+                        <button disabled={players.length > 0 && players.some(player => !player["ready"])} onClick={startGameClick}>
                             Start Game
                         </button>
                     )
