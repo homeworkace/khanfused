@@ -66,6 +66,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             });
 
             setEditMode(false);
+            setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, ready: true } : player));
         } else {
             // clear the name property of player object 
             // setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: "" } : player
@@ -77,6 +78,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             });
 
             setEditMode(true);
+            setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, ready: false } : player));
         }
 
     };
@@ -153,9 +155,13 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                 <h2>Current Season: {currentSeason}</h2>
             </div>
             <div className="roomPageView-button-bar">
-                <button disabled>
-                    Start Game
-                </button>
+                {players.length > 0 && players[0]["session"] == Number(getSession()) &&
+                    (
+                        <button>
+                            Start Game
+                        </button>
+                    )
+                }
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
