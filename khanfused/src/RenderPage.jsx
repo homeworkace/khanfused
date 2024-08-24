@@ -66,6 +66,10 @@ function RoomPage() {
         setWinterStage(true);
     }
 
+    const startGameClick = async () => {
+        console.log("Game started");
+    }
+
     const leaveRoomClick = async () => {
         let result = await leaveLobby();
         if ("redirect" in result) {
@@ -141,6 +145,7 @@ function RoomPage() {
                             leaveRoomClick={leaveRoomClick}
                             players={players}
                             setPlayers={setPlayers}
+                            startGameClick={startGameClick}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                             socket={socket}
                             
