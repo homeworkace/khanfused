@@ -170,6 +170,7 @@ def clear_sessions():
 def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
+    print("Room Data on Join:", rooms[session[3]].minified()) 
     join_room(session[3])
 
 @socket_app.on('leave')
@@ -179,8 +180,10 @@ def socket_on_leave(data):
 
 @socket_app.on('confirm_name')
 def socket_on_confirm_name(data):
+    print(f"Received name confirmation: {data['name']} for session {data['session']}")
+
     session = db.query_session(data['session'])
-    the_lobby = room[session[3]]
+    the_lobby = rooms[session[3]]
 
     # Check if someone else has this name.
     if data['name'] in [player[1] for player in the_lobby.players if player[0] != int(data['session'])] :
@@ -194,29 +197,33 @@ def socket_on_confirm_name(data):
         if the_lobby.players[player][0] != int(data['session']) :
             continue
 
-        if the_lobby.players[player][1] == data['name']:
+        if the_lobby.players[player][1] != data['name']:
             name_is_different = True
-        else: 
-            the_lobby.players[player][1] = data['name']
+
+            # the_lobby.players[player][1] = data['name']
+            the_lobby.players[player] = (int(data['session']), data['name'])
+            
         the_lobby.ready[player] = True
         break
 
     if name_is_different :
         # Update the name in the database.
-        db.update_name(data['name'])
+        db.update_name(data['session'], data['name'])
+
+        print(f"Existing players: {the_lobby.players}")
 
         # Notify all players that this player is ready.
         emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3])
+
     else :
         emit('ready', { 'session' : int(data['session']) }, room = session[3])
-
 
 @socket_app.on('edit_name')
 def socket_on_edit_name(data):
     session = db.query_session(data['session'])
 
     # Unready the player in the lobby instance.
-    the_lobby = room[session[3]]
+    the_lobby = rooms[session[3]]
     for player in range(len(the_lobby.players)) :
         if the_lobby.players[player][0] != int(data['session']) :
             continue
@@ -225,6 +232,19 @@ def socket_on_edit_name(data):
 
     # Notify other players that this player is unready.
     emit('unready', { 'session' : int(data['session']) }, room = session[3], include_self = False)
+
+@socket_app.on('start_game')
+def socket_on_start_game(data):
+    session = db.query_session(data['session'])
+
+    # Attempt to start the game in the lobby.
+    the_lobby = rooms[session[3]]
+    result = the_lobby.start()
+    if result is None :
+        # Notify other players that the game has started.
+        emit('start_game', room = session[3])
+    else :
+        emit('start_game', { 'message' : result })
 
 @socket_app.on('start_instructions')
 def socket_start_instructions(data):

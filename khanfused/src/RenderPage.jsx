@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
-import { getSession } from './utility.js';
+import { getSession, getName } from './utility.js';
 import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
@@ -16,15 +16,63 @@ import AutumnGamePlay from './AutumnGamePlay.jsx';
 import AutumnDouble from './AutumnDouble.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function RoomPage() {
 
     const navigate = useNavigate();
     const { code } = useParams();
-    const [hasConnected, setHasConnected] = useState(false);
     const [shouldConnect, setShouldConnect] = useState(false);
+    const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
     const socket = useRef(null);
+    const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
+
+    // Test switch case purposes
+    const [isRandomising, setIsRandomising] = useState(false);
+    const [isSpring,springComes] = useState(false);
+    const [springStage, setSpringStage] = useState(false);
+    const [summerStage, setSummerStage] = useState(false);
+    const [autumnStage, setAutumnStage] = useState(false);
+    const [winterStage, setWinterStage] = useState(false);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const handleRandomiseClick = () => {
+        setIsRandomising(true);
+        console.log(isRandomising);
+    }
+
+    const handleSpringStage = () => {
+        setSpringStage(true);
+    }
+
+    const handleSummerStage = () => {
+        setSummerStage(true);
+    }
+
+    const handleAutumnStage = () => {
+        setAutumnStage(true);
+    }
+
+    const handleWinterStage = () => { 
+        setWinterStage(true);
+    }
+
+    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
+    const startGameClick = () => {
+        socket.current.emit("start_game", {
+            session: getSession()
+        });
+    }
 
     const leaveRoomClick = async () => {
         let result = await leaveLobby();
@@ -33,18 +81,60 @@ function RoomPage() {
         }
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     const renderPage = () => {
         if (hasConnected) {
-            switch (currentSeason) {
-                case "double_harvest":
-                    return <SpringDouble />
-                
-                case "spring":
-                    return <SpringGamePlay
-                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
+            switch (true) {
+
+                case winterStage:
+                    return <WinterDouble
                 />
 
-                case "role_assignment":
+                case currentSeason == "winter":
+                    return <WinterGamePlay
+                    handleWinterStage = {handleWinterStage}
+                />
+
+                case autumnStage:
+                    return <AutumnDouble
+                    handleWinterChangeClick={handleWinterChangeClick}
+                />
+
+                case currentSeason == "autumn":
+                    return <AutumnGamePlay 
+                    handleAutumnStage = {handleAutumnStage}
+                />
+
+                case summerStage:
+                    return <SummerDouble
+                    handleAutumnChangeClick={handleAutumnChangeClick}
+                />
+
+                case currentSeason == "summer":
+                    return <SummerGamePlay
+                    handleSummerStage = {handleSummerStage}
+                />
+
+                case currentSeason == "double_harvest":
+                    return <SpringDouble
+                    handleSummerChangeClick={handleSummerChangeClick} 
+                />
+                
+                case currentSeason == "spring":
+                    return <SpringGamePlay
+                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
+                />  
+
+                /*case isSpring:
+                    return <SpringGamePlay
+                    handleSpringStage = {handleSpringStage} 
+                    />*/
+
+                case currentSeason == "role_assignment": 
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
                     //proceedToSpring = {proceedToSpring}
@@ -58,14 +148,24 @@ function RoomPage() {
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
+                            setPlayers={setPlayers}
+                            startGameClick={startGameClick}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
+                            socket={socket}
+                            myName={myName}
+                            setMyName={setMyName}
                         />
                     )
             }
         }
     };
 
-    useEffect(() => {
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {   
         let promise = checkSession();
         promise.then((sessionDetails) => {
             if (!("redirect" in sessionDetails)) {
@@ -80,12 +180,10 @@ function RoomPage() {
         });
     }, [navigate]);
 
-    useEffect(() => {
-            console.log("Players array", players);
-            players.forEach(player => {
-                console.log(`Session: ${player.session}, Name: ${player.name}`);
-            });
-    }, [players]);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         if (!shouldConnect) {
@@ -99,68 +197,241 @@ function RoomPage() {
         const handleConnect = () => {
             setHasConnected(true);
         }
-        socket.current.on("connect", handleConnect);
+        socket.current.once("connect", handleConnect);
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            const receivedPlayersData = data['players'];
-            const _players = receivedPlayersData.map(playerData => {
-                const sessionID = playerData[0]; // session of the player
-                const sessionName = playerData[1]; // name of the player
-
-                return { session: sessionID, name: sessionName };
-            });
+            let _players = [];
+            for (let i = 0; i < data['players'].length; ++i) {
+                _players.push({
+                    session: data['players'][i][0],
+                    name: data['players'][i][1],
+                    ready: data['ready'][i]
+                });
+            }
 
             setPlayers(_players);
+            console.log('Players joined: ', players);
         }
-        socket.current.on("join", handleJoin);
+        socket.current.once("join", handleJoin);
 
-        /*
-         * ALL RoomPageView COMMANDS ARE BELOW.
-         * Consider porting page-specific handlers to their respective .jsx files.
-         */
-        // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
+        // connect and emit join event
+        socket.current.connect();
+        socket.current.emit("join", {
+            session: getSession()
+        });
+
+        return () => {
+            // cleanup code
+        }
+    }, [shouldConnect]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("new_player");
         const handleNewPlayer = (data) => {
             const sessionID = data['session'];
             let sessionName = data['name'];
-            console.log(`Player ${sessionID} ${sessionName} joined`);
             const _player = players.find(p => p.session === sessionID);
-            if (!_player){
-                setPlayers(p => [...p, { session: sessionID, name: sessionName }]);
+            if (!_player) {
+                setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
+            console.log(players);
         }
         socket.current.on("new_player", handleNewPlayer);
 
-        // Receives the session ID ("session", integer) of the leaving player.
+        return () => {
+            socket.current.off("new_player", handleNewPlayer);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Receives the session ID ("session", integer) of the leaving player.
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("player_left");
         const handlePlayerLeft = (data) => {
-            console.log(data);
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
         socket.current.on("player_left", handlePlayerLeft);
+        
 
-        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        return () => {
+            socket.current.off("player_left", handlePlayerLeft);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("ready");
         const handleReady = (data) => {
-            console.log(data);
+            const sessionID = data['session'];
+
             // If the player is yourself, then forget the old name.
+            // player.name is updated to myName based on matching session ID
+            if (data["session"] === Number(getSession())) {
+                // forget the old name
+                setPlayers(p => p.map(player => player.session === sessionID ? { ...player, name: myName } : player));
+            }
+            else {
+                let thePlayer = players.find(p => p["session"] === sessionID);
+                thePlayer["ready"] = true;
+                if ("name" in data) {
+                    thePlayer["name"] = data["name"];
+                }
+
+                //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player))
+                //setPlayers(players);
+            }
         }
         socket.current.on("ready", handleReady);
 
-        // Receives the session ID ("session", integer) of the player who has unreadied.
+        return () => {
+            socket.current.off("ready", handleReady);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("confirm_name_name_exists");
+        const handleConfirmNameNameExists = () => {
+            // restore the old name
+            // myName = player.name based on matching session ID
+            const p = players.find(player => player.session === Number(getSession()));
+            // console.log(`Player name found: ${p.name}`);
+
+            if (p) {
+                setMyName(p.name); // This stale state thing still exists
+                p.ready = false;
+                // console.log(`myName: ${myName}`);
+            }
+        }
+        socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
+
+        return () => {
+            socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Receives the session ID ("session", integer) of the player who has unreadied.
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("unready");
         const handleUnready = (data) => {
-            console.log(data);
+            const sessionID = data['session'];
+
+            //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player));
+            //setPlayers(p => p.map(player => player.session === sessionID) ? { ...player, ready: false } : player);
+            let thePlayer = players.find(player => player.session === sessionID);
+            thePlayer['ready'] = false;
         }
         socket.current.on("unready", handleUnready);
 
-        // Makes the decision to reverse the name change because the server has detected that someone else has this name.
-        const handleEditNameNameExists = () => {
-            console.log("edit_name_name_exists");
-            // Return to edit mode and restore your old name.
+        return () => {
+            socket.current.off("unready", handleUnready);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Receives the session ID ("session", integer) of the player who has unreadied.
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("start_game");
+        const handleStartGame = (data) => {
+            if (data) {
+                console.log(data["message"]);
+            }
+            else {
+                console.log("Host has started");
+                // Handle transition here.
+            }
+        }
+        socket.current.on("start_game", handleStartGame);
+
+        return () => {
+            socket.current.off("start_game", handleStartGame);
+        }
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        
+        return () => {
+
+        }
+    }, []);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
         }
 
         //fakerayray
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role Assignment change received:", data);  // Debugging
+            setIsRandomising(true);
             setCurrentSeason(data.state);
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
@@ -198,24 +469,16 @@ function RoomPage() {
         };
         socket.current.on("winter_changed", handleWinterChange);
 
-        // connect and emit join event
-        socket.current.connect();
-        socket.current.emit("join", {
-            session: getSession()
-        });
-
         // A reference to the cleanup function
         const cleanup = () => {
             socket.current.emit("leave", {
                 session: getSession()
             });
 
-            socket.current.off("connect", handleConnect);
-            socket.current.off("join", handleJoin);
-            socket.current.off("new_player", handleNewPlayer);
-            socket.current.off("player_left", handlePlayerLeft);
-            socket.current.off("ready", handleReady);
-            socket.current.off("unready", handleUnready);
+            // socket.current.off("player_left", handlePlayerLeft);
+            // socket.current.off("ready", handleReady);
+            // socket.current.off("unready", handleUnready);
+            // socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
             //fakerayray
             socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
             socket.current.off("spring_changed", handleSpringChange);
@@ -235,10 +498,12 @@ function RoomPage() {
             window.removeEventListener("beforeunload", cleanup);
             cleanup();
         };
-    }, [shouldConnect]);
+    }, [hasConnected]);
 
-
-    ///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // pass socket to roompageview
     const handleEditButtonClick = () => {
@@ -260,6 +525,7 @@ function RoomPage() {
             //socket.current.emit("edit_name", {
             //    session: getSession()
             //});
+            
     }
 
     //fakerayray
@@ -317,6 +583,11 @@ function RoomPage() {
         console.log(currentSeason);
 
     };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     return (
         <>
