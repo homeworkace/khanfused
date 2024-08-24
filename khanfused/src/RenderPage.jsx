@@ -30,7 +30,7 @@ function RoomPage() {
     const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
     const socket = useRef(null);
-    const [players, setPlayers] = useState([{session: 0, name: "bruh", ready: true}]);
+    const [players, setPlayers] = useState([]);
 
     // Test switch case purposes
     const [isRandomising, setIsRandomising] = useState(false);
