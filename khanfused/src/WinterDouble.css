@@ -1,0 +1,36 @@
+.winterDouble {
+    width: 100vw;
+    height: 100vh;
+    background: url('./Assets/WINTER CUTSCENE.svg') no-repeat center center;
+    background-size: contain;
+    background-color: #799eefb9;
+}
+
+.winterDouble-container {
+    position: relative; 
+    height: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; 
+}
+
+.winterDouble-button-bar {
+    display: flex;
+    gap: 20px; 
+}
+
+.winterDouble-button-bar button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #fff; 
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2; 
+}
+
+.winterDouble-button-bar button:hover {
+    background-color: #e0e0e0;
+}
+

@@ -4,6 +4,7 @@
     height: 100vh;
     background-size: contain;
     background-color: #ef79b0b9;
+    align-items: center;
 }
 
 .randomTeams-container {
