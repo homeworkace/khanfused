@@ -176,7 +176,7 @@ def socket_on_leave(data):
 
 @socket_app.on('confirm_name')
 def socket_on_confirm_name(data):
-    # print(f"Received name confirmation: {data['name']} for session {data['session']}")
+    print(f"Received name confirmation: {data['name']} for session {data['session']}")
 
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -193,11 +193,12 @@ def socket_on_confirm_name(data):
         if the_lobby.players[player][0] != int(data['session']) :
             continue
 
-        if the_lobby.players[player][1] == data['name']:
+        if the_lobby.players[player][1] != data['name']:
             name_is_different = True
-        else: 
+
             # the_lobby.players[player][1] = data['name']
             the_lobby.players[player] = (int(data['session']), data['name'])
+            
         the_lobby.ready[player] = True
         break
 
@@ -205,10 +206,11 @@ def socket_on_confirm_name(data):
         # Update the name in the database.
         db.update_name(data['session'], data['name'])
 
-        # print(f"Existing players: {the_lobby.players}")
+        print(f"Existing players: {the_lobby.players}")
 
         # Notify all players that this player is ready.
         emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3])
+
     else :
         emit('ready', { 'session' : int(data['session']) }, room = session[3])
 

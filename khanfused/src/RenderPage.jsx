@@ -16,6 +16,7 @@ import AutumnGamePlay from './AutumnGamePlay.jsx';
 import AutumnDouble from './AutumnDouble.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
+
 function RoomPage() {
 
     const navigate = useNavigate();
@@ -126,7 +127,7 @@ function RoomPage() {
                             players={players}
                             setPlayers={setPlayers}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
-                            socket={socket.current}
+                            socket={socket}
                             
                         />
                     )
@@ -152,7 +153,7 @@ function RoomPage() {
     useEffect(() => {
             console.log("Players array", players);
             players.forEach(player => {
-                console.log(`Session: ${player.session}, Name: ${player.name}`);
+                // console.log(`Session: ${player.session}, Name: ${player.name}`);
             });
     }, [players]);
 
@@ -172,59 +173,74 @@ function RoomPage() {
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
-            const receivedPlayersData = data['players'];
-            const _players = receivedPlayersData.map(playerData => {
-                const sessionID = playerData[0]; // session of the player
-                let sessionName = playerData[1]; // name of the player
-                // let readyState = playerData['ready'];
-
-                return { session: sessionID, name: sessionName };
-            });
+            let _players = [];
+            for (let i = 0; i < data['players'].length; ++i) {
+                _players.push({
+                    session: data['players'][i][0],
+                    name: data['players'][i][1],
+                    ready: data['ready'][i]
+                });
+            }
 
             setPlayers(_players);
+            console.log('Players joined: ', players);
         }
         socket.current.on("join", handleJoin);
+
+        
 
         /*
          * ALL RoomPageView COMMANDS ARE BELOW.
          * Consider porting page-specific handlers to their respective .jsx files.
          */
+
+        socket.current.removeAllListeners("new_player");
         // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
         const handleNewPlayer = (data) => {
-            console.log("Data received on join:", data);
+            // console.log("Data received on join:", data);
             const sessionID = data['session'];
             let sessionName = data['name'];
-            console.log(`Player ${sessionID} ${sessionName} joined`);
             const _player = players.find(p => p.session === sessionID);
             if (!_player){
                 setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
+
+            console.log(players);
         }
         socket.current.on("new_player", handleNewPlayer);
 
         // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
-            console.log(data);
+            // console.log(data);
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
         socket.current.on("player_left", handlePlayerLeft);
 
         // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
         const handleReady = (data) => {
-            console.log(data);
             // If the player is yourself, then forget the old name.
         }
         socket.current.on("ready", handleReady);
 
+        const handleConfirmNameNameExists = () => {
+            // restore the old name
+            console.log(`confirm_name_name_exists`);
+            console.log(players);
+
+            // RoomPageView.setMyName(player.name);
+            // myName = player.name;
+        }
+        socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
+
         // Receives the session ID ("session", integer) of the player who has unreadied.
         const handleUnready = (data) => {
-            console.log(data);
+            // console.log(data);
         }
         socket.current.on("unready", handleUnready);
 
         // Makes the decision to reverse the name change because the server has detected that someone else has this name.
         const handleEditNameNameExists = () => {
-            console.log("edit_name_name_exists");
+            // console.log("edit_name_name_exists");
             // Return to edit mode and restore your old name.
         }
 
@@ -276,10 +292,6 @@ function RoomPage() {
             session: getSession()
         });
 
-        
-
-
-
         // A reference to the cleanup function
         const cleanup = () => {
             socket.current.emit("leave", {
@@ -292,6 +304,7 @@ function RoomPage() {
             socket.current.off("player_left", handlePlayerLeft);
             socket.current.off("ready", handleReady);
             socket.current.off("unready", handleUnready);
+            socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
             //fakerayray
             socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
             socket.current.off("spring_changed", handleSpringChange);

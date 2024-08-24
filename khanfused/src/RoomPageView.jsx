@@ -36,24 +36,31 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         let maxCharacters = 8;
 
         if (editMode) {
-            const sanitizedInput = playerName.trim();
+            const sanitizedInput = myName.trim();
 
             if (!sanitizedInput || sanitizedInput.length > maxCharacters) {
                 alert(`Name can only be maximum ${ maxCharacters } characters long`);
                 return;
             }
 
-            const nameExists = players.some(player => player.name === sanitizedInput);
-            if (nameExists) {
-                alert(`This name is already taken. Please choose a different one`);
+            if (sanitizedInput === ""){
+                alert(`Input field cannot be empty`);
                 return;
             }
 
-            // register existence of player object
+            
+            const nameExists = players.some(player => player.name === sanitizedInput && player.session !== Number(getSession()));
+            if (nameExists) {
+                alert(`This name is already taken. Please choose a different one`);
+                // return;
+            }
+
+
             setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0') ? 
             { ...player, name: sanitizedInput } : player));
 
-            socket.emit("confirm_name", 
+
+            socket.current.emit("confirm_name", 
             {
                 session: getSession(),
                 name: sanitizedInput
@@ -62,16 +69,17 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             setEditMode(false);
         } else {
             // clear the name property of player object 
-            setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0')? { ...player, name: "" } : player
-            ));
+            // setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: "" } : player
+            // ));
 
-            socket.emit("edit_name", 
+            socket.current.emit("edit_name", 
             {
                 session: getSession()
             });
 
             setEditMode(true);
         }
+
     };
 
     const handleInputChange = (event) => {
@@ -82,8 +90,8 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
     const displayPlayerList = () => {
 
         return players.map((player, index) => {
-            console.log(player.session);
-            console.log(Number(getSession()));
+            // console.log(player.session);
+            // console.log(Number(getSession()));
 
 
             return (
@@ -122,7 +130,27 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         });
     }
 
-    console.log(`getSession() returns ${getSession().toString()}`);
+    // useEffect(() => {
+
+    //     // reflect updated players list
+    //     const handlePlayerListUpdate = (data) => {
+    //         console.log(data);
+
+    //         setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0') ? 
+    //         { ...player, name: data['name'] } : player));
+
+
+    //     };
+
+    //     socket.current.on("confirm_name", handlePlayerListUpdate);
+
+    //     return () => {
+    //         socket.current.off("confirm_name", handlePlayerListUpdate);
+    //     };
+
+    // }, [socket]);
+
+    // console.log(`getSession() returns ${getSession().toString()}`);
 
     return (
         <div className="roomPageView">
