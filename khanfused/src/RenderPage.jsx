@@ -30,7 +30,9 @@ function RoomPage() {
     const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
     const socket = useRef(null);
-    const [players, setPlayers] = useState([{session: 0, name: "bruh", ready: true}]);
+    const [myName, setMyName] = useState(getName() ? getName() : "");
+    const [players, setPlayers] = useState([]);
+    const [isHost, setIsHost] = useState(false);
 
     // Test switch case purposes
     const [isRandomising, setIsRandomising] = useState(false);
@@ -64,6 +66,14 @@ function RoomPage() {
 
     const handleWinterStage = () => { 
         setWinterStage(true);
+    }
+
+    const handleHostState = (data) => {
+        // let hostSessionID = data['session'];
+        // if (Number(getSession()) === hostSessionID) {
+        //      setIsHost(true);
+        //      enable start button
+        // }
     }
 
     const leaveRoomClick = async () => {
@@ -143,7 +153,8 @@ function RoomPage() {
                             setPlayers={setPlayers}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                             socket={socket}
-                            
+                            myName={myName}
+                            setMyName={setMyName}
                         />
                     )
             }
@@ -259,11 +270,12 @@ function RoomPage() {
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
         socket.current.on("player_left", handlePlayerLeft);
+        
 
         return () => {
             socket.current.off("player_left", handlePlayerLeft);
         }
-    }, []);
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +289,23 @@ function RoomPage() {
 
         // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
         const handleReady = (data) => {
+            const sessionID = data['session'];
+
             // If the player is yourself, then forget the old name.
+            // player.name is updated to myName based on matching session ID
+            if (data["session"] === Number(getSession())) {
+                // forget the old name
+                setPlayers(p => p.map(player => player.session === sessionID ? { ...player, name: myName } : player));
+            }
+            else {
+                let thePlayer = players.find(p => p["session"] === sessionID);
+                thePlayer["ready"] = true;
+                if ("name" in data) {
+                    thePlayer["name"] = data["name"];
+                }
+
+                setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player))
+            }
         }
         socket.current.on("ready", handleReady);
 
@@ -299,8 +327,14 @@ function RoomPage() {
         socket.current.removeAllListeners("confirm_name_name_exists");
         const handleConfirmNameNameExists = () => {
             // restore the old name
-            console.log(`confirm_name_name_exists`);
-            console.log(players);
+            // myName = player.name based on matching session ID
+            const p = players.find(player => player.session === Number(getSession()));
+            // console.log(`Player name found: ${p.name}`);
+
+            if (p) {
+                setMyName(p.name);
+                // console.log(`myName: ${myName}`);
+            }
         }
         socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
 
@@ -321,14 +355,22 @@ function RoomPage() {
 
         // Receives the session ID ("session", integer) of the player who has unreadied.
         const handleUnready = (data) => {
-            // console.log(data);
+            console.log(data['session']);
+            const sessionID = data['session'];
+
+            let thePlayer = players.find(player => player.session === sessionID);
+            console.log(thePlayer['ready']);
+            thePlayer['ready'] = false;
+            console.log(thePlayer['ready']);
+
+            // might want to disable start button here (for host)
         }
         socket.current.on("unready", handleUnready);
 
         return () => {
             socket.current.off("unready", handleUnready);
         }
-    }, []);
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
