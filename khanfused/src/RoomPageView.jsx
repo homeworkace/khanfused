@@ -36,7 +36,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         let maxCharacters = 8;
 
         if (editMode) {
-            const sanitizedInput = playerName.trim();
+            const sanitizedInput = myName.trim();
 
             if (!sanitizedInput || sanitizedInput.length > maxCharacters) {
                 alert(`Name can only be maximum ${ maxCharacters } characters long`);
@@ -82,9 +82,8 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
     const displayPlayerList = () => {
 
         return players.map((player, index) => {
-            console.log(player.session);
-            console.log(Number(getSession()));
-
+            //console.log(player.session);
+            //console.log(Number(getSession()));
 
             return (
                 <li key={index}>
@@ -121,8 +120,6 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             )
         });
     }
-
-    console.log(`getSession() returns ${getSession().toString()}`);
 
     return (
         <div className="roomPageView">

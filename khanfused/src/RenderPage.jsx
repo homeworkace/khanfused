@@ -20,11 +20,11 @@ function RoomPage() {
 
     const navigate = useNavigate();
     const { code } = useParams();
-    const [hasConnected, setHasConnected] = useState(false);
     const [shouldConnect, setShouldConnect] = useState(false);
+    const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
     const socket = useRef(null);
-    const [players, setPlayers] = useState([]);
+    const [players, setPlayers] = useState([{session: 0, name: "bruh", ready: true}]);
 
     // Test switch case purposes
     const [isRandomising, setIsRandomising] = useState(false);
@@ -149,12 +149,12 @@ function RoomPage() {
         });
     }, [navigate]);
 
-    useEffect(() => {
-            console.log("Players array", players);
-            players.forEach(player => {
-                console.log(`Session: ${player.session}, Name: ${player.name}`);
-            });
-    }, [players]);
+    //useEffect(() => {
+    //        console.log("Players array", players);
+    //        players.forEach(player => {
+    //            console.log(`Session: ${player.session}, Name: ${player.name}`);
+    //        });
+    //}, [players]);
 
     useEffect(() => {
         if (!shouldConnect) {
@@ -168,7 +168,7 @@ function RoomPage() {
         const handleConnect = () => {
             setHasConnected(true);
         }
-        socket.current.on("connect", handleConnect);
+        socket.current.once("connect", handleConnect);
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
@@ -183,24 +183,49 @@ function RoomPage() {
 
             setPlayers(_players);
         }
-        socket.current.on("join", handleJoin);
+        socket.current.once("join", handleJoin);
 
-        /*
-         * ALL RoomPageView COMMANDS ARE BELOW.
-         * Consider porting page-specific handlers to their respective .jsx files.
-         */
-        // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
+        // connect and emit join event
+        socket.current.connect();
+        socket.current.emit("join", {
+            session: getSession()
+        });
+
+        return () => {
+        }
+    }, [shouldConnect]);
+
+    // Receives the session ID ("session", integer) and name ("name", string or null) of the new player.
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("new_player");
         const handleNewPlayer = (data) => {
             console.log("Data received on join:", data);
             const sessionID = data['session'];
             let sessionName = data['name'];
             console.log(`Player ${sessionID} ${sessionName} joined`);
             const _player = players.find(p => p.session === sessionID);
-            if (!_player){
+            if (!_player) {
                 setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
+
+            console.log(players);
         }
         socket.current.on("new_player", handleNewPlayer);
+    }, [players]);
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        /*
+         * ALL RoomPageView COMMANDS ARE BELOW.
+         * Consider porting page-specific handlers to their respective .jsx files.
+         */
 
         // Receives the session ID ("session", integer) of the leaving player.
         const handlePlayerLeft = (data) => {
@@ -270,25 +295,12 @@ function RoomPage() {
         };
         socket.current.on("winter_changed", handleWinterChange);
 
-        // connect and emit join event
-        socket.current.connect();
-        socket.current.emit("join", {
-            session: getSession()
-        });
-
-        
-
-
-
         // A reference to the cleanup function
         const cleanup = () => {
             socket.current.emit("leave", {
                 session: getSession()
             });
 
-            socket.current.off("connect", handleConnect);
-            socket.current.off("join", handleJoin);
-            socket.current.off("new_player", handleNewPlayer);
             socket.current.off("player_left", handlePlayerLeft);
             socket.current.off("ready", handleReady);
             socket.current.off("unready", handleUnready);
@@ -311,7 +323,7 @@ function RoomPage() {
             window.removeEventListener("beforeunload", cleanup);
             cleanup();
         };
-    }, [shouldConnect]);
+    }, [hasConnected]);
 
 
     ///////////////////////////////////////////////////////////////////////////////
