@@ -20,25 +20,33 @@ function RoomPageView({ code, currentSeason, players, leaveRoomClick, handleRole
 
     const displayPlayerList = () => {
 
-        console.log(players); // so far this the latest changes right?
-
         return players.map((player, index) => (
             <li key={ index }>
-                {  player.session === getSession() && editMode ? 
+                { (player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0')) ? 
                     (
-                        <div>
-                            <input placeholder="Enter your name" value={ playerName } onChange={ handleInputChange } />
-                            <button onClick={ handleEditClick }> Submit </button>
-                        </div>
-                    ):(
-                        <div>
+                        editMode ? 
+                        (
+                            <div>
+                                <input placeholder="Enter your name" value={ playerName } onChange={ handleInputChange } />
+                                <button onClick={ handleEditClick }> Submit </button>
+                            </div>
+                        ) : (
+                            <div>
                             <span> { playerName } </span>
                             <button onClick={ handleEditClick }> Edit </button>
+                            </div>
+                        ) 
+                    ) : (
+                        <div>
+                            <span> New Player </span>
                         </div>
-                    ) }
+                    ) 
+                }
             </li>
         ));
     }
+
+    console.log(`getSession() returns ${getSession().toString()}`);
 
     return (
         <div className="roomPageView">

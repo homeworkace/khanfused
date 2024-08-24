@@ -1,6 +1,6 @@
 import './SpringDouble.css';
 
-function SpringDouble ( ) {
+function SpringDouble ({handleSummerChangeClick}) {
     return (
         <div className="springDouble">
             <div className="springDouble-container">
@@ -8,7 +8,7 @@ function SpringDouble ( ) {
                     <button>
                         Double Harvest
                     </button>
-                    <button>
+                    <button onClick={handleSummerChangeClick}>
                         Proceed
                     </button>
                 </div>
