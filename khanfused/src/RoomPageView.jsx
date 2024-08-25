@@ -4,10 +4,12 @@ import './RoomPageView.css';
 import { useEffect, useState } from 'react';
 import { getSession, getName } from './utility.js';
 
-function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveRoomClick, handleRoleAssignmentChangeClick }) {
+function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName, setMyName, leaveRoomClick, startGameClick, handleRoleAssignmentChangeClick }) {
 
-    const [myName, setMyName] = useState(getName() ? getName() : "");
+    //const [myName, setMyName] = useState(getName() ? getName() : "");
     const [editMode, setEditMode] = useState(myName === "");
+    let sanitizedInput = myName.trim();
+
     const placeholderNames = [
         "Anonymous Serf", "Anonymous Nomad", "Anonymous Bandit", "Anonymous Burgher", "Anonymous Tanner",
         "Anonymous Hunter", "Anonymous Farmer", "Anonymous Sailor", "Anonymous Miller", "Anonymous Merchant",
@@ -36,18 +38,15 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         let maxCharacters = 8;
 
         if (editMode) {
-            const sanitizedInput = myName.trim();
-
-            if (!sanitizedInput || sanitizedInput.length > maxCharacters) {
+            if (sanitizedInput.length > maxCharacters) {
                 alert(`Name can only be maximum ${ maxCharacters } characters long`);
                 return;
             }
 
-            if (sanitizedInput === ""){
-                alert(`Input field cannot be empty`);
+            if (!sanitizedInput) {
+                alert(`Enter your name`);
                 return;
             }
-
             
             const nameExists = players.some(player => player.name === sanitizedInput && player.session !== Number(getSession()));
             if (nameExists) {
@@ -56,7 +55,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             }
 
 
-            setPlayers(p => p.map(player => player.session.toString().padStart(9, '0') === getSession().toString().padStart(9, '0') ? 
+            setPlayers(p => p.map(player => player.session === Number(getSession()) ? 
             { ...player, name: sanitizedInput } : player));
 
 
@@ -67,10 +66,9 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             });
 
             setEditMode(false);
-        } else {
-            // clear the name property of player object 
-            // setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: "" } : player
-            // ));
+            setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, ready: true } : player));
+        }
+        else {
 
             socket.current.emit("edit_name", 
             {
@@ -78,6 +76,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             });
 
             setEditMode(true);
+            setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, ready: false } : player));
         }
 
     };
@@ -87,15 +86,20 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
         setMyName(event.target.value);
     };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     const displayPlayerList = () => {
 
-        return players.map((player, index) => {
-            console.log(player.session);
-            console.log(Number(getSession()));
+        return players.map((player) => {
+            //console.log(player.session);
+            //console.log(Number(getSession()));
 
 
             return (
-                <li key={index}>
+                <li key={player.session}>
                     {player.session === Number(getSession()) ?
                         (editMode ?
                             (
@@ -114,7 +118,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
                             )
                         ) : (
                             <div>
-                                <span className={player.name ? "" : "grayed-out"}>
+                                <span key={player.name} className={player.name ? "" : "grayed-out"}>
                                     {player.name ? player.name : placeholderNames[player.session % 100]}
                                 </span>
                                 {player.ready && (
@@ -129,8 +133,6 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
             )
         });
     }
-
-    console.log(`getSession() returns ${getSession().toString()}`);
 
     return (
         <div className="roomPageView">
@@ -151,9 +153,14 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, leaveR
                 <h2>Current Season: {currentSeason}</h2>
             </div>
             <div className="roomPageView-button-bar">
-                <button disabled>
-                    Start Game
-                </button>
+                {players.length > 0 && players[0]["session"] == Number(getSession()) &&
+                    (
+                        // Set to 5 when needed
+                        <button disabled={players.length > 0 && players.some(player => !player["ready"])} onClick={startGameClick}>
+                            Start Game
+                        </button>
+                    )
+                }
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>

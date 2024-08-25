@@ -31,7 +31,8 @@ function RoomPage() {
     const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
     const socket = useRef(null);
-    const [players, setPlayers] = useState([{session: 0, name: "bruh", ready: true}]);
+    const [myName, setMyName] = useState(getName() ? getName() : "");
+    const [players, setPlayers] = useState([]);
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -56,9 +57,11 @@ function RoomPage() {
         setWinterStage(true);
     }
 
-    const handleKhanWin = () => {
-        setKhanWin(true);
-        console.log(khanWin);
+    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
+    const startGameClick = () => {
+        socket.current.emit("start_game", {
+            session: getSession()
+        });
     }
 
     const leaveRoomClick = async () => {
@@ -134,9 +137,11 @@ function RoomPage() {
                             leaveRoomClick={leaveRoomClick}
                             players={players}
                             setPlayers={setPlayers}
+                            startGameClick={startGameClick}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                             socket={socket}
-                            
+                            myName={myName}
+                            setMyName={setMyName}
                         />
                     )
             }
@@ -242,35 +247,55 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the leaving player.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the leaving player.
+        socket.current.removeAllListeners("player_left");
         const handlePlayerLeft = (data) => {
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
         socket.current.on("player_left", handlePlayerLeft);
+        
 
         return () => {
             socket.current.off("player_left", handlePlayerLeft);
         }
-    }, []);
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        socket.current.removeAllListeners("ready");
         const handleReady = (data) => {
+            const sessionID = data['session'];
+
             // If the player is yourself, then forget the old name.
+            // player.name is updated to myName based on matching session ID
+            if (data["session"] === Number(getSession())) {
+                // forget the old name
+                setPlayers(p => p.map(player => player.session === sessionID ? { ...player, name: myName } : player));
+            }
+            else {
+                let thePlayer = players.find(p => p["session"] === sessionID);
+                thePlayer["ready"] = true;
+                if ("name" in data) {
+                    thePlayer["name"] = data["name"];
+                }
+
+                //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player))
+                //setPlayers(players);
+            }
         }
         socket.current.on("ready", handleReady);
 
@@ -292,8 +317,15 @@ function RoomPage() {
         socket.current.removeAllListeners("confirm_name_name_exists");
         const handleConfirmNameNameExists = () => {
             // restore the old name
-            console.log(`confirm_name_name_exists`);
-            console.log(players);
+            // myName = player.name based on matching session ID
+            const p = players.find(player => player.session === Number(getSession()));
+            // console.log(`Player name found: ${p.name}`);
+
+            if (p) {
+                setMyName(p.name); // This stale state thing still exists
+                p.ready = false;
+                // console.log(`myName: ${myName}`);
+            }
         }
         socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
 
@@ -307,26 +339,60 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the player who has unreadied.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the player who has unreadied.
+        socket.current.removeAllListeners("unready");
         const handleUnready = (data) => {
-            // console.log(data);
+            const sessionID = data['session'];
+
+            //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player));
+            //setPlayers(p => p.map(player => player.session === sessionID) ? { ...player, ready: false } : player);
+            let thePlayer = players.find(player => player.session === sessionID);
+            thePlayer['ready'] = false;
         }
         socket.current.on("unready", handleUnready);
 
         return () => {
             socket.current.off("unready", handleUnready);
         }
-    }, []);
+    }, [players]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Receives the session ID ("session", integer) of the player who has unreadied.
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        socket.current.removeAllListeners("start_game");
+        const handleStartGame = (data) => {
+            if (data) {
+                console.log(data["message"]);
+            }
+            else {
+                console.log("Host has started");
+                // Handle transition here.
+            }
+        }
+        socket.current.on("start_game", handleStartGame);
+
+        return () => {
+            socket.current.off("start_game", handleStartGame);
+        }
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     useEffect(() => {
         if (!hasConnected) {
@@ -347,12 +413,6 @@ function RoomPage() {
     useEffect(() => {
         if (!hasConnected) {
             return;
-        }
-
-        // Makes the decision to reverse the name change because the server has detected that someone else has this name.
-        const handleEditNameNameExists = () => {
-            // console.log("edit_name_name_exists");
-            // Return to edit mode and restore your old name.
         }
 
         //fakerayray
