@@ -16,6 +16,9 @@ import AutumnGamePlay from './AutumnGamePlay.jsx';
 import AutumnDouble from './AutumnDouble.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
+import KhanWin from './KhanWin.jsx';
+import LordWin from './LordWin.jsx';
+import InsufficentFood from './InsufficentFood.jsx';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,28 +35,30 @@ function RoomPage() {
     const socket = useRef(null);
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
-    const [isHost, setIsHost] = useState(false);
+    const [pageToRender, setPageToRender] = useState("default");
 
-    // Test switch case purposes
-    const [isRandomising, setIsRandomising] = useState(false);
-    const [isSpring,springComes] = useState(false);
-    const [springStage, setSpringStage] = useState(false);
+    // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
     const [autumnStage, setAutumnStage] = useState(false);
     const [winterStage, setWinterStage] = useState(false);
-
+    const [khanWin, setKhanWin] = useState(false);
+    const [lordWin, setLordWin] = useState(false);
+    const [insufficentFood, setInsufficentFood] = useState(false);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const handleRandomiseClick = () => {
-        setIsRandomising(true);
-        console.log(isRandomising);
+    const handleInsufficentFood = () => {
+        setInsufficentFood(true);
     }
 
-    const handleSpringStage = () => {
-        setSpringStage(true);
+    const handleLordWins = () => { 
+        setLordWin(true);
+    }
+
+    const handleKhanWin = () => {
+        setKhanWin(true);
     }
 
     const handleSummerStage = () => {
@@ -68,12 +73,11 @@ function RoomPage() {
         setWinterStage(true);
     }
 
-    const handleHostState = (data) => {
-        // let hostSessionID = data['session'];
-        // if (Number(getSession()) === hostSessionID) {
-        //      setIsHost(true);
-        //      enable start button
-        // }
+    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
+    const startGameClick = () => {
+        socket.current.emit("start_game", {
+            session: getSession()
+        });
     }
 
     const leaveRoomClick = async () => {
@@ -90,7 +94,22 @@ function RoomPage() {
     
     const renderPage = () => {
         if (hasConnected) {
-            switch (true) {
+            switch (pageToRender) {
+
+                // insufficentFood scenario -- to be replaced with actual state
+                case insufficentFood:
+                    return <InsufficentFood
+                />
+
+                // lordWin scenario -- to be replaced with actual state
+                // case lordWin:
+                //     return <LordWin
+                // />
+
+                // khanWin screnario -- to be repladed with actual state
+                // case khanWin:
+                //     return <KhanWin
+                // />
 
                 case winterStage:
                     return <WinterDouble
@@ -131,26 +150,23 @@ function RoomPage() {
                     handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
-                /*case isSpring:
-                    return <SpringGamePlay
-                    handleSpringStage = {handleSpringStage} 
-                    />*/
-
-                case isRandomising: 
+                case currentSeason == "role_assignment": 
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
-                    //proceedToSpring = {proceedToSpring}
-                    />
+                    // handleKhanWin = {handleKhanWin}
+                    // handleLordWins = {handleLordWins}
+                    handleInsufficentFood = {handleInsufficentFood}
+                />
 
                 default:
                     return (
                         <RoomPageView
-                            handleRandomiseClick={handleRandomiseClick}
                             code={code}
                             currentSeason={currentSeason}
                             leaveRoomClick={leaveRoomClick}
                             players={players}
                             setPlayers={setPlayers}
+                            startGameClick={startGameClick}
                             handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                             socket={socket}
                             myName={myName}
@@ -260,12 +276,13 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the leaving player.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the leaving player.
+        socket.current.removeAllListeners("player_left");
         const handlePlayerLeft = (data) => {
             setPlayers(p => p.filter(player => player.session !== data['session']));
         }
@@ -282,12 +299,13 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the player who has readied, and optionally their name ("name", string) if it has changed.
+        socket.current.removeAllListeners("ready");
         const handleReady = (data) => {
             const sessionID = data['session'];
 
@@ -342,7 +360,8 @@ function RoomPage() {
             const p = players.find(player => player.session === Number(getSession()));
 
             if (p) {
-                setMyName(p.name);
+                setMyName(p.name); // This stale state thing still exists
+                p.ready = false;
             }
         }
         socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
@@ -357,12 +376,13 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Receives the session ID ("session", integer) of the player who has unreadied.
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
-        // Receives the session ID ("session", integer) of the player who has unreadied.
+        socket.current.removeAllListeners("unready");
         const handleUnready = (data) => {
             const sessionID = data['session'];
 
@@ -372,15 +392,8 @@ function RoomPage() {
                     if (player.session === sessionID) {
                         let thePlayer = player;
 
-                        // debugging
-                        console.log(`Player editing: ${thePlayer.name}`);
-                        console.log(`Ready state of the ${thePlayer.name}: ${thePlayer.ready}`);
-
                         // creates a copy of existing found 'player' with ready property set to false
                         thePlayer = { ...player, ready: false };
-
-                        // debugging
-                        console.log(`Ready state of the ${thePlayer.name} changes to ${thePlayer.ready}`);
 
                         return thePlayer;
                     }
@@ -407,6 +420,38 @@ function RoomPage() {
             return;
         }
 
+        socket.current.removeAllListeners("start_game");
+        const handleStartGame = (data) => {
+
+            if (data) {
+                console.log(data);
+            }
+            else {
+                console.log("Host has started");
+                // Handle transition here.
+
+                // for trying purposes
+                // setPageToRender(winterStage);
+            }
+        }
+        socket.current.on("start_game", handleStartGame);
+
+        return () => {
+            socket.current.off("start_game", handleStartGame);
+        }
+    }, [hasConnected]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
         
         return () => {
 
@@ -423,17 +468,10 @@ function RoomPage() {
             return;
         }
 
-        // Makes the decision to reverse the name change because the server has detected that someone else has this name.
-        const handleEditNameNameExists = () => {
-            // console.log("edit_name_name_exists");
-            // Return to edit mode and restore your old name.
-        }
-
         //fakerayray
 
         const handleRoleAssignmentChange = (data) => {
             console.log("Role Assignment change received:", data);  // Debugging
-            setIsRandomising(true);
             setCurrentSeason(data.state);
         };
         socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
@@ -477,9 +515,6 @@ function RoomPage() {
                 session: getSession()
             });
 
-            // socket.current.off("player_left", handlePlayerLeft);
-            // socket.current.off("ready", handleReady);
-            // socket.current.off("unready", handleUnready);
             // socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
             //fakerayray
             socket.current.off("role_assignment_changed", handleRoleAssignmentChange);

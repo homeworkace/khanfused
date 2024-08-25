@@ -8,7 +8,7 @@ function WinterDouble () {
                     <button>
                         Double Harvest
                     </button>
-                    <button>
+                    <button> 
                         Proceed
                     </button>
                 </div>

@@ -152,6 +152,10 @@ def leave_lobby():
 def clear_sessions():
     removed_sessions = db.clear_sessions(1800)
     for session, lobby_code in removed_sessions :
+        if lobby_code is None:
+            continue
+        if not lobby_code in rooms :
+            continue
         the_lobby = rooms[lobby_code]
         for player in range(len(the_lobby.players)) :
             if the_lobby.players[player][0] != session :
@@ -159,7 +163,7 @@ def clear_sessions():
             the_lobby.players.pop(player)
             the_lobby.ready.pop(player)
             break
-        if len(rooms[lobby_code].players) < 1 :
+        if len(the_lobby.players) < 1 :
             del rooms[lobby_code]
 
 @socket_app.on('join')
@@ -214,7 +218,6 @@ def socket_on_confirm_name(data):
     else :
         emit('ready', { 'session' : int(data['session']) }, room = session[3])
 
-
 @socket_app.on('edit_name')
 def socket_on_edit_name(data):
     session = db.query_session(data['session'])
@@ -229,6 +232,19 @@ def socket_on_edit_name(data):
 
     # Notify other players that this player is unready.
     emit('unready', { 'session' : int(data['session']) }, room = session[3], include_self = False)
+
+@socket_app.on('start_game')
+def socket_on_start_game(data):
+    session = db.query_session(data['session'])
+
+    # Attempt to start the game in the lobby.
+    the_lobby = rooms[session[3]]
+    result = the_lobby.start()
+    if result is None :
+        # Notify other players that the game has started.
+        emit('start_game', room = session[3])
+    else :
+        emit('start_game', { 'message' : result })
 
 @socket_app.on('start_instructions')
 def socket_start_instructions(data):

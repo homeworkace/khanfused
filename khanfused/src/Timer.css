@@ -1,0 +1,24 @@
+
+.timer-container {
+    position: absolute;
+    top: 10px; 
+    left: 10px; 
+    z-index: 10; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .timer-icon {
+    width: 30px; 
+    height: 30px; 
+  }
+
+  .timer-text {
+    color: black; 
+    font-size: 1.5rem; 
+    margin-left: 10px;
+  }
+  
