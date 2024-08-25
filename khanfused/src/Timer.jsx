@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import './Timer.css'; 
 
 const Timer = ({ duration, onTimeUp }) => {
-  const [timeLeft, setTimeLeft] = useState(duration); 
+  const [timeLeft, setTimeLeft] = useState(duration);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       if (onTimeUp) {
-        onTimeUp(); 
+        onTimeUp();
       }
       return;
     }
@@ -19,8 +20,8 @@ const Timer = ({ duration, onTimeUp }) => {
   }, [timeLeft, onTimeUp]);
 
   return (
-    <div>
-      <h1>Time Left: {timeLeft} seconds</h1>
+    <div className="timer-container">
+      Time Left: {timeLeft} seconds
     </div>
   );
 };
