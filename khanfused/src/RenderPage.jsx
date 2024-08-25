@@ -291,21 +291,32 @@ function RoomPage() {
         const handleReady = (data) => {
             const sessionID = data['session'];
 
-            // If the player is yourself, then forget the old name.
-            // player.name is updated to myName based on matching session ID
-            if (data["session"] === Number(getSession())) {
-                // forget the old name
-                setPlayers(p => p.map(player => player.session === sessionID ? { ...player, name: myName } : player));
-            }
-            else {
-                let thePlayer = players.find(p => p["session"] === sessionID);
-                thePlayer["ready"] = true;
-                if ("name" in data) {
-                    thePlayer["name"] = data["name"];
-                }
+            // 'p' is the previous state of 'players'
+            setPlayers((p) => {
+                // return a new array of 'p' with elements of 'p' named 'player'
+                return p.map((player) => {
+                    // find that specific 'player' with matching sessionID
+                    if (player.session === sessionID) {
 
-                setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player))
-            }
+                        // creates a shallow copy of existing found 'player' with ready property set to true
+                        let thePlayer = { ...player, ready: true };
+
+                        // if the session ID turns out to be my own session ID
+                        if (sessionID === Number(getSession())) {
+                            
+                            thePlayer.name = myName;
+
+                        } else if ("name" in data) {
+                            // update the other player's name if name is provided
+                            thePlayer.name = data['name'];
+                        }
+
+                        return thePlayer;
+                    }
+
+                    return player;
+                });
+            });
         }
         socket.current.on("ready", handleReady);
 
@@ -326,14 +337,12 @@ function RoomPage() {
 
         socket.current.removeAllListeners("confirm_name_name_exists");
         const handleConfirmNameNameExists = () => {
+
             // restore the old name
-            // myName = player.name based on matching session ID
             const p = players.find(player => player.session === Number(getSession()));
-            // console.log(`Player name found: ${p.name}`);
 
             if (p) {
                 setMyName(p.name);
-                // console.log(`myName: ${myName}`);
             }
         }
         socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
@@ -355,15 +364,31 @@ function RoomPage() {
 
         // Receives the session ID ("session", integer) of the player who has unreadied.
         const handleUnready = (data) => {
-            console.log(data['session']);
             const sessionID = data['session'];
 
-            let thePlayer = players.find(player => player.session === sessionID);
-            console.log(thePlayer['ready']);
-            thePlayer['ready'] = false;
-            console.log(thePlayer['ready']);
+            setPlayers((p) => {
+                return p.map((player) => {
+                    // find that specific 'player' with matching sessionID
+                    if (player.session === sessionID) {
+                        let thePlayer = player;
 
-            // might want to disable start button here (for host)
+                        // debugging
+                        console.log(`Player editing: ${thePlayer.name}`);
+                        console.log(`Ready state of the ${thePlayer.name}: ${thePlayer.ready}`);
+
+                        // creates a copy of existing found 'player' with ready property set to false
+                        thePlayer = { ...player, ready: false };
+
+                        // debugging
+                        console.log(`Ready state of the ${thePlayer.name} changes to ${thePlayer.ready}`);
+
+                        return thePlayer;
+                    }
+
+                    return player;
+                });
+            });
+
         }
         socket.current.on("unready", handleUnready);
 
