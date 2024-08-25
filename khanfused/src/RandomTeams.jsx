@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import './RandomTeams.css';
 import Timer from './Timer';
 
-function RandomTeams ( {handleSpringChangeClick, handleKhanWin}) {
+function RandomTeams ( {handleSpringChangeClick, handleLordWins}) {
     const questionRef = useRef<LottieRefCurrentProps>(null);
     
     const handleTimeUp = () => {
@@ -16,7 +16,7 @@ function RandomTeams ( {handleSpringChangeClick, handleKhanWin}) {
         <div className="randomTeams">
             <div className="randomTeams-container">
                 <div className="randomTeams-button-bar">
-                    <button onClick={handleKhanWin}>
+                    <button onClick={handleLordWins}>
                         Randomise Teams
                     </button>
                     <button onClick = {handleSpringChangeClick}>
