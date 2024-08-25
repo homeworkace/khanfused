@@ -3,11 +3,22 @@
     position: absolute;
     top: 10px; 
     left: 10px; 
-    background-color: rgba(0, 0, 0, 0.7); 
-    color: white;
+    z-index: 10; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px;
     border-radius: 5px;
-    font-size: 1rem;
-    z-index: 10; 
+  }
+  
+  .timer-icon {
+    width: 30px; 
+    height: 30px; 
+  }
+
+  .timer-text {
+    color: black; 
+    font-size: 1.5rem; 
+    margin-left: 10px;
   }
   

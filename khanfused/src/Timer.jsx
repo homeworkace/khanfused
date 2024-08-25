@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Timer.css'; 
+import timer from './Assets/timer.svg';
 
 const Timer = ({ duration, onTimeUp }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -21,7 +22,8 @@ const Timer = ({ duration, onTimeUp }) => {
 
   return (
     <div className="timer-container">
-      Time Left: {timeLeft} seconds
+      <img src = {timer} alt = "Time Left:" className="timer-icon" />
+      <span className="timer-text">{timeLeft}</span>
     </div>
   );
 };
