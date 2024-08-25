@@ -18,6 +18,7 @@ import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
 import KhanWin from './KhanWin.jsx';
 import LordWin from './LordWin.jsx';
+import InsufficentFood from './InsufficentFood.jsx';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,10 +42,15 @@ function RoomPage() {
     const [winterStage, setWinterStage] = useState(false);
     const [khanWin, setKhanWin] = useState(false);
     const [lordWin, setLordWin] = useState(false);
+    const [insufficentFood, setInsufficentFood] = useState(false);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const handleInsufficentFood = () => {
+        setInsufficentFood(true);
+    }
 
     const handleLordWins = () => { 
         setLordWin(true);
@@ -89,10 +95,15 @@ function RoomPage() {
         if (hasConnected) {
             switch (true) {
 
-                // lordWin scenario -- to be replaced with actual state
-                case lordWin:
-                    return <LordWin
+                // insufficentFood scenario -- to be replaced with actual state
+                case insufficentFood:
+                    return <InsufficentFood
                 />
+
+                // lordWin scenario -- to be replaced with actual state
+                // case lordWin:
+                //     return <LordWin
+                // />
 
                 // khanWin screnario -- to be repladed with actual state
                 // case khanWin:
@@ -142,7 +153,8 @@ function RoomPage() {
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
                     // handleKhanWin = {handleKhanWin}
-                    handleLordWins = {handleLordWins}
+                    // handleLordWins = {handleLordWins}
+                    handleInsufficentFood = {handleInsufficentFood}
                 />
 
                 default:
