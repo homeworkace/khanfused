@@ -35,6 +35,10 @@ function RoomPage() {
     const socket = useRef(null);
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
+    const [role, setRole] = useState(0); // 0 if king, 1 if lord, 2 if khan
+    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
+    const [king, setKing] = useState(0); // session ID of king
+    const [grain, setGrain] = useState(0);
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -209,25 +213,27 @@ function RoomPage() {
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
         socket.current = io("http://localhost:5000", { autoConnect: false });
 
-        // Makes the decision to load the lobby pages when the server returns acknowledgement.
-        const handleConnect = () => {
-            setHasConnected(true);
-        }
-        socket.current.once("connect", handleConnect);
-
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
             let _players = [];
             for (let i = 0; i < data['players'].length; ++i) {
-                _players.push({
-                    session: data['players'][i][0],
-                    name: data['players'][i][1],
-                    ready: data['ready'][i]
-                });
+                let thePlayer = {};
+                thePlayer.session = data['players'][i][0];
+                thePlayer.name = data['players'][i][1];
+                thePlayer.ready = data['ready'][i];
+                _players.push(thePlayer);
+                //if (data['state'] !== 'waiting' && data['state'] !== 'instructions' && data['state'] !== 'role_assignment') {
+                //    _players
             }
-
             setPlayers(_players);
-            console.log('Players joined: ', players);
+            //setRole(data['role']);
+            //setStatus(data['status']);
+            //if ('king' in data) {
+            //  setKing(data['king']);
+            //}
+            setGrain(data['grain']);
+
+            setHasConnected(true);
         }
         socket.current.once("join", handleJoin);
 
