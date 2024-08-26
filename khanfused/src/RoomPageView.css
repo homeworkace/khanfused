@@ -79,17 +79,6 @@
     /* align-self: center; */
 }
 
-.roomPageView-list-container span {
-    /* align-self: center; */
-}
-
-.roomPageView-list-container img, span, button {
-    /* border: 1px solid black; */
-}
-
-.listed-name {
-
-}
 
 
 
@@ -118,7 +107,7 @@
 
 
 .spacing {
-    /* flex-grow: 0.5; */
+    flex-grow: 0.5;
 }
 
 .randomise-button {
