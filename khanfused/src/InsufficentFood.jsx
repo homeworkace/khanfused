@@ -7,6 +7,8 @@ function InsufficentFood() {
         Not enough <strong className="highlight">FOOD</strong> have been <strong className="highlight">harvested</strong> for the  <strong className="highlight">EMPIRE</strong>
       </h1>
       <h2>The <strong className="highlight">EMPIRE</strong> have <strong className="highlight">FALLEN</strong></h2>
+
+      <button>Leave</button>
     </div>
   );
 }

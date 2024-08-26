@@ -431,7 +431,7 @@ function RoomPage() {
                 // Handle transition here.
 
                 // for trying purposes
-                setPageToRender(currentSeason);
+                setPageToRender(currentSeason === "spring");
             }
         }
         socket.current.on("start_game", handleStartGame);
