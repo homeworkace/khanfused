@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext, createContext} from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
@@ -25,7 +25,7 @@ import InsufficentFood from './InsufficentFood.jsx';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function RoomPage() {
+function RoomPage() {       
 
     const navigate = useNavigate();
     const { code } = useParams();
@@ -36,6 +36,8 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [pageToRender, setPageToRender] = useState("default");
+    // Test wrap -- createContext()
+    const RoleContext = createContext();
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -44,6 +46,9 @@ function RoomPage() {
     const [khanWin, setKhanWin] = useState(false);
     const [lordWin, setLordWin] = useState(false);
     const [insufficentFood, setInsufficentFood] = useState(false);
+
+    // Test wrap -- createContext()
+    const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
