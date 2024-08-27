@@ -27,7 +27,9 @@ class lobby :
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
+        self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
+        self.timer = 0
 
         self.machine = Machine(model=self, states=fsm_states, transitions=fsm_transitions, initial='waiting')
 
@@ -37,9 +39,10 @@ class lobby :
         result['password'] = self.password
         result['players'] = self.players
         result['ready'] = self.ready
-        #result['roles'] = self.roles
-        #result['status'] = self.status
-        #result['grain'] = self.grain
+        result['roles'] = self.roles
+        result['status'] = self.status
+        result['choices'] = self.choices
+        result['grain'] = self.grain
         return result
 
     def unminified(lobby_to_copy) :
@@ -48,9 +51,9 @@ class lobby :
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
         result.ready = lobby_to_copy['ready']
-        #result.roles = lobby_to_copy['roles']
-        #result.status = lobby_to_copy['status']
-        #result.grain = lobby_to_copy['grain']
+        result.roles = lobby_to_copy['roles']
+        result.status = lobby_to_copy['status']
+        result.grain = lobby_to_copy['grain']
         return result
 
     # Define states and transitions

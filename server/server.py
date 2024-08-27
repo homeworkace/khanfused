@@ -93,7 +93,7 @@ def join_lobby():
     the_lobby = rooms[data['lobby_code']]
 
     # Check if the game has already started.
-    if the_lobby['state'] != 'waiting' :
+    if the_lobby.state != 'waiting' :
         return { 'message': 'Game is in progress' }, 400
 
     # Check if the provided password matches with the lobby's.
@@ -133,7 +133,7 @@ def leave_lobby():
     the_lobby = rooms[lobby_code]
 
     # If the game has already started, reject this request.
-    if the_lobby['state'] != 'waiting' :
+    if the_lobby.state != 'waiting' :
         return { 'message': 'Wrong password' }, 400
 
     for player in range(len(the_lobby.players)) :
