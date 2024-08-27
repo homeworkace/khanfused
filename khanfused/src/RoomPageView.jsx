@@ -98,6 +98,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             //console.log(Number(getSession()));
 
 
+        
             return (
                 <li key={player.session}>
                     {player.session === Number(getSession()) ?
@@ -130,6 +131,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             )
         });
     }
+
 
     return (
         <div className="roomPageView">

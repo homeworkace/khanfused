@@ -4,7 +4,7 @@ function LordWin() {
   return (
     <div className="lord-win-container">
       <h1 className="fade-in-text">
-        All the <strong className="highlight">KHANS</strong> have been <strong className="highlight">PURGED</strong> from the  <strong className="highlight">EMPIRE</strong>
+        All the <strong className="highlight">KHANS</strong> have been <strong className="highlight">PURGED</strong> from the  <strong className="highlight">KINGDOM</strong>
       </h1>
       <h2>The <strong className="highlight">LORDS</strong> have won</h2>
 

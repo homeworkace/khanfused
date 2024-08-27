@@ -1,3 +1,4 @@
+
 .roomPageView {
     display: flex;
     flex-direction: column;
@@ -100,9 +101,6 @@
 .grayed-out {
     color: grey;
 }
-
-
-
 
 
 

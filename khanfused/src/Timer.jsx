@@ -32,4 +32,5 @@ const Timer = ({ duration, onTimeUp }) => {
   );
 };
 
+
 export default Timer;
