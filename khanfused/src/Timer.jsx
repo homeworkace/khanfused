@@ -22,8 +22,12 @@ const Timer = ({ duration, onTimeUp }) => {
 
   return (
     <div className="timer-container">
-      <img src = {timer} alt = "Time Left:" className="timer-icon" />
-      <span className="timer-text">{timeLeft}</span>
+      <img
+      src={timer}
+      alt="Timer Icon"
+      className={`timer-icon ${timeLeft <= 5 ? 'shake' : ' '}`} 
+      />
+      <span className={`timer-text" ${timeLeft <= 5 ? 'red-text' : 'timer-text'}`}> {timeLeft}</span>
     </div>
   );
 };
