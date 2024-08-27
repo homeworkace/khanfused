@@ -94,7 +94,7 @@ function RoomPage() {
     
     const renderPage = () => {
         if (hasConnected) {
-            switch (pageToRender) {
+            switch (true) {
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case insufficentFood:
