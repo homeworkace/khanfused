@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext, createContext} from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
@@ -36,6 +36,8 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [pageToRender, setPageToRender] = useState("default");
+    // Test wrap -- createContext()
+    const RoleContext = createContext();
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -43,7 +45,9 @@ function RoomPage() {
     const [winterStage, setWinterStage] = useState(false);
     const [khanWin, setKhanWin] = useState(false);
     const [lordWin, setLordWin] = useState(false);
-    const [insufficentFood, setInsufficentFood] = useState(false);
+    const [insufficentFood, setInsufficentFood] = useState(false); 
+    // Test wrap -- createContext()
+    const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +98,7 @@ function RoomPage() {
     
     const renderPage = () => {
         if (hasConnected) {
-            switch (pageToRender) {
+            switch (true) {
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case insufficentFood:
@@ -628,7 +632,9 @@ function RoomPage() {
 
     return (
         <>
+        <RoleContext.Provider value={{setRoleToLord, roleToLord}}>
             {renderPage()}
+        </RoleContext.Provider>
         </>
     )
 
