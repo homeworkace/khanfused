@@ -98,34 +98,32 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             //console.log(Number(getSession()));
 
 
+        
             return (
                 <li key={player.session}>
                     {player.session === Number(getSession()) ?
                         (editMode ?
                             (
-                                <div>
+                                <div className="roomPageView-list-container">
                                     <input placeholder="Enter your name" value={myName} onChange={handleInputChange} />
                                     <button onClick={handleEditClick}> Submit </button>
                                 </div>
                             ) : (
-                                <div>
+                                <div className="roomPageView-list-container">
+                                    <img src={tick} />
                                     <span> {myName} </span>
                                     <button onClick={handleEditClick}> Edit </button>
-                                    <div className="roomPageView-tick">
-                                        <img src={tick} />
-                                    </div>
+
                                 </div>
                             )
                         ) : (
-                            <div>
-                                <span key={player.name} className={player.name ? "" : "grayed-out"}>
+                            <div className="roomPageView-list-container">
+                                {player.ready && (
+                                    <img src={tick} />
+                                )}
+                                <span key={player.name} className={player.name ? "listed-name" : "grayed-out"}>
                                     {player.name ? player.name : placeholderNames[player.session % 100]}
                                 </span>
-                                {player.ready && (
-                                    <div className="roomPageView-tick">
-                                        <img src={tick} />
-                                    </div>
-                                )}
                             </div>
                         )
                     }
@@ -133,6 +131,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
             )
         });
     }
+
 
     return (
         <div className="roomPageView">
@@ -149,9 +148,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                     { displayPlayerList() }
                 </ul>
             </div>
-            <div className="current-season">
-                <h2>Current Season: {currentSeason}</h2>
-            </div>
+
             <div className="roomPageView-button-bar">
                 {players.length > 0 && players[0]["session"] == Number(getSession()) &&
                     (
@@ -164,13 +161,15 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                 <button onClick={ leaveRoomClick }>
                     Leave Room
                 </button>
-                <button onClick={ handleRoleAssignmentChangeClick }>
-                    Randomise
-                </button>
-                
-
             </div>
-           
+
+            <button className="randomise-button" onClick={ handleRoleAssignmentChangeClick }>
+                    Randomise
+            </button>
+
+            <div className="current-season">
+            <h2>Current Season: {currentSeason}</h2>
+            </div>         
         </div>
     );
 }
