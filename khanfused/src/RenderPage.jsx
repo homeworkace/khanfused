@@ -25,7 +25,7 @@ import InsufficentFood from './InsufficentFood.jsx';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function RoomPage() {
+function RoomPage() {       
 
     const navigate = useNavigate();
     const { code } = useParams();
@@ -45,7 +45,8 @@ function RoomPage() {
     const [winterStage, setWinterStage] = useState(false);
     const [khanWin, setKhanWin] = useState(false);
     const [lordWin, setLordWin] = useState(false);
-    const [insufficentFood, setInsufficentFood] = useState(false); 
+    const [insufficentFood, setInsufficentFood] = useState(false);
+
     // Test wrap -- createContext()
     const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +99,7 @@ function RoomPage() {
     
     const renderPage = () => {
         if (hasConnected) {
-            switch (true) {
+            switch (pageToRender) {
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case insufficentFood:
@@ -632,9 +633,7 @@ function RoomPage() {
 
     return (
         <>
-        <RoleContext.Provider value={{setRoleToLord, roleToLord}}>
             {renderPage()}
-        </RoleContext.Provider>
         </>
     )
 
