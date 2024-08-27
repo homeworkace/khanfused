@@ -137,6 +137,7 @@ function RoomPage() {
                 case currentSeason == "role_assignment": 
                     return <RandomTeams
                     handleSpringChangeClick = {handleSpringChangeClick}
+                    players = {players}
                     //proceedToSpring = {proceedToSpring}
                     />
 

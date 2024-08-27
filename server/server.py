@@ -264,9 +264,12 @@ def socket_start_role_assignment(data):
     if lobby_code in rooms:
         lobby = rooms[lobby_code]
         lobby.role_assignment_transition()
+        #players_with_roles = lobby.role_assignment_transition(lobby.players)
         emit('role_assignment_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
+        #emit('roles_assigned', {'players': players_with_roles}, broadcast=True)
     else:
         print("Lobby not found.")
+
 
 @socket_app.on('spring_transition')
 def socket_spring_transition(data):
