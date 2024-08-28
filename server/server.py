@@ -62,7 +62,7 @@ def create_lobby():
 
     # Generate a lobby code and create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
-    rooms[lobby_code] = lobby(data['password'])
+    rooms[lobby_code] = lobby(scheduler, data['password'])
     
     # Add the player into the lobby.
     the_lobby = rooms[lobby_code]
@@ -359,7 +359,7 @@ if __name__ == '__main__':
         rooms = json.load(rooms_file)
         rooms_file.close()
         for code in rooms :
-            rooms[code] = lobby.unminified(rooms[code])
+            rooms[code] = lobby.unminified(rooms[code], scheduler)
     try :
         # app.run(debug=True, use_reloader=False)
         socket_app.run(app)
