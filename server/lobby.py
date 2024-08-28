@@ -1,6 +1,7 @@
 import random
 import string
 from transitions import Machine
+from flask_socketio import emit
 
 fsm_states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
             'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
@@ -55,6 +56,27 @@ class lobby :
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
         return result
+
+    def join_lobby(self, session, name = None) :
+        if self.state != 'waiting' :
+            return False
+
+        self.players.append((session, name))
+        self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
+        return True
+
+    def leave_lobby(self, session) :
+        if self.state != 'waiting' :
+            return False
+
+        for player in range(len(self.players)) :
+            if self.players[player][0] != session :
+                continue
+            self.players.pop(player)
+            self.ready.pop(player)
+            return True
+        
+        return False
 
     # Define states and transitions
     
@@ -111,6 +133,13 @@ class lobby :
             print("Transitioned to Winter.")
         else:
             print("Winter transition failed.")
+
+    def waiting_transition(self) :
+        self.ready = [True] * len(self.players)
+        self.roles = []
+        self.status = []
+        self.choices = []
+        self.grain = 0
 
     def _can_start_instructions(self):
         # Example condition to start instructions; modify based on your game logic

@@ -32,6 +32,7 @@ function RoomPage() {
     const [shouldConnect, setShouldConnect] = useState(false);
     const [hasConnected, setHasConnected] = useState(false);
     const [currentSeason, setCurrentSeason] = useState("waiting");
+    const [pageToRender, setPageToRender] = useState("default");
     const socket = useRef(null);
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
@@ -100,70 +101,7 @@ function RoomPage() {
     
     const renderPage = () => {
         if (hasConnected) {
-            switch (true) {
-
-                // insufficentFood scenario -- to be replaced with actual state
-                case insufficentFood:
-                    return <InsufficentFood
-                />
-
-                // lordWin scenario -- to be replaced with actual state
-                // case lordWin:
-                //     return <LordWin
-                // />
-
-                // khanWin screnario -- to be repladed with actual state
-                // case khanWin:
-                //     return <KhanWin
-                // />
-
-                case winterStage:
-                    return <WinterDouble
-                />
-
-                case currentSeason == "winter":
-                    return <WinterGamePlay
-                    handleWinterStage = {handleWinterStage}
-                />
-
-                case autumnStage:
-                    return <AutumnDouble
-                    handleWinterChangeClick={handleWinterChangeClick}
-                />
-
-                case currentSeason == "autumn":
-                    return <AutumnGamePlay 
-                    handleAutumnStage = {handleAutumnStage}
-                />
-
-                case summerStage:
-                    return <SummerDouble
-                    handleAutumnChangeClick={handleAutumnChangeClick}
-                />
-
-                case currentSeason == "summer":
-                    return <SummerGamePlay
-                    handleSummerStage = {handleSummerStage}
-                />
-
-                case currentSeason == "double_harvest":
-                    return <SpringDouble
-                    handleSummerChangeClick={handleSummerChangeClick} 
-                />
-                
-                case currentSeason == "spring":
-                    return <SpringGamePlay
-                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
-                />  
-
-                case currentSeason == "role_assignment": 
-                    return <RandomTeams
-                    handleSpringChangeClick = {handleSpringChangeClick}
-                    // handleKhanWin = {handleKhanWin}
-                    // handleLordWins = {handleLordWins}
-                    handleInsufficentFood = {handleInsufficentFood}
-                />
-
+            switch (pageToRender) {
                 default:
                     return (
                         <RoomPageView
@@ -179,6 +117,68 @@ function RoomPage() {
                             setMyName={setMyName}
                         />
                     )
+
+                case "role_assignment": 
+                    return <RandomTeams
+                    handleSpringChangeClick = {handleSpringChangeClick}
+                    // handleKhanWin = {handleKhanWin}
+                    // handleLordWins = {handleLordWins}
+                    handleInsufficentFood = {handleInsufficentFood}
+                />
+
+                case "spring":
+                    return <SpringGamePlay
+                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
+                />  
+
+                // insufficentFood scenario -- to be replaced with actual state
+                case "insufficentFood":
+                    return <InsufficentFood
+                />
+
+                // lordWin scenario -- to be replaced with actual state
+                // case lordWin:
+                //     return <LordWin
+                // />
+
+                // khanWin screnario -- to be repladed with actual state
+                // case khanWin:
+                //     return <KhanWin
+                // />
+
+                case "winterStage":
+                    return <WinterDouble
+                />
+
+                case "winter":
+                    return <WinterGamePlay
+                    handleWinterStage = {handleWinterStage}
+                />
+
+                case "autumnStage":
+                    return <AutumnDouble
+                    handleWinterChangeClick={handleWinterChangeClick}
+                />
+
+                case "autumn":
+                    return <AutumnGamePlay 
+                    handleAutumnStage = {handleAutumnStage}
+                />
+
+                case "summerStage":
+                    return <SummerDouble
+                    handleAutumnChangeClick={handleAutumnChangeClick}
+                />
+
+                case "summer":
+                    return <SummerGamePlay
+                    handleSummerStage = {handleSummerStage}
+                />
+
+                case "double_harvest":
+                    return <SpringDouble
+                    handleSummerChangeClick={handleSummerChangeClick} 
+                />
             }
         }
     };
@@ -234,7 +234,7 @@ function RoomPage() {
             //if ('king' in data) {
             //  setKing(data['king']);
             //}
-            setGrain(data['grain']);
+            //setGrain(data['grain']);
 
             setHasConnected(true);
         }
@@ -438,9 +438,7 @@ function RoomPage() {
             else {
                 console.log("Host has started");
                 // Handle transition here.
-
-                // for trying purposes
-                setPageToRender(currentSeason === "spring");
+                setCurrentSeason("role_assignment");
             }
         }
         socket.current.on("start_game", handleStartGame);
@@ -455,6 +453,39 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        /**
+         *      refresh button leads to default page for now
+         *      will work on it
+         */
+        if (currentSeason !== "waiting") {
+
+            if (currentSeason === "role_assignment") setPageToRender("role_assignment");
+            if (currentSeason === "spring") setPageToRender("spring");
+            if (currentSeason === "summer") setPageToRender("summerStage");
+            if (currentSeason === "autumn") setPageToRender("autumnStage");
+            if (currentSeason === "winter") setPageToRender("winterStage");
+            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
+
+        } else {
+            setPageToRender("default");
+        }
+
+        
+        return () => {
+
+        }
+    }, [currentSeason]);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         if (!hasConnected) {

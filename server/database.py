@@ -28,18 +28,20 @@ class khanfused_db :
 				)
 			)
 
-	def clear_sessions(self, age_in_seconds) :
+	def clear_sessions_1(self, age_in_seconds) :
 		result = self.write(
 			'''SELECT id, lobby FROM Sessions WHERE last_active < ?''', (
 				math.floor(time.time()) - age_in_seconds,
 				)
 			)
+		return result
+
+	def clear_sessions_2(self, sessions) :
 		self.write(
-			'''DELETE FROM Sessions WHERE last_active < ?''', (
-				math.floor(time.time()) - age_in_seconds,
+			f'''DELETE FROM Sessions WHERE id IN ({','.join(['?']*len(sessions))})''', (
+				sessions
 				)
 			)
-		return result
 
 	def update_lobby(self, session_id, lobby_code = None) :
 		self.write(
