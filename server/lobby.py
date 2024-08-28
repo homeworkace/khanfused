@@ -1,5 +1,6 @@
 import random
 import string
+from flask_socketio import emit
 import time
 
 states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
@@ -12,6 +13,7 @@ class lobby :
         self.players = []
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
+        self.perspectives = []
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
@@ -24,6 +26,7 @@ class lobby :
         result['players'] = self.players
         result['ready'] = self.ready
         result['roles'] = self.roles
+        result['perspectives'] = self.perspectives
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
@@ -36,13 +39,33 @@ class lobby :
         result.players = lobby_to_copy['players']
         result.ready = lobby_to_copy['ready']
         result.roles = lobby_to_copy['roles']
+        result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
         return result
 
-    # Define states and transitions
-    
+    def join_lobby(self, session, name = None) :
+        if self.state != 'waiting' :
+            return False
 
+        self.players.append((session, name))
+        self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
+        return True
+
+    def leave_lobby(self, session) :
+        if self.state != 'waiting' :
+            return False
+
+        for player in range(len(self.players)) :
+            if self.players[player][0] != session :
+                continue
+            self.players.pop(player)
+            self.ready.pop(player)
+            return True
+        
+        return False
+
+    
     def start(self) :
         if len(self.players) < 1 : # Change to 6 when needed
             return "Not enough players!"
@@ -82,6 +105,15 @@ class lobby :
         else:
             self.current_season_index = 0
             self.state = game_seasons[self.current_season_index]
+
+    def waiting_transition(self) :
+        self.ready = [True] * len(self.players)
+        self.roles = []
+        self.perspectives = []
+        self.status = []
+        self.choices = []
+        self.grain = 0
+        
 
     def get_state(self):
         return self.state
