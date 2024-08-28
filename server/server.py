@@ -66,9 +66,7 @@ def create_lobby():
     
     # Add the player into the lobby.
     the_lobby = rooms[lobby_code]
-    the_lobby.players.append((int(data['session']), db.query_session(data['session'])[2]))
-    the_lobby.ready.append(not the_lobby.players[-1][1] is None) # If the player already has a name in the database, they are ready.
-
+    the_lobby.join_lobby(int(data['session']), db.query_session(data['session'])[2])
     db.update_lobby(data['session'], lobby_code)
 
     # Send relevant data back
@@ -106,9 +104,8 @@ def join_lobby():
         new_player_name = None
         db.update_name(data['session'], None)
 
-    # Add the new player. 
-    the_lobby.players.append((int(data['session']), new_player_name))
-    the_lobby.ready.append(not new_player_name is None) # If the player already has a non-conflicting name in the database, they are ready.
+    # Add the new player.
+    the_lobby.join_lobby(int(data['session']), new_player_name)
     db.update_lobby(data['session'], data['lobby_code'])
 
     # Send the client a redirect.
@@ -116,7 +113,7 @@ def join_lobby():
     result['redirect'] = '/room/' + data['lobby_code']
     
     # Notify other players.
-    emit('new_player', { 'session' : rooms[data['lobby_code']].players[-1][0], 'name' : rooms[data['lobby_code']].players[-1][1] }, room = data['lobby_code'], namespace = '/')
+    emit('new_player', { 'session' : int(data['session']), 'name' : new_player_name }, room = data['lobby_code'], namespace = '/')
 
     return result
 
@@ -134,14 +131,10 @@ def leave_lobby():
 
     # If the game has already started, reject this request.
     if the_lobby.state != 'waiting' :
-        return { 'message': 'Wrong password' }, 400
+        return { 'message': 'Game is in progress' }, 400
 
-    for player in range(len(the_lobby.players)) :
-        if the_lobby.players[player][0] != int(data['session']) :
-            continue
-        the_lobby.players.pop(player)
-        the_lobby.ready.pop(player)
-        break
+    if the_lobby.leave_lobby(int(data['session'])) :
+        db.update_lobby(data['session'], None)
     
     # If this results in an empty lobby, remove the lobby too.
     if len(rooms[lobby_code].players) < 1 :
@@ -149,8 +142,6 @@ def leave_lobby():
     else: 
         # Otherwise, notify remaining players.
         emit('player_left', { 'session' : int(data['session']) }, room = lobby_code, namespace = '/')
-        
-    db.update_lobby(data['session'], None)
 
     # Send the client a redirect.
     result = {}
@@ -161,27 +152,40 @@ def leave_lobby():
 # Routinely clear sessions whose last_active is older than 30 minutes.
 @scheduler.task('interval', id='clear_sessions', seconds=10)
 def clear_sessions():
-    removed_sessions = db.clear_sessions(1800)
+    removed_sessions = db.clear_sessions_1(1800)
     for session, lobby_code in removed_sessions :
         if lobby_code is None:
             continue
         if not lobby_code in rooms :
             continue
         the_lobby = rooms[lobby_code]
-        for player in range(len(the_lobby.players)) :
-            if the_lobby.players[player][0] != session :
-                continue
-            the_lobby.players.pop(player)
-            the_lobby.ready.pop(player)
-            break
-        if len(the_lobby.players) < 1 :
-            del rooms[lobby_code]
+        if the_lobby.state != 'waiting' : # If a game is in progress, mark the session for deletion instead.
+            for player in range(len(the_lobby.players)) :
+                if the_lobby.players[player][0] != session :
+                    continue
+                the_lobby.players[player] = the_lobby.players[player] + (True, )
+        else :
+            the_lobby.leave_lobby(session)
+            if len(the_lobby.players) < 1 :
+                del rooms[lobby_code]
+            else: 
+                # Otherwise, notify remaining players.
+                socket_app.emit('player_left', { 'session' : session }, room = lobby_code, namespace = '/')
+    db.clear_sessions_2(tuple([session[0] for session in removed_sessions]))
+
+    # Routinely remove players who could not be removed.
+    for code in list(rooms.keys()) :
+        the_lobby = rooms[code]
+        for player in [player for player in rooms[code].players if len(player) > 2] :
+            socket_app.emit('player_left', { 'session' : player[0] }, room = code, namespace = '/')
+        the_lobby.players = [player for player in rooms[code].players if len(player) < 3]
+        if len(rooms[code].players) < 1 :
+            del rooms[code]
 
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
-    print("Room Data on Join:", rooms[session[3]].minified()) 
     join_room(session[3])
 
 @socket_app.on('leave')
@@ -191,8 +195,6 @@ def socket_on_leave(data):
 
 @socket_app.on('confirm_name')
 def socket_on_confirm_name(data):
-    print(f"Received name confirmation: {data['name']} for session {data['session']}")
-
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
 
@@ -220,8 +222,6 @@ def socket_on_confirm_name(data):
     if name_is_different :
         # Update the name in the database.
         db.update_name(data['session'], data['name'])
-
-        print(f"Existing players: {the_lobby.players}")
 
         # Notify all players that this player is ready.
         emit('ready', { 'session' : int(data['session']), 'name' : data['name'] }, room = session[3])
