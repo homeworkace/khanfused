@@ -91,8 +91,8 @@ class lobby :
             if ready is False :
                 return "Not all players are ready!"
 
-        # state = 'instructions'
-        self.start_role_assignment()
+        self.state = 'role_assignment'
+        #self.start_role_assignment()
         return None
 
     def role_assignment_transition(self):
