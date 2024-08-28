@@ -27,6 +27,7 @@ class lobby :
         self.players = []
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
+        self.perspectives = []
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
@@ -41,6 +42,7 @@ class lobby :
         result['players'] = self.players
         result['ready'] = self.ready
         result['roles'] = self.roles
+        result['perspectives'] = self.perspectives
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
@@ -53,6 +55,7 @@ class lobby :
         result.players = lobby_to_copy['players']
         result.ready = lobby_to_copy['ready']
         result.roles = lobby_to_copy['roles']
+        result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
         return result
@@ -137,6 +140,7 @@ class lobby :
     def waiting_transition(self) :
         self.ready = [True] * len(self.players)
         self.roles = []
+        self.perspectives = []
         self.status = []
         self.choices = []
         self.grain = 0
