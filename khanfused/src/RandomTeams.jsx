@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import './RandomTeams.css';
 import Timer from './Timer';
 
-function RandomTeams ( {handleSpringChangeClick, handleInsufficentFood}) {
+function RandomTeams ( {players, handleSpringChangeClick}) {
     const questionRef = useRef<LottieRefCurrentProps>(null);
     
     const handleTimeUp = () => {

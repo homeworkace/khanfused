@@ -69,13 +69,37 @@ class lobby :
         # state = 'instructions'
         self.start_role_assignment()
         return None
+    
+    def randomize_roles(self, players):
 
-    def role_assignment_transition(self):
+        # Add predefined roles
+        self.roles.append("King")
+        self.roles.extend(["Khan", "Khan"])
+
+        # Fill the rest of the roles with "Lord"
+        while len(self.roles) < len(players):
+            self.roles.append("Lord")
+
+        # Shuffle the roles to randomize
+        random.shuffle(self.roles)
+
+        # Assign the roles to the players
+        players_with_roles = [
+            {"session": player['session'], "name": player['name'], "role": role}
+            for player, role in zip(players, self.roles)
+        ]
+
+        return players_with_roles
+
+    def role_assignment_transition(self, players):
         if self._can_start_role_assignment():
             self.start_role_assignment()
+            #player_with_roles = self.randomize_roles(players)
             print("Transitioned to Role Assignment.")
+            #return player_with_roles
         else:
             print("Role Assignment transition failed.")
+
     
     def spring_transition(self):
         if self._can_start_spring():
