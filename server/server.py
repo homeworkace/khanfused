@@ -89,11 +89,17 @@ def join_lobby():
     if not data['lobby_code'] in rooms :
         return { 'message': 'No lobby with this code' }, 400
 
+    
+    the_lobby = rooms[data['lobby_code']]
+
+    # Check if the game has already started.
+    if the_lobby.state != 'waiting' :
+        return { 'message': 'Game is in progress' }, 400
+
     # Check if the provided password matches with the lobby's.
-    if data['password'] != rooms[data['lobby_code']].password :
+    if data['password'] != the_lobby.password :
         return { 'message': 'Wrong password' }, 400
 
-    the_lobby = rooms[data['lobby_code']]
     # If the player's name in the database matches someone else's, remove their name.
     new_player_name = db.query_session(data['session'])[2]
     if new_player_name in [player[1] for player in the_lobby.players] :
@@ -125,6 +131,11 @@ def leave_lobby():
     # Retrieve the lobby code and remove the player from said lobby.
     lobby_code = db.query_session(data['session'])[3]
     the_lobby = rooms[lobby_code]
+
+    # If the game has already started, reject this request.
+    if the_lobby.state != 'waiting' :
+        return { 'message': 'Wrong password' }, 400
+
     for player in range(len(the_lobby.players)) :
         if the_lobby.players[player][0] != int(data['session']) :
             continue
