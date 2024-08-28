@@ -233,7 +233,7 @@ function RoomPage() {
             //if ('king' in data) {
             //  setKing(data['king']);
             //}
-            setGrain(data['grain']);
+            //setGrain(data['grain']);
 
             setHasConnected(true);
         }
