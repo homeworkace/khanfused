@@ -2,6 +2,7 @@ import random
 import string
 from transitions import Machine
 from flask_socketio import emit
+from flask_apscheduler import APScheduler
 
 fsm_states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
             'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
@@ -21,7 +22,7 @@ fsm_transitions = [
 ]
 
 class lobby :
-    def __init__(self, password='') :
+    def __init__(self, scheduler, password='') :
         self.state = 'waiting'
         self.password = password
         self.players = []
@@ -31,8 +32,9 @@ class lobby :
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
-        self.timer = 0
-
+        self.timer = scheduler
+        #self.next_job
+        
         self.machine = Machine(model=self, states=fsm_states, transitions=fsm_transitions, initial='waiting')
 
     def minified(self) :
@@ -48,7 +50,7 @@ class lobby :
         result['grain'] = self.grain
         return result
 
-    def unminified(lobby_to_copy) :
+    def unminified(lobby_to_copy, scheduler) :
         result = lobby()
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
@@ -58,6 +60,7 @@ class lobby :
         result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
+        result.scheduler = scheduler
         return result
 
     def join_lobby(self, session, name = None) :
@@ -93,6 +96,7 @@ class lobby :
 
         self.state = 'role_assignment'
         #self.start_role_assignment()
+        #self.scheduler.add_job(spring_start, 'interval', seconds = 5)
         return None
 
     def role_assignment_transition(self):
