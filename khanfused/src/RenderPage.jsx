@@ -455,6 +455,7 @@ function RoomPage() {
 
         return () => {
             socket.current.off("start_game_failed", handleStartGameFailure);
+            socket.current.off("change_state", handleStartGameFailure);
         }
     }, [hasConnected]);
 
