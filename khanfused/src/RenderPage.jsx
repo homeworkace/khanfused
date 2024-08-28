@@ -19,6 +19,7 @@ import WinterDouble from './WinterDouble.jsx';
 import KhanWin from './KhanWin.jsx';
 import LordWin from './LordWin.jsx';
 import InsufficentFood from './InsufficentFood.jsx';
+import Role from './Role.jsx';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,15 +121,15 @@ function RoomPage() {
 
                 case "role_assignment": 
                     return <RandomTeams
-                    handleSpringChangeClick = {handleSpringChangeClick}
-                    // handleKhanWin = {handleKhanWin}
-                    // handleLordWins = {handleLordWins}
-                    handleInsufficentFood = {handleInsufficentFood}
+                        handleSpringChangeClick = {handleSpringChangeClick}
+                        // handleKhanWin = {handleKhanWin}
+                        // handleLordWins = {handleLordWins}
+                        handleInsufficentFood = {handleInsufficentFood}
                 />
 
                 case "spring":
                     return <SpringGamePlay
-                    handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
+                        handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
                 // insufficentFood scenario -- to be replaced with actual state
@@ -152,33 +153,38 @@ function RoomPage() {
 
                 case "winter":
                     return <WinterGamePlay
-                    handleWinterStage = {handleWinterStage}
+                        handleWinterStage = {handleWinterStage}
                 />
 
                 case "autumnStage":
                     return <AutumnDouble
-                    handleWinterChangeClick={handleWinterChangeClick}
+                        handleWinterChangeClick={handleWinterChangeClick}
                 />
 
                 case "autumn":
                     return <AutumnGamePlay 
-                    handleAutumnStage = {handleAutumnStage}
+                        handleAutumnStage = {handleAutumnStage}
                 />
 
                 case "summerStage":
                     return <SummerDouble
-                    handleAutumnChangeClick={handleAutumnChangeClick}
+                        handleAutumnChangeClick={handleAutumnChangeClick}
                 />
 
                 case "summer":
                     return <SummerGamePlay
-                    handleSummerStage = {handleSummerStage}
+                        handleSummerStage = {handleSummerStage}
                 />
 
                 case "double_harvest":
                     return <SpringDouble
-                    handleSummerChangeClick={handleSummerChangeClick} 
+                        handleSummerChangeClick={handleSummerChangeClick} 
                 />
+
+                case "reveal_role":
+                    return <Role 
+                        players={players}
+                    />;
             }
         }
     };
@@ -429,22 +435,26 @@ function RoomPage() {
             return;
         }
 
-        socket.current.removeAllListeners("start_game");
-        const handleStartGame = (data) => {
+        // handle game start failure
+        const handleStartGameFailure = (data) => {
+            console.log(data['message']);
+        };
 
-            if (data) {
-                console.log(data);
-            }
-            else {
-                console.log("Host has started");
-                // Handle transition here.
-                setCurrentSeason("role_assignment");
-            }
+        const handleChangeState = (data) => {
+            console.log(`Changing to state: ${data['state']}`);
+            // setCurrentSeason(data['state']);
+
+            // testing king reveal page
+            setCurrentSeason("role");
+
+            console.log(`Role: ${data['role']}`);
         }
-        socket.current.on("start_game", handleStartGame);
+
+        socket.current.on("start_game_failed", handleStartGameFailure);
+        socket.current.on("change_state", handleChangeState);
 
         return () => {
-            socket.current.off("start_game", handleStartGame);
+            socket.current.off("start_game_failed", handleStartGameFailure);
         }
     }, [hasConnected]);
 
@@ -471,6 +481,7 @@ function RoomPage() {
             if (currentSeason === "autumn") setPageToRender("autumnStage");
             if (currentSeason === "winter") setPageToRender("winterStage");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
+            if (currentSeason === "role") setPageToRender("reveal_role");
 
         } else {
             setPageToRender("default");
