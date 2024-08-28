@@ -187,10 +187,12 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
     join_room(session[3])
+    join_room(data['session'])
 
 @socket_app.on('leave')
 def socket_on_leave(data):
     session = db.query_session(data['session'])
+    leave_room(data['session'])
     leave_room(session[3])
 
 @socket_app.on('confirm_name')
@@ -253,9 +255,18 @@ def socket_on_start_game(data):
     result = the_lobby.start()
     if result is None :
         # Notify other players that the game has started.
-        emit('start_game', room = session[3])
+        perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
+        emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(1, min(2, len(the_lobby.players))) :
+            perspective = [0] + ([1] * (len(the_lobby.players) - 1))
+            perspective[player] = 2
+            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(2, len(the_lobby.players)) :
+            perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
+            perspective[player] = 1
+            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
     else :
-        emit('start_game', { 'message' : result })
+        emit('start_game_failed', { 'message' : result })
 
 @socket_app.on('start_instructions')
 def socket_start_instructions(data):
