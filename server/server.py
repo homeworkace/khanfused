@@ -62,7 +62,7 @@ def create_lobby():
 
     # Generate a lobby code and create a new lobby in the backend.
     lobby_code = generate_lobby_code([code for code in rooms])
-    rooms[lobby_code] = lobby(data['password'])
+    rooms[lobby_code] = lobby(scheduler, data['password'])
     
     # Add the player into the lobby.
     the_lobby = rooms[lobby_code]
@@ -187,10 +187,12 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     emit('join', rooms[session[3]].minified())
     join_room(session[3])
+    join_room(data['session'])
 
 @socket_app.on('leave')
 def socket_on_leave(data):
     session = db.query_session(data['session'])
+    leave_room(data['session'])
     leave_room(session[3])
 
 @socket_app.on('confirm_name')
@@ -253,10 +255,18 @@ def socket_on_start_game(data):
     result = the_lobby.start()
     if result is None :
         # Notify other players that the game has started.
-        emit('start_game', room = session[3])
-        emit('role_assignment_time')
+        perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
+        emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(1, min(2, len(the_lobby.players))) :
+            perspective = [0] + ([1] * (len(the_lobby.players) - 1))
+            perspective[player] = 2
+            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(2, len(the_lobby.players)) :
+            perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
+            perspective[player] = 1
+            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
     else :
-        emit('start_game', { 'message' : result })
+        emit('start_game_failed', { 'message' : result })
 
     scheduler.add_job(func=lambda: transition_game_state(the_lobby), trigger='interval', seconds=20, id=f'{the_lobby}_transition', replace_existing=True)
     the_lobby.update_timer(20)
@@ -282,7 +292,7 @@ if __name__ == '__main__':
         rooms = json.load(rooms_file)
         rooms_file.close()
         for code in rooms :
-            rooms[code] = lobby.unminified(rooms[code])
+            rooms[code] = lobby.unminified(rooms[code], scheduler)
     try :
         # app.run(debug=True, use_reloader=False)
         socket_app.run(app)
