@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext, createContext} from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
@@ -25,7 +25,7 @@ import InsufficentFood from './InsufficentFood.jsx';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function RoomPage() {
+function RoomPage() {       
 
     const navigate = useNavigate();
     const { code } = useParams();
@@ -35,10 +35,9 @@ function RoomPage() {
     const socket = useRef(null);
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
-    const [role, setRole] = useState(0); // 0 if king, 1 if lord, 2 if khan
-    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
-    const [king, setKing] = useState(0); // session ID of king
-    const [grain, setGrain] = useState(0);
+    const [pageToRender, setPageToRender] = useState("default");
+    // Test wrap -- createContext()
+    const RoleContext = createContext();
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -47,6 +46,9 @@ function RoomPage() {
     const [khanWin, setKhanWin] = useState(false);
     const [lordWin, setLordWin] = useState(false);
     const [insufficentFood, setInsufficentFood] = useState(false);
+
+    // Test wrap -- createContext()
+    const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -314,22 +316,32 @@ function RoomPage() {
         const handleReady = (data) => {
             const sessionID = data['session'];
 
-            // If the player is yourself, then forget the old name.
-            // player.name is updated to myName based on matching session ID
-            if (data["session"] === Number(getSession())) {
-                // forget the old name
-                setPlayers(p => p.map(player => player.session === sessionID ? { ...player, name: myName } : player));
-            }
-            else {
-                let thePlayer = players.find(p => p["session"] === sessionID);
-                thePlayer["ready"] = true;
-                if ("name" in data) {
-                    thePlayer["name"] = data["name"];
-                }
+            // 'p' is the previous state of 'players'
+            setPlayers((p) => {
+                // return a new array of 'p' with elements of 'p' named 'player'
+                return p.map((player) => {
+                    // find that specific 'player' with matching sessionID
+                    if (player.session === sessionID) {
 
-                //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player))
-                //setPlayers(players);
-            }
+                        // creates a shallow copy of existing found 'player' with ready property set to true
+                        let thePlayer = { ...player, ready: true };
+
+                        // if the session ID turns out to be my own session ID
+                        if (sessionID === Number(getSession())) {
+                            
+                            thePlayer.name = myName;
+
+                        } else if ("name" in data) {
+                            // update the other player's name if name is provided
+                            thePlayer.name = data['name'];
+                        }
+
+                        return thePlayer;
+                    }
+
+                    return player;
+                });
+            });
         }
         socket.current.on("ready", handleReady);
 
@@ -350,15 +362,13 @@ function RoomPage() {
 
         socket.current.removeAllListeners("confirm_name_name_exists");
         const handleConfirmNameNameExists = () => {
+
             // restore the old name
-            // myName = player.name based on matching session ID
             const p = players.find(player => player.session === Number(getSession()));
-            // console.log(`Player name found: ${p.name}`);
 
             if (p) {
                 setMyName(p.name); // This stale state thing still exists
                 p.ready = false;
-                // console.log(`myName: ${myName}`);
             }
         }
         socket.current.on("confirm_name_name_exists", handleConfirmNameNameExists);
@@ -383,10 +393,22 @@ function RoomPage() {
         const handleUnready = (data) => {
             const sessionID = data['session'];
 
-            //setPlayers(p => p.map(player => player.session === Number(getSession()) ? { ...player, name: myName } : player));
-            //setPlayers(p => p.map(player => player.session === sessionID) ? { ...player, ready: false } : player);
-            let thePlayer = players.find(player => player.session === sessionID);
-            thePlayer['ready'] = false;
+            setPlayers((p) => {
+                return p.map((player) => {
+                    // find that specific 'player' with matching sessionID
+                    if (player.session === sessionID) {
+                        let thePlayer = player;
+
+                        // creates a copy of existing found 'player' with ready property set to false
+                        thePlayer = { ...player, ready: false };
+
+                        return thePlayer;
+                    }
+
+                    return player;
+                });
+            });
+
         }
         socket.current.on("unready", handleUnready);
 
@@ -398,7 +420,7 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Receives the session ID ("session", integer) of the player who has unreadied.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         if (!hasConnected) {
@@ -407,12 +429,16 @@ function RoomPage() {
 
         socket.current.removeAllListeners("start_game");
         const handleStartGame = (data) => {
+
             if (data) {
-                console.log(data["message"]);
+                console.log(data);
             }
             else {
                 console.log("Host has started");
                 // Handle transition here.
+
+                // for trying purposes
+                setPageToRender(currentSeason === "spring");
             }
         }
         socket.current.on("start_game", handleStartGame);
@@ -420,7 +446,7 @@ function RoomPage() {
         return () => {
             socket.current.off("start_game", handleStartGame);
         }
-    }, [players]);
+    }, [hasConnected]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,9 +522,6 @@ function RoomPage() {
                 session: getSession()
             });
 
-            // socket.current.off("player_left", handlePlayerLeft);
-            // socket.current.off("ready", handleReady);
-            // socket.current.off("unready", handleUnready);
             // socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
             //fakerayray
             socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
