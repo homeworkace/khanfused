@@ -1,6 +1,7 @@
 import random
 import string
 from transitions import Machine
+from flask_socketio import emit
 
 fsm_states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
             'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
@@ -26,6 +27,7 @@ class lobby :
         self.players = []
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
+        self.perspectives = []
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
@@ -40,6 +42,7 @@ class lobby :
         result['players'] = self.players
         result['ready'] = self.ready
         result['roles'] = self.roles
+        result['perspectives'] = self.perspectives
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
@@ -52,9 +55,31 @@ class lobby :
         result.players = lobby_to_copy['players']
         result.ready = lobby_to_copy['ready']
         result.roles = lobby_to_copy['roles']
+        result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
         return result
+
+    def join_lobby(self, session, name = None) :
+        if self.state != 'waiting' :
+            return False
+
+        self.players.append((session, name))
+        self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
+        return True
+
+    def leave_lobby(self, session) :
+        if self.state != 'waiting' :
+            return False
+
+        for player in range(len(self.players)) :
+            if self.players[player][0] != session :
+                continue
+            self.players.pop(player)
+            self.ready.pop(player)
+            return True
+        
+        return False
 
     # Define states and transitions
     
@@ -135,6 +160,14 @@ class lobby :
             print("Transitioned to Winter.")
         else:
             print("Winter transition failed.")
+
+    def waiting_transition(self) :
+        self.ready = [True] * len(self.players)
+        self.roles = []
+        self.perspectives = []
+        self.status = []
+        self.choices = []
+        self.grain = 0
 
     def _can_start_instructions(self):
         # Example condition to start instructions; modify based on your game logic
