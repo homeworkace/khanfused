@@ -1,24 +1,10 @@
 import random
 import string
-from transitions import Machine
+import time
 
-fsm_states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
+states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
             'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
-
-fsm_transitions = [
-    {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
-    {'trigger': 'start_role_assignment', 'source': '*', 'dest': 'role_assignment'},
-    {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
-    {'trigger': 'start_double_harvest', 'source': '*', 'dest': 'double_harvest'},
-    {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
-    {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
-    {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
-    {'trigger': 'transition_to_insufficient_food', 'source': '*', 'dest': 'insufficient_food'},
-    {'trigger': 'transition_to_khans_pillaged', 'source': '*', 'dest': 'khans_pillaged'},
-    {'trigger': 'transition_to_lords_killed', 'source': '*', 'dest': 'lords_killed'},
-    {'trigger': 'end_game', 'source': '*', 'dest': 'end_game'}
-]
-
+game_seasons = ['spring', 'double_harvest','summer', 'autumn', 'winter']
 class lobby :
     def __init__(self, password='') :
         self.state = 'waiting'
@@ -30,8 +16,6 @@ class lobby :
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
         self.timer = 0
-
-        self.machine = Machine(model=self, states=fsm_states, transitions=fsm_transitions, initial='waiting')
 
     def minified(self) :
         result = {}
@@ -66,19 +50,19 @@ class lobby :
             if ready is False :
                 return "Not all players are ready!"
 
-        # state = 'instructions'
-        self.start_role_assignment()
+        self.state = 'role_assignment'
+        self.randomize_roles()
         return None
     
     def randomize_roles(self, players):
 
         # Add predefined roles
-        self.roles.append("King")
-        self.roles.extend(["Khan", "Khan"])
+        self.roles.append(0)
+        self.roles.extend([2, 2])
 
         # Fill the rest of the roles with "Lord"
         while len(self.roles) < len(players):
-            self.roles.append("Lord")
+            self.roles.append(1)
 
         # Shuffle the roles to randomize
         random.shuffle(self.roles)
@@ -91,81 +75,22 @@ class lobby :
 
         return players_with_roles
 
-    def role_assignment_transition(self, players):
-        if self._can_start_role_assignment():
-            self.start_role_assignment()
-            #player_with_roles = self.randomize_roles(players)
-            print("Transitioned to Role Assignment.")
-            #return player_with_roles
+    def transition_to_next_season(self):
+        if self.current_season_index < len(game_seasons):
+            self.state = game_seasons[self.current_season_index]
+            self.current_season_index += 1
         else:
-            print("Role Assignment transition failed.")
-
-    
-    def spring_transition(self):
-        if self._can_start_spring():
-            self.start_spring()
-            print("Transitioned to Spring.")
-        else:
-            print("Spring transition failed.")
-
-    def double_harvest_transition(self):
-        if self._can_start_double_harvest():
-            self.start_double_harvest()
-            print("Transitioned to Double Harvest.")
-        else:
-            print("Double Harvest transition failed.")
-
-    def summer_transition(self):
-        if self._can_start_summer():
-            self.start_summer()
-            print("Transitioned to Summer.")
-        else:
-            print("Summer transition failed.")
-    
-    def autumn_transition(self):
-        if self._can_start_autumn():
-            self.start_autumn()
-            print("Transitioned to Autumn.")
-        else:
-            print("Autumn transition failed.")
-
-    def winter_transition(self):
-        if self._can_start_winter():
-            self.start_winter()
-            print("Transitioned to Winter.")
-        else:
-            print("Winter transition failed.")
-
-    def _can_start_instructions(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-    
-    def _can_start_role_assignment(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-
-    def _can_start_spring(self):
-        # Example condition to start spring; modify based on your game logic
-        return True
-    
-    def _can_start_double_harvest(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-
-    def _can_start_summer(self):
-        # Example condition to start summer; modify based on your game logic
-        return True
-
-    def _can_start_autumn(self):
-        # Example condition to start autumn; modify based on your game logic
-        return True
-
-    def _can_start_winter(self):
-        # Example condition to start winter; modify based on your game logic
-        return True
+            self.current_season_index = 0
+            self.state = game_seasons[self.current_season_index]
 
     def get_state(self):
         return self.state
+    
+    def update_timer(self, duration):
+        if self.timer:
+            self.timer.cancel()
+        self.timer = threading.Timer(duration, self.transition_to_next_season)
+        self.timer.start()
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)

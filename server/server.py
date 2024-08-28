@@ -254,92 +254,23 @@ def socket_on_start_game(data):
     if result is None :
         # Notify other players that the game has started.
         emit('start_game', room = session[3])
+        emit('role_assignment_time')
     else :
         emit('start_game', { 'message' : result })
 
-@socket_app.on('start_instructions')
-def socket_start_instructions(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.start_instructions()
-        emit('instructions_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('role_assignment_transition')
-def socket_start_role_assignment(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.role_assignment_transition()
-        #players_with_roles = lobby.role_assignment_transition(lobby.players)
-        emit('role_assignment_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-        #emit('roles_assigned', {'players': players_with_roles}, broadcast=True)
-    else:
-        print("Lobby not found.")
-
-
-@socket_app.on('spring_transition')
-def socket_spring_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
+    scheduler.add_job(func=lambda: transition_game_state(the_lobby), trigger='interval', seconds=20, id=f'{the_lobby}_transition', replace_existing=True)
+    the_lobby.update_timer(20)
     
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.spring_transition()  # Trigger the season transition
-        emit('spring_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
+    def transition_game_state(lobby_code):
+        if lobby_code in rooms:
+            the_lobby = rooms[lobby_code]
+            the_lobby.transition_to_next_season()
+            emit('state_changed', {'state': the_lobby.state}, room=lobby_code, namespace='/')
 
-@socket_app.on('double_harvest_transition')
-def socket_double_harvest_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.double_harvest_transition()
-        emit('double_harvest_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
+            # Update timer for next transition
+            the_lobby.update_timer(10)
 
-@socket_app.on('summer_transition')
-def socket_summer_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.summer_transition()  # Trigger the season transition
-        emit('summer_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
 
-@socket_app.on('autumn_transition')
-def socket_autumn_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.autumn_transition()  # Trigger the season transition
-        emit('autumn_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('winter_transition')
-def socket_winter_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.winter_transition()  # Trigger the season transition
-        emit('winter_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
 
 if __name__ == '__main__':
     random.seed = time.time()
