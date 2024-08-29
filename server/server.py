@@ -163,7 +163,7 @@ def clear_sessions():
             for player in range(len(the_lobby.players)) :
                 if the_lobby.players[player][0] != session :
                     continue
-                the_lobby.players[player] = the_lobby.players[player] + (True, )
+                the_lobby.players[player] += [True]
         else :
             the_lobby.leave_lobby(session)
             if len(the_lobby.players) < 1 :

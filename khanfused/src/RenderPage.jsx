@@ -37,7 +37,7 @@ function RoomPage() {
     const socket = useRef(null);
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
-    const [role, setRole] = useState(0); // 0 if king, 1 if lord, 2 if khan
+    const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
@@ -466,8 +466,24 @@ function RoomPage() {
 
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
-            console.log(data);
+
             setCurrentSeason(data["state"]);
+
+            switch (data['state']) {
+
+                case "role_assignment":
+                    let role_int = Math.max(...data['role']);
+
+                    if (role_int === 0) setRole("king"); // king
+                    if (role_int === 1) setRole("lord"); // lord
+                    if (role_int === 2) setRole("khan"); // khan   
+
+                    let index = data['role'].indexOf(0);
+                    setKing(players[index]['session']);
+
+                    console.log(data['role']);
+                    console.log(players[index]['name'])
+            }
         }
         socket.current.on("change_state", handleChangeState);
 
@@ -486,11 +502,13 @@ function RoomPage() {
             return;
         }
 
+        console.log(`My role: ${role}`);
+        console.log(`The king session ID: ${king}`);
         
         return () => {
 
         }
-    }, []);
+    }, [role, king]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
