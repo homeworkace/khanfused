@@ -18,6 +18,7 @@
 .spring-button-bar {
     display: flex;
     gap: 20px; 
+    align-items: center; 
 }
 
 .spring-button-bar button {
@@ -28,15 +29,17 @@
     cursor: pointer;
     border-radius: 5px;
     z-index: 2; 
+    transition: background-color 0.3s ease; 
 }
 
 .spring-button-bar button:hover {
     background-color: #e0e0e0;
 }
+
 .spring-player-list {
     position: absolute;
-    top : 1rem;
-    left : 5rem;
+    top: 1rem;
+    left: 5rem;
 }
 
 .chat-button {
@@ -44,7 +47,6 @@
     top: 20px;
     right: 20px;
 }
-
 
 .chat-box {
     position: absolute;
@@ -61,36 +63,58 @@
     flex-direction: column;
 }
 
+
 .double-harvest-button {
-    margin-top: 1rem;
     padding: 0.5rem 1rem;
     cursor: pointer;
-  }
+    background-color: #fff; 
+    border: 1px solid #ddd; 
+    border-radius: 5px;
+    transition: background-color 0.3s ease; 
+}
+
+.double-harvest-button:hover {
+    background-color: #e0e0e0; 
+}
+
 
 .double-harvest-list {
     margin-top: 1rem;
     padding: 1rem;
     border: 1px solid #ddd;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); 
+    border-radius: 8px; 
     width: 200px;
+    max-height: 200px; 
+    overflow-y: auto; 
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 4;
+    display: none; 
 }
-  
+
+.double-harvest-list.active {
+    display: block;
+}
+
 .double-harvest-list ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
-  
+
 .double-harvest-list li {
     padding: 0.5rem;
     cursor: pointer;
+    text-align: center;
 }
-  
+
 .double-harvest-list li:hover {
     background-color: #f0f0f0;
 }
-  
+
 .double-harvest-list .selected {
     background-color: #d0e0ff;
     font-weight: bold;
