@@ -255,99 +255,19 @@ def socket_on_start_game(data):
     result = the_lobby.start()
     if result is None :
         # Notify other players that the game has started.
-        perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
-        emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
-        for player in range(1, min(2, len(the_lobby.players))) :
-            perspective = [0] + ([1] * (len(the_lobby.players) - 1))
-            perspective[player] = 2
-            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
-        for player in range(2, len(the_lobby.players)) :
-            perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
-            perspective[player] = 1
-            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(len(the_lobby.players)) :
+            emit(
+                'change_state', {
+                    'state' : the_lobby.state,
+                    'role' : the_lobby.perspectives[player],
+                    'game_rules' : {
+                        'yearly_deduction' : math.floor(len(the_lobby.players) / 2)
+                        }
+                    },
+                room = str(the_lobby.players[player][0])
+                )
     else :
         emit('start_game_failed', { 'message' : result })
-
-@socket_app.on('start_instructions')
-def socket_start_instructions(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.start_instructions()
-        emit('instructions_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('role_assignment_transition')
-def socket_start_role_assignment(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.role_assignment_transition()
-        emit('role_assignment_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('spring_transition')
-def socket_spring_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.spring_transition()  # Trigger the season transition
-        emit('spring_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('double_harvest_transition')
-def socket_double_harvest_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.double_harvest_transition()
-        emit('double_harvest_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('summer_transition')
-def socket_summer_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.summer_transition()  # Trigger the season transition
-        emit('summer_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('autumn_transition')
-def socket_autumn_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.autumn_transition()  # Trigger the season transition
-        emit('autumn_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
-
-@socket_app.on('winter_transition')
-def socket_winter_transition(data):
-    session = db.query_session(data['session'])
-    lobby_code = session[3]
-    
-    if lobby_code in rooms:
-        lobby = rooms[lobby_code]
-        lobby.winter_transition()  # Trigger the season transition
-        emit('winter_changed', {'state': lobby.get_state()}, room=request.sid)  # Broadcast the new state
-    else:
-        print("Lobby not found.")
 
 if __name__ == '__main__':
     random.seed = time.time()

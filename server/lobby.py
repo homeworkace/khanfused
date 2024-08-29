@@ -1,26 +1,12 @@
+import math
 import random
 import string
-from transitions import Machine
 from flask_socketio import emit
 from flask_apscheduler import APScheduler
 
-fsm_states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
+states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
             'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
-
-fsm_transitions = [
-    {'trigger': 'start_instructions', 'source': '*', 'dest': 'instructions'},
-    {'trigger': 'start_role_assignment', 'source': '*', 'dest': 'role_assignment'},
-    {'trigger': 'start_spring', 'source': '*', 'dest': 'spring'},
-    {'trigger': 'start_double_harvest', 'source': '*', 'dest': 'double_harvest'},
-    {'trigger': 'start_summer', 'source': '*', 'dest': 'summer'},
-    {'trigger': 'start_autumn', 'source': '*', 'dest': 'autumn'},
-    {'trigger': 'start_winter', 'source': '*', 'dest': 'winter'},
-    {'trigger': 'transition_to_insufficient_food', 'source': '*', 'dest': 'insufficient_food'},
-    {'trigger': 'transition_to_khans_pillaged', 'source': '*', 'dest': 'khans_pillaged'},
-    {'trigger': 'transition_to_lords_killed', 'source': '*', 'dest': 'lords_killed'},
-    {'trigger': 'end_game', 'source': '*', 'dest': 'end_game'}
-]
-
+game_seasons = ['spring', 'double_harvest','summer', 'autumn', 'winter']
 class lobby :
     def __init__(self, scheduler, password='') :
         self.state = 'waiting'
@@ -33,9 +19,7 @@ class lobby :
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
         self.timer = scheduler
-        #self.next_job
-        
-        self.machine = Machine(model=self, states=fsm_states, transitions=fsm_transitions, initial='waiting')
+        self.next_job = None
 
     def minified(self) :
         result = {}
@@ -51,7 +35,7 @@ class lobby :
         return result
 
     def unminified(lobby_to_copy, scheduler) :
-        result = lobby()
+        result = lobby(scheduler)
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
@@ -60,7 +44,6 @@ class lobby :
         result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
-        result.scheduler = scheduler
         return result
 
     def join_lobby(self, session, name = None) :
@@ -69,6 +52,21 @@ class lobby :
 
         self.players.append((session, name))
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
+
+        # Testing 10-man lobby
+        self.players += [
+            (0, 'Jules'),
+            (1, 'Sofia'),
+            (2, 'Wilford'),
+            (3, 'Vivienne'),
+            (4, 'Clemens'),
+            (5, 'Oliver'),
+            (6, 'Qasym'),
+            (7, 'Zhuldyz'),
+            (8, 'Aytac'),
+        ]
+        self.ready += [True] * 9
+
         return True
 
     def leave_lobby(self, session) :
@@ -84,9 +82,7 @@ class lobby :
         
         return False
 
-    # Define states and transitions
     
-
     def start(self) :
         if len(self.players) < 1 : # Change to 6 when needed
             return "Not enough players!"
@@ -94,52 +90,38 @@ class lobby :
             if ready is False :
                 return "Not all players are ready!"
 
-        self.state = 'role_assignment'
-        #self.start_role_assignment()
-        #self.scheduler.add_job(spring_start, 'interval', seconds = 5)
+        self.role_assignment_start()
+        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
         return None
-
-    def role_assignment_transition(self):
-        if self._can_start_role_assignment():
-            self.start_role_assignment()
-            print("Transitioned to Role Assignment.")
-        else:
-            print("Role Assignment transition failed.")
     
-    def spring_transition(self):
-        if self._can_start_spring():
-            self.start_spring()
-            print("Transitioned to Spring.")
-        else:
-            print("Spring transition failed.")
+    def role_assignment_start(self):
+        self.state = 'role_assignment'
+        # temp lol
+        self.roles = []
+        self.perspectives = []
 
-    def double_harvest_transition(self):
-        if self._can_start_double_harvest():
-            self.start_double_harvest()
-            print("Transitioned to Double Harvest.")
-        else:
-            print("Double Harvest transition failed.")
+        # Populate the roles array in sequence, then shuffle.
+        self.roles += [0] # There is always 1 king
+        self.roles += [2] * math.floor(len(self.players) / 4) # For every 4 players, there is 1 khan
+        self.roles += [1] * (len(self.players) - len(self.roles)) # The rest are lords
+        random.shuffle(self.roles)
 
-    def summer_transition(self):
-        if self._can_start_summer():
-            self.start_summer()
-            print("Transitioned to Summer.")
-        else:
-            print("Summer transition failed.")
+        # Populate the roles from the perspectives of each player.
+        for i in range(len(self.roles)) :
+            if self.roles[i] == 0 :
+                self.perspectives.append([(-1 if role > 0 else 0) for role in self.roles]) # The king only knows who they are
+            elif self.roles[i] == 1 :
+                self.perspectives.append([(self.roles[role] if (role == i or self.roles[role] < 1) else -1) for role in range(len(self.roles))]) # A lord knows who they are, as well as who the king is
+            else :
+                self.perspectives.append(self.roles[:]) # A khan knows who everyone is
+
+        # Initialise all other game variables.
+        self.status += [0] * len(self.players)
+        #self.grain = 0 # Uncomment if we have a starting grain rule
     
-    def autumn_transition(self):
-        if self._can_start_autumn():
-            self.start_autumn()
-            print("Transitioned to Autumn.")
-        else:
-            print("Autumn transition failed.")
-
-    def winter_transition(self):
-        if self._can_start_winter():
-            self.start_winter()
-            print("Transitioned to Winter.")
-        else:
-            print("Winter transition failed.")
+    def spring_start(self):
+        self.next_job.remove()
+        print('spring_start')
 
     def waiting_transition(self) :
         self.ready = [True] * len(self.players)
@@ -148,37 +130,6 @@ class lobby :
         self.status = []
         self.choices = []
         self.grain = 0
-
-    def _can_start_instructions(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-    
-    def _can_start_role_assignment(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-
-    def _can_start_spring(self):
-        # Example condition to start spring; modify based on your game logic
-        return True
-    
-    def _can_start_double_harvest(self):
-        # Example condition to start instructions; modify based on your game logic
-        return True
-
-    def _can_start_summer(self):
-        # Example condition to start summer; modify based on your game logic
-        return True
-
-    def _can_start_autumn(self):
-        # Example condition to start autumn; modify based on your game logic
-        return True
-
-    def _can_start_winter(self):
-        # Example condition to start winter; modify based on your game logic
-        return True
-
-    def get_state(self):
-        return self.state
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
