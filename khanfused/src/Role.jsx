@@ -1,5 +1,5 @@
 import logo from "./Assets/Khanfused.svg";
-import player_icon from './Assets/player_icon.svg'
+import PlayerList from "./PlayerList";
 import './Role.css'
 
 function Role({ players, king }) {
@@ -8,22 +8,6 @@ function Role({ players, king }) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    const displayPlayerList = () => {
-        return players.map((player) => {
-
-            return (
-                <li key={player.session}>
-                    <div>
-                        <img src={player_icon} alt="Player Icon"/>
-                    </div>
-                    <div>
-                        <span>{player.name}</span>
-                    </div>
-                </li>
-            );
-        });
-    }
 
     const displayKing = () => {
         const kingName = players.find(p => p.session === king);
@@ -40,9 +24,7 @@ function Role({ players, king }) {
         <div className="rolePage">
 
             <div className="rolePage-player-list">
-                <ul>
-                    { displayPlayerList() }
-                </ul>
+                <PlayerList players={players} />
             </div>
 
             <div className="rolePage-container">

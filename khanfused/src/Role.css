@@ -23,52 +23,23 @@
     z-index: -1; /* Ensure it stays behind other content */
 }
 
-
-
 .rolePage-player-list {
     position: absolute;
     top: 0;
     left: 0;
 }
 
-.rolePage-player-list ul {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-}
-
-.rolePage-player-list li {
-    display: flex;
-    align-items: center;
-}
-
-.rolePage-player-list img {
-    height: 2rem;
-    margin-top: 0.25rem;
-}
-
-.rolePage-player-list span {
-    margin-bottom: 0.25rem;
-}
-
-
-
-
-
 .rolePage-container {
-    /* border: 1px solid black; */
-
     display: flex;
     flex-direction: column;
     align-items: center;
-
     width: 70%;
 }
 
-.rolePage-container h4, h1, button {
-    /* border: 1px solid black; */
+.rolePage-container h4,
+.rolePage-container h1,
+.rolePage-container button {
     margin: 0;
-
 }
 
 .rolePage-container button {

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './SpringGamePlay.css';
 import HelpButton from './Instructions';
 import Timer from './Timer';
+import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ handleDoubleHarvestChangeClick, role}) {
+function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
 
@@ -52,10 +53,14 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role}) {
             Chat
           </button>
 
+          <div className="spring-player-list">
+                <PlayerList players={players} />
+            </div>
+
           {renderRoleSpecificContent()} {}
 
           <HelpButton />
-
+        
           <button onClick={handleDoubleHarvestChangeClick}>
             Proceed
           </button>

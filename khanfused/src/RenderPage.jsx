@@ -103,14 +103,15 @@ function RoomPage() {
 
                 case "spring":
                     return <SpringGamePlay
+                        players={players}
                         role ={role}
                         handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
                 // insufficentFood scenario -- to be replaced with actual state
-                case "insufficentFood":
-                    return <InsufficentFood
-                />
+                // case "insufficentFood":
+                //     return <InsufficentFood
+                // />
 
                 // lordWin scenario -- to be replaced with actual state
                 // case lordWin:
@@ -122,30 +123,30 @@ function RoomPage() {
                 //     return <KhanWin
                 // />
 
-                case "winterStage":
-                    return <WinterDouble
-                />
+                // case "winterStage":
+                //     return <WinterDouble
+                // />
 
                 case "winter":
                     return <WinterGamePlay
                         handleWinterStage = {handleWinterStage}
                 />
 
-                case "autumnStage":
-                    return <AutumnDouble
-                        handleWinterChangeClick={handleWinterChangeClick}
-                />
+                // case "autumnStage":
+                //     return <AutumnDouble
+                //         handleWinterChangeClick={handleWinterChangeClick}
+                // />
 
                 case "autumn":
                     return <AutumnGamePlay 
                         handleAutumnStage = {handleAutumnStage}
                 />
 
-                case "summerStage":
-                    return <SummerDouble
-                        handleAutumnChangeClick={handleAutumnChangeClick}
-                        role = {role}
-                />
+                // case "summerStage":
+                //     return <SummerDouble
+                //         handleAutumnChangeClick={handleAutumnChangeClick}
+                //         role = {role}
+                // />
 
                 case "summer":
                     return <SummerGamePlay
