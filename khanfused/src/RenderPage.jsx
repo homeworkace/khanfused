@@ -466,6 +466,7 @@ function RoomPage() {
 
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
+            console.log(data);
 
             setCurrentSeason(data["state"]);
 
