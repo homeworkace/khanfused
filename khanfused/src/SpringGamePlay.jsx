@@ -92,7 +92,7 @@ function SpringGamePlay({ socket, role, players}) {
           <HelpButton />
         
           <button onClick={springReadyClick}>
-            Proceed
+            Ready
           </button>
         </div>
 

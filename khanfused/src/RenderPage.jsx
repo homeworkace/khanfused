@@ -448,7 +448,7 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            //setCurrentSeason(data["state"]);
+            // setCurrentSeason(data["state"]);
             setCurrentSeason("spring");
 
             switch (data['state']) {
@@ -517,7 +517,7 @@ function RoomPage() {
         return () => {
             socket.current.off("unready", handleUnreadyState);
         }
-    }, []);
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
