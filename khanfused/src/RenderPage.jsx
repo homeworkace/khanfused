@@ -101,7 +101,7 @@ function RoomPage() {
                         handleSpringChangeClick = {handleSpringChangeClick}
                         // handleKhanWin = {handleKhanWin}
                         // handleLordWins = {handleLordWins}
-                        handleInsufficentFood = {handleInsufficentFood}
+                        // handleInsufficentFood = {handleInsufficentFood}
                 />
 
                 case "spring":
@@ -130,7 +130,7 @@ function RoomPage() {
 
                 case "winter":
                     return <WinterGamePlay
-                        handleWinterStage = {handleWinterStage}
+                        // handleWinterStage = {handleWinterStage}
                 />
 
                 case "autumnStage":
@@ -140,7 +140,7 @@ function RoomPage() {
 
                 case "autumn":
                     return <AutumnGamePlay 
-                        handleAutumnStage = {handleAutumnStage}
+                        // handleAutumnStage = {handleAutumnStage}
                 />
 
                 case "summerStage":
@@ -150,7 +150,7 @@ function RoomPage() {
 
                 case "summer":
                     return <SummerGamePlay
-                        handleSummerStage = {handleSummerStage}
+                        // handleSummerStage = {handleSummerStage}
                 />
 
                 case "double_harvest":
@@ -286,6 +286,10 @@ function RoomPage() {
             return;
         }
 
+        if (currentSeason !== "waiting") {
+            return;
+        }
+
         socket.current.removeAllListeners("ready");
         const handleReady = (data) => {
             const sessionID = data['session'];
@@ -317,6 +321,7 @@ function RoomPage() {
                 });
             });
         }
+
         socket.current.on("ready", handleReady);
 
         return () => {
@@ -461,7 +466,6 @@ function RoomPage() {
                     setKing(players[index]['session']);
 
                 case "spring":
-
                     // set every player to unready state at start of spring
                     setPlayers(p => p.map(player => ({ ...player, ready: false })));
             }
@@ -477,11 +481,21 @@ function RoomPage() {
         if (!hasConnected) {
             return;
         }
+
+        if (currentSeason === "waiting") {
+            return;
+        }
+
+        socket.current.removeAllListeners("ready");
+        const handleReadyState = (data) => {
+            console.log(data);
+        };
+        socket.current.on("ready", handleReadyState);
         
         return () => {
-
+            socket.current.off("ready", handleReadyState);
         }
-    }, []);
+    }, []); 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -494,12 +508,25 @@ function RoomPage() {
             return;
         }
 
-        console.log(players);
+        
         
         return () => {
 
         }
-    }, [players]);
+    }, []);
+
+    // useEffect for debugging
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        
+        
+        return () => {
+
+        }
+    }, []);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
