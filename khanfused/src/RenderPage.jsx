@@ -98,7 +98,7 @@ function RoomPage() {
                         handleSpringChangeClick = {handleSpringChangeClick}
                         // handleKhanWin = {handleKhanWin}
                         // handleLordWins = {handleLordWins}
-                        handleInsufficentFood = {handleInsufficentFood}
+                        // handleInsufficentFood = {handleInsufficentFood}
                 />
 
                 case "spring":
@@ -129,7 +129,7 @@ function RoomPage() {
 
                 case "winter":
                     return <WinterGamePlay
-                        handleWinterStage = {handleWinterStage}
+                        // handleWinterStage = {handleWinterStage}
                 />
 
                 // case "autumnStage":
@@ -139,7 +139,7 @@ function RoomPage() {
 
                 case "autumn":
                     return <AutumnGamePlay 
-                        handleAutumnStage = {handleAutumnStage}
+                        // handleAutumnStage = {handleAutumnStage}
                 />
 
                 // case "summerStage":
@@ -150,7 +150,7 @@ function RoomPage() {
 
                 case "summer":
                     return <SummerGamePlay
-                        handleSummerStage = {handleSummerStage}
+                        // handleSummerStage = {handleSummerStage}
                         role = {role}
                 />
 
@@ -287,6 +287,10 @@ function RoomPage() {
             return;
         }
 
+        if (currentSeason !== "waiting") {
+            return;
+        }
+
         socket.current.removeAllListeners("ready");
         const handleReady = (data) => {
             const sessionID = data['session'];
@@ -318,6 +322,7 @@ function RoomPage() {
                 });
             });
         }
+
         socket.current.on("ready", handleReady);
 
         return () => {
@@ -414,10 +419,6 @@ function RoomPage() {
             return;
         }
 
-        /**
-         *      refresh button leads to default page for now
-         *      will work on it
-         */
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
@@ -447,8 +448,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            // setCurrentSeason(data["state"]);
-            setCurrentSeason("spring");
+            setCurrentSeason(data["state"]);
+            // setCurrentSeason("spring");
 
             switch (data['state']) {
 
@@ -463,7 +464,6 @@ function RoomPage() {
                     setKing(players[index]['session']);
 
                 case "spring":
-
                     // set every player to unready state at start of spring
                     setPlayers(p => p.map(player => ({ ...player, ready: false })));
             }
@@ -479,9 +479,43 @@ function RoomPage() {
         if (!hasConnected) {
             return;
         }
+
+        if (currentSeason === "waiting") {
+            return;
+        }
+
+        socket.current.removeAllListeners("ready");
+        const handleReadyState = (data) => {
+            console.log(data);
+
+            setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: true } : player));
+        };
+        socket.current.on("ready", handleReadyState);
         
         return () => {
+            socket.current.off("ready", handleReadyState);
+        }
+    }, [players]);
 
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason === "waiting") {
+            return;
+        }
+
+        socket.current.removeAllListeners("unready");
+        const handleUnreadyState = (data) => {
+            console.log(data);
+
+            setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: false } : player));
+        };
+        socket.current.on("unready", handleUnreadyState);
+        
+        return () => {
+            socket.current.off("unready", handleUnreadyState);
         }
     }, []);
 
@@ -496,12 +530,25 @@ function RoomPage() {
             return;
         }
 
-        console.log(players);
+        
         
         return () => {
 
         }
-    }, [players]);
+    }, []);
+
+    // useEffect for debugging
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        
+        
+        return () => {
+
+        }
+    }, []);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
