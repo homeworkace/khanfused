@@ -434,28 +434,32 @@ function RoomPage() {
         if (!hasConnected) {
             return;
         }
+        if (currentSeason !== "waiting") {
+            return;
+        }
 
+        socket.current.removeAllListeners('start_game_failed');
         // handle game start failure
         const handleStartGameFailure = (data) => {
             console.log(data['message']);
         };
 
-        const handleChangeState = (data) => {
-            console.log(`Changing to state: ${data['state']}`);
-            // setCurrentSeason(data['state']);
+        //const handleChangeState = (data) => {
+        //    console.log(`Changing to state: ${data['state']}`);
+        //    // setCurrentSeason(data['state']);
 
-            // testing king reveal page
-            setCurrentSeason("role");
+        //    // testing king reveal page
+        //    setCurrentSeason("role");
 
-            console.log(`Role: ${data['role']}`);
-        }
+        //    console.log(`Role: ${data['role']}`);
+        //}
 
         socket.current.on("start_game_failed", handleStartGameFailure);
-        socket.current.on("change_state", handleChangeState);
+        //socket.current.on("change_state", handleChangeState);
 
         return () => {
             socket.current.off("start_game_failed", handleStartGameFailure);
-            socket.current.off("change_state", handleStartGameFailure);
+            //socket.current.off("change_state", handleStartGameFailure);
         }
     }, [hasConnected]);
 
@@ -507,6 +511,7 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
             console.log(data);
+            setCurrentSeason(data["state"]);
         }
         socket.current.on("change_state", handleChangeState);
 
