@@ -27,6 +27,5 @@ ranslation by H. Rackham.</p>
     </div>
   );
 }
-
 export default HelpButton;
 

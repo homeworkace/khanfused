@@ -20,7 +20,6 @@ import KhanWin from './KhanWin.jsx';
 import LordWin from './LordWin.jsx';
 import InsufficentFood from './InsufficentFood.jsx';
 import Role from './Role.jsx';
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,8 +49,6 @@ function RoomPage() {
     const [lordWin, setLordWin] = useState(false);
     const [insufficentFood, setInsufficentFood] = useState(false);
 
-    // Test wrap -- createContext()
-    const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +126,7 @@ function RoomPage() {
 
                 case "spring":
                     return <SpringGamePlay
+                        role ={role}
                         handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
@@ -169,11 +167,13 @@ function RoomPage() {
                 case "summerStage":
                     return <SummerDouble
                         handleAutumnChangeClick={handleAutumnChangeClick}
+                        role = {role}
                 />
 
                 case "summer":
                     return <SummerGamePlay
                         handleSummerStage = {handleSummerStage}
+                        role = {role}
                 />
 
                 case "double_harvest":
@@ -468,7 +468,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            setCurrentSeason(data["state"]);
+            // setCurrentSeason(data["state"]);
+            setCurrentSeason("spring");
 
             switch (data['state']) {
 
