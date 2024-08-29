@@ -16,7 +16,7 @@ function RandomTeams ( {players, handleSpringChangeClick}) {
         <div className="randomTeams">
             <div className="randomTeams-container">
                 <div className="randomTeams-button-bar">
-                    <button onClick={handleInsufficentFood}>
+                    <button>
                         Randomise Teams
                     </button>
                     <button onClick = {handleSpringChangeClick}>

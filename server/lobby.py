@@ -1,3 +1,4 @@
+import math
 import random
 import string
 from flask_socketio import emit
@@ -18,7 +19,7 @@ class lobby :
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
         self.timer = scheduler
-        #self.next_job
+        self.next_job = None
 
     def minified(self) :
         result = {}
@@ -34,7 +35,7 @@ class lobby :
         return result
 
     def unminified(lobby_to_copy, scheduler) :
-        result = lobby()
+        result = lobby(scheduler)
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
@@ -43,7 +44,6 @@ class lobby :
         result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
-        result.scheduler = scheduler
         return result
 
     def join_lobby(self, session, name = None) :
@@ -52,6 +52,21 @@ class lobby :
 
         self.players.append((session, name))
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
+
+        # Testing 10-man lobby
+        self.players += [
+            (0, 'Jules'),
+            (1, 'Sofia'),
+            (2, 'Wilford'),
+            (3, 'Vivienne'),
+            (4, 'Clemens'),
+            (5, 'Oliver'),
+            (6, 'Qasym'),
+            (7, 'Zhuldyz'),
+            (8, 'Aytac'),
+        ]
+        self.ready += [True] * 9
+
         return True
 
     def leave_lobby(self, session) :
@@ -75,39 +90,38 @@ class lobby :
             if ready is False :
                 return "Not all players are ready!"
 
-        self.state = 'role_assignment'
-        #self.start_role_assignment()
-        #self.scheduler.add_job(spring_start, 'interval', seconds = 5)
+        self.role_assignment_start()
+        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
         return None
     
-    def randomize_roles(self, players):
+    def role_assignment_start(self):
+        self.state = 'role_assignment'
+        # temp lol
+        self.roles = []
+        self.perspectives = []
 
-        # Add predefined roles
-        self.roles.append(0)
-        self.roles.extend([2, 2])
-
-        # Fill the rest of the roles with "Lord"
-        while len(self.roles) < len(players):
-            self.roles.append(1)
-
-        # Shuffle the roles to randomize
+        # Populate the roles array in sequence, then shuffle.
+        self.roles += [0] # There is always 1 king
+        self.roles += [2] * math.floor(len(self.players) / 4) # For every 4 players, there is 1 khan
+        self.roles += [1] * (len(self.players) - len(self.roles)) # The rest are lords
         random.shuffle(self.roles)
 
-        # Assign the roles to the players
-        players_with_roles = [
-            {"session": player['session'], "name": player['name'], "role": role}
-            for player, role in zip(players, self.roles)
-        ]
+        # Populate the roles from the perspectives of each player.
+        for i in range(len(self.roles)) :
+            if self.roles[i] == 0 :
+                self.perspectives.append([(-1 if role > 0 else 0) for role in self.roles]) # The king only knows who they are
+            elif self.roles[i] == 1 :
+                self.perspectives.append([(self.roles[role] if (role == i or self.roles[role] < 1) else -1) for role in range(len(self.roles))]) # A lord knows who they are, as well as who the king is
+            else :
+                self.perspectives.append(self.roles[:]) # A khan knows who everyone is
 
-        return players_with_roles
-
-    def transition_to_next_season(self):
-        if self.current_season_index < len(game_seasons):
-            self.state = game_seasons[self.current_season_index]
-            self.current_season_index += 1
-        else:
-            self.current_season_index = 0
-            self.state = game_seasons[self.current_season_index]
+        # Initialise all other game variables.
+        self.status += [0] * len(self.players)
+        #self.grain = 0 # Uncomment if we have a starting grain rule
+    
+    def spring_start(self):
+        self.next_job.remove()
+        print('spring_start')
 
     def waiting_transition(self) :
         self.ready = [True] * len(self.players)
@@ -116,16 +130,6 @@ class lobby :
         self.status = []
         self.choices = []
         self.grain = 0
-        
-
-    def get_state(self):
-        return self.state
-    
-    def update_timer(self, duration):
-        if self.timer:
-            self.timer.cancel()
-        self.timer = threading.Timer(duration, self.transition_to_next_season)
-        self.timer.start()
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)

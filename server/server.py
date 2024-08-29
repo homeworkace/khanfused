@@ -255,32 +255,19 @@ def socket_on_start_game(data):
     result = the_lobby.start()
     if result is None :
         # Notify other players that the game has started.
-        perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
-        emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
-        for player in range(1, min(2, len(the_lobby.players))) :
-            perspective = [0] + ([1] * (len(the_lobby.players) - 1))
-            perspective[player] = 2
-            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
-        for player in range(2, len(the_lobby.players)) :
-            perspective = [0] + ([-1] * (len(the_lobby.players) - 1))
-            perspective[player] = 1
-            emit('change_state', { 'state' : 'role_assignment', 'role' : perspective }, room = str(the_lobby.players[0][0]))
+        for player in range(len(the_lobby.players)) :
+            emit(
+                'change_state', {
+                    'state' : the_lobby.state,
+                    'role' : the_lobby.perspectives[player],
+                    'game_rules' : {
+                        'yearly_deduction' : math.floor(len(the_lobby.players) / 2)
+                        }
+                    },
+                room = str(the_lobby.players[player][0])
+                )
     else :
         emit('start_game_failed', { 'message' : result })
-
-    scheduler.add_job(func=lambda: transition_game_state(the_lobby), trigger='interval', seconds=20, id=f'{the_lobby}_transition', replace_existing=True)
-    the_lobby.update_timer(20)
-    
-    def transition_game_state(lobby_code):
-        if lobby_code in rooms:
-            the_lobby = rooms[lobby_code]
-            the_lobby.transition_to_next_season()
-            emit('state_changed', {'state': the_lobby.state}, room=lobby_code, namespace='/')
-
-            # Update timer for next transition
-            the_lobby.update_timer(10)
-
-
 
 if __name__ == '__main__':
     random.seed = time.time()
