@@ -6,7 +6,8 @@ import PlayerList from "./PlayerList";
 
 function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  const [isDoubleHarvestOpen, setDoubleHarvestIsOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -16,28 +17,36 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
     handleDoubleHarvestChangeClick();
   };
 
-  const renderRoleSpecificContent = () => {
-    console.log(`Current role is: ${role}`);
-    if (role === "king") {
-      return (
-        <div>
-          <p>You are the King. Manage your resources wisely!</p>
-        </div>
-      );
-    } else if (role === "lord") {
-      return (
-        <div>
-          <p>You are a Lord. Protect your lands!</p>
-        </div>
-      );
-    } else if (role === "khan") {
-      return (
-        <div>
-          <p>You are the Khan. Conquer new territories!</p>
-        </div>
-      );
-    }
+  const handleDoubleHarvestClick = () => {
+    setDoubleHarvestIsOpen(!isDoubleHarvestOpen);
+  }
+
+  const handlePlayerSelect = (player) => {
+    setSelectedPlayer(player);
   };
+
+  // const renderRoleSpecificContent = () => {
+  //   console.log(`Current role is: ${role}`);
+  //   if (role === "king") {
+  //     return (
+  //       <div>
+  //         <p>You are the King. Manage your resources wisely!</p>
+  //       </div>
+  //     );
+  //   } else if (role === "lord") {
+  //     return (
+  //       <div>
+  //         <p>You are a Lord. Protect your lands!</p>
+  //       </div>
+  //     );
+  //   } else if (role === "khan") {
+  //     return (
+  //       <div>
+  //         <p>You are the Khan. Conquer new territories!</p>
+  //       </div>
+  //     );
+  //   }
+  // };
 
   return (
     <div className="spring">
@@ -55,9 +64,29 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
 
           <div className="spring-player-list">
                 <PlayerList players={players} />
-            </div>
+          </div>
 
-          {renderRoleSpecificContent()} {}
+          {role === "king" && (
+            <button onClick={handleDoubleHarvestClick}> Double Harvest </button>
+          )}
+          
+          {
+            isDoubleHarvestOpen && (
+              <div className="double-harvest-list">
+                <ul>
+                  {players.map((player) => (
+                  <li
+                    key={player.session}
+                    onClick={() => handlePlayerSelect(player)}
+                    className={selectedPlayer === player ? "selected" : ""}
+                    style={{ cursor: 'pointer' }}
+                  >
+                  {player.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
           <HelpButton />
         
