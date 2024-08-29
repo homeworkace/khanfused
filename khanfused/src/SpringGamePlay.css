@@ -60,3 +60,38 @@
     display: flex;
     flex-direction: column;
 }
+
+.double-harvest-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+
+.double-harvest-list {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 200px;
+}
+  
+.double-harvest-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+  
+.double-harvest-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+  
+.double-harvest-list li:hover {
+    background-color: #f0f0f0;
+}
+  
+.double-harvest-list .selected {
+    background-color: #d0e0ff;
+    font-weight: bold;
+}
