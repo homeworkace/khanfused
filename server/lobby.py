@@ -18,6 +18,7 @@ class lobby :
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
+        #self.socket = None
         self.timer = scheduler
         self.next_job = None
 

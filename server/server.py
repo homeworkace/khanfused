@@ -185,7 +185,44 @@ def clear_sessions():
 @socket_app.on('join')
 def socket_on_join(data):
     session = db.query_session(data['session'])
-    emit('join', rooms[session[3]].minified())
+    lobby_info = rooms[session[3]].minified()
+
+    # Edit the information that is shown to the player.
+    # Find the index of the player. This allows us to reference the same index across other lists.
+    player_index = 0
+    while session[0] != lobby_info['players'][player_index][0] :
+        player_index += 1
+
+    # Present a sanitised version of the roles that represents what the player should know.
+    if lobby_info['state'] != 'waiting' :
+        lobby_info['roles'] = lobby_info['perspectives'][player_index]
+    del lobby_info['perspectives']
+
+    # Except for waiting, spring and autumn, only present whether the player is ready.
+    if lobby_info['state'] != 'waiting' and lobby_info['state'] != 'spring' and lobby_info['state'] != 'autumn' :
+        lobby_info['ready'] = lobby_info['ready'][player_index]
+
+    # The choices field broadly represents the choice(s) that the player or other players have made, depending on the season.
+    choices = lobby_info['choices'][:]
+    del lobby_info['choices']
+    # spring: king chooses double harvest. only the king should know their choice
+    if lobby_info['state'] == 'spring' :
+        if lobby_info['role'][player_index] == 0:
+            lobby_info['choices'] = choices[0]
+    # summer: lords choose what to do. session id for scout, -1 for farm, -2 for double
+    elif lobby_info['state'] == 'summer' :
+        if lobby_info['role'][player_index] == 1 and lobby_info['status'][player_index] == 0:
+            lobby_info['choices'] = choices[player_index]
+    # autumn: king chooses banish. only the king should know their choice. session id for banish, -1 for none
+    elif lobby_info['state'] == 'autumn' :
+        if lobby_info['role'][player_index] == 0:
+            lobby_info['choices'] = choices[0]
+    # winter: khans choose pillage. the khans should know each others decisions. session id for pillage, -1 for none
+    elif lobby_info['state'] == 'winter' :
+        if lobby_info['role'][player_index] == 0:
+            lobby_info['choices'] = choices
+
+    emit('join', lobby_info)
     join_room(session[3])
     join_room(data['session'])
 
