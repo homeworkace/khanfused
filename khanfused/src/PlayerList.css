@@ -1,0 +1,27 @@
+.player-list-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .player-icon {
+    height: 2rem;
+    margin-top: 0.25rem;
+    cursor: pointer; 
+  }
+  
+  .player-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    margin-top: 0.5rem; 
+  }
+  
+  .player-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem; 
+  }
+  
+  .player-name {
+    margin-left: 0.5rem;
+  }

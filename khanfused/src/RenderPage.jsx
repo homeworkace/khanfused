@@ -20,7 +20,6 @@ import KhanWin from './KhanWin.jsx';
 import LordWin from './LordWin.jsx';
 import InsufficentFood from './InsufficentFood.jsx';
 import Role from './Role.jsx';
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,8 +49,6 @@ function RoomPage() {
     const [lordWin, setLordWin] = useState(false);
     const [insufficentFood, setInsufficentFood] = useState(false);
 
-    // Test wrap -- createContext()
-    const [roleToLord, setRoleToLord] = useState("Lord");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,13 +103,15 @@ function RoomPage() {
 
                 case "spring":
                     return <SpringGamePlay
+                        players={players}
+                        role ={role}
                         handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
                 />  
 
                 // insufficentFood scenario -- to be replaced with actual state
-                case "insufficentFood":
-                    return <InsufficentFood
-                />
+                // case "insufficentFood":
+                //     return <InsufficentFood
+                // />
 
                 // lordWin scenario -- to be replaced with actual state
                 // case lordWin:
@@ -124,33 +123,35 @@ function RoomPage() {
                 //     return <KhanWin
                 // />
 
-                case "winterStage":
-                    return <WinterDouble
-                />
+                // case "winterStage":
+                //     return <WinterDouble
+                // />
 
                 case "winter":
                     return <WinterGamePlay
                         // handleWinterStage = {handleWinterStage}
                 />
 
-                case "autumnStage":
-                    return <AutumnDouble
-                        handleWinterChangeClick={handleWinterChangeClick}
-                />
+                // case "autumnStage":
+                //     return <AutumnDouble
+                //         handleWinterChangeClick={handleWinterChangeClick}
+                // />
 
                 case "autumn":
                     return <AutumnGamePlay 
                         // handleAutumnStage = {handleAutumnStage}
                 />
 
-                case "summerStage":
-                    return <SummerDouble
-                        handleAutumnChangeClick={handleAutumnChangeClick}
-                />
+                // case "summerStage":
+                //     return <SummerDouble
+                //         handleAutumnChangeClick={handleAutumnChangeClick}
+                //         role = {role}
+                // />
 
                 case "summer":
                     return <SummerGamePlay
                         // handleSummerStage = {handleSummerStage}
+                        role = {role}
                 />
 
                 case "double_harvest":
@@ -418,10 +419,6 @@ function RoomPage() {
             return;
         }
 
-        /**
-         *      refresh button leads to default page for now
-         *      will work on it
-         */
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
@@ -452,6 +449,7 @@ function RoomPage() {
             console.log(data);
 
             setCurrentSeason(data["state"]);
+            // setCurrentSeason("spring");
 
             switch (data['state']) {
 
@@ -489,13 +487,37 @@ function RoomPage() {
         socket.current.removeAllListeners("ready");
         const handleReadyState = (data) => {
             console.log(data);
+
+            setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: true } : player));
         };
         socket.current.on("ready", handleReadyState);
         
         return () => {
             socket.current.off("ready", handleReadyState);
         }
-    }, []); 
+    }, [players]);
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason === "waiting") {
+            return;
+        }
+
+        socket.current.removeAllListeners("unready");
+        const handleUnreadyState = (data) => {
+            console.log(data);
+
+            setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: false } : player));
+        };
+        socket.current.on("unready", handleUnreadyState);
+        
+        return () => {
+            socket.current.off("unready", handleUnreadyState);
+        }
+    }, []);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
