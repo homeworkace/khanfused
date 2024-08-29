@@ -45,7 +45,6 @@ function Role({ players }) {
             <div className="rolePage-container">
                 <h4>Our King will be</h4>
                 <h1 className="fade-in-text">RICK</h1>
-                <button>Proceed</button>
             </div>
         </div>
     );
