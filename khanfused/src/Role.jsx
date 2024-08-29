@@ -2,8 +2,7 @@ import logo from "./Assets/Khanfused.svg";
 import player_icon from './Assets/player_icon.svg'
 import './Role.css'
 
-function Role({ players }) {
-
+function Role({ players, king }) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +11,6 @@ function Role({ players }) {
 
     const displayPlayerList = () => {
         return players.map((player) => {
-
 
             return (
                 <li key={player.session}>
@@ -27,6 +25,11 @@ function Role({ players }) {
         });
     }
 
+    const displayKing = () => {
+        const kingName = players.find(p => p.session === king);
+
+        return kingName.name;
+    };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +47,7 @@ function Role({ players }) {
 
             <div className="rolePage-container">
                 <h4>Our King will be</h4>
-                <h1 className="fade-in-text">RICK</h1>
+                <h1 className="fade-in-text">{ displayKing() }</h1>
             </div>
         </div>
     );
