@@ -105,7 +105,7 @@ function RoomPage() {
                     return <SpringGamePlay
                         players={players}
                         role ={role}
-                        handleDoubleHarvestChangeClick = {handleDoubleHarvestChangeClick}
+                        socket={socket}
                 />  
 
                 // insufficentFood scenario -- to be replaced with actual state
@@ -448,8 +448,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            setCurrentSeason(data["state"]);
-            // setCurrentSeason("spring");
+            //setCurrentSeason(data["state"]);
+            setCurrentSeason("spring");
 
             switch (data['state']) {
 
@@ -660,11 +660,11 @@ function RoomPage() {
 
     //fakerayray
 
-    const handleStartInstructionsClick = () => {
-        socket.current.emit('start_instructions', {
-            session: getSession()
-        });
-    };
+    // const handleStartInstructionsClick = () => {
+    //     socket.current.emit('start_instructions', {
+    //         session: getSession()
+    //     });
+    // };
 
     const handleRoleAssignmentChangeClick = () => {
         socket.current.emit('role_assignment_transition', {
@@ -679,15 +679,6 @@ function RoomPage() {
             session: getSession()
         });
         console.log(currentSeason);
-
-    };
-
-    const handleDoubleHarvestChangeClick = () => {
-        socket.current.emit('double_harvest_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-
     };
 
     const handleSummerChangeClick = () => {
@@ -695,24 +686,23 @@ function RoomPage() {
             session: getSession()
         });
         console.log(currentSeason);
-
     };
 
-    const handleAutumnChangeClick = () => {
-        socket.current.emit('autumn_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
+    // const handleAutumnChangeClick = () => {
+    //     socket.current.emit('autumn_transition', {
+    //         session: getSession()
+    //     });
+    //     console.log(currentSeason);
 
-    };
+    // };
 
-    const handleWinterChangeClick = () => {
-        socket.current.emit('winter_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
+    // const handleWinterChangeClick = () => {
+    //     socket.current.emit('winter_transition', {
+    //         session: getSession()
+    //     });
+    //     console.log(currentSeason);
 
-    };
+    // };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -726,4 +716,5 @@ function RoomPage() {
     )
 
 }
-export default RoomPage;
+
+export default RoomPage

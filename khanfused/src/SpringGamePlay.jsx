@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import './SpringGamePlay.css';
 import HelpButton from './Instructions';
 import Timer from './Timer';
+import { getSession } from './utility.js';
 import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
+function SpringGamePlay({ socket, role, players}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setDoubleHarvestListOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -14,7 +15,7 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
   };
 
   const handleTimeUp = () => {
-    handleDoubleHarvestChangeClick();
+    // handleDoubleHarvestChangeClick();
   };
 
   const toggleDoubleHarvestList = () => {
@@ -24,6 +25,23 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
   const handlePlayerSelect = (player) => {
     setSelectedPlayer(player);
   };
+
+  const springReadyClick = () => {
+
+    // check if double harvest is selected first
+    if (role === "king") {
+      if (selectedPlayer === null) {
+        console.log("King select a player for DH");
+        return;
+      }
+    }
+
+    socket.current.emit('ready', {
+        session: getSession()
+    });
+
+    console.log(`Player ${getSession()} is ready`);
+};
 
   const renderRoleSpecificContent = () => {
     console.log(`Current role is: ${role}`);
@@ -73,7 +91,7 @@ function SpringGamePlay({ handleDoubleHarvestChangeClick, role, players}) {
 
           <HelpButton />
         
-          <button onClick={handleDoubleHarvestChangeClick}>
+          <button onClick={springReadyClick}>
             Proceed
           </button>
         </div>
