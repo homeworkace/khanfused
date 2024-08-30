@@ -37,12 +37,10 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
-    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
+    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
-    // const [scout, setScout] = useState([]);
-    // const [farm, setFarm] = useState([]);
-    // const [doubleHarvest, setDoubleHarvest] = useState([]);
+    const [action, setAction] = useState("");
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -214,15 +212,9 @@ function RoomPage() {
             }
             setPlayers(_players);
 
+            // renders page based on current state for joining players
             setCurrentSeason(data['state']);
-            
-
-            //setRole(data['role']);
-            //setStatus(data['status']);
-            //if ('king' in data) {
-            //  setKing(data['king']);
-            //}
-            //setGrain(data['grain']);
+        
 
             setHasConnected(true);
         }
@@ -424,6 +416,7 @@ function RoomPage() {
             return;
         }
 
+        // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
@@ -453,8 +446,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            // setCurrentSeason(data["state"]);
-            setCurrentSeason("spring");
+            // sync client's state with server's state
+            setCurrentSeason(data["state"]);
 
             switch (data['state']) {
 
@@ -469,22 +462,42 @@ function RoomPage() {
                     setKing(players[index]['session']);
 
                 case "spring":
-                    // set every player to unready state at start of spring
-                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    // if not pillaged or banished
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    }
 
                 case "summer":
-                    // set every player to unready state at start of summer
-                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
 
-                    if ("double_harvest" in data) {
-                        if (role !== "lord") return;
+                        // if key "double_harvest" is found in data payload
+                        if ("double_harvest" in data) {
+                            if (role !== "lord") return;
 
-                        // assuming "double_harvest" is a session ID
-                        let thePlayer = players.find(player => player.session === data['double_harvest']);
-                        if (thePlayer) {
-                            // setDoubleHarvest(data['session']);
-                            // setGrain(g => g + data['grain']);
+                            // assuming "double harvest" is a session ID
+                            if (data['double_harvest'] !== getSession()) {
+                                return;
+                            }
+
+                            // set current player status as double harvest
+                            setStatus(3);
                         }
+                    }
+                
+                case "autumn":
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    }
+
+                case "winter":
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
             }
         }
@@ -493,7 +506,7 @@ function RoomPage() {
         return () => {
             socket.current.off("change_state", handleChangeState);
         }
-    }, []);
+    }, [hasConnected]);
 
     useEffect(() => {
         if (!hasConnected) {
@@ -550,11 +563,12 @@ function RoomPage() {
             return;
         }
 
+        console.log(players);
         
         return () => {
 
         }
-    }, []);
+    }, [players]);
 
     // useEffect for debugging
     useEffect(() => {
