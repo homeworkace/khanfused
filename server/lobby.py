@@ -14,7 +14,7 @@ class lobby :
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
         self.perspectives = []
-        self.status = [] # 0 if active, 1 if pillaged, 2 if banished
+        self.status = [] # 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
         self.socket = socket
@@ -123,26 +123,47 @@ class lobby :
     
     def spring_start(self):
         self.state = 'spring'
-        # Emit change in state
         
-        # Unready everyone who is active and ready everyone who is banished.
+        # Ready everyone who is banished and unready everyone else.
+        self.ready = [True if player > 1 else False for player in self.status]
 
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'spring' })
+        
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start')
 
     def summer_start(self) :
         self.state = 'summer'
-        # Emit change in state
         
-        # Unready everyone who is active and ready everyone who is banished.
+        # If the chosen player is a lord, the king's choice is reflected in their status.
+        for player in range(len(self.players)) :
+            if self.players[player][0] != self.choices[0] :
+                continue
+            if self.roles[player] == 1 and self.status[player] == 0 :
+                self.status[player] = 3
+            break
+        
+        # Reset the list of choices so that it represents the lords' decisions.
+        self.choices = [(-1 if self.status[player] == 0 and self.roles[player] == 1 else None) for player in range(len(self.status))]
+
+        # Unready everyone who is active and ready everyone else.
+        self.ready = [False if player == 0 else True for player in self.status]
+
+        # Emit change in state.
+        for player in range(len(self.players)) :
+            if self.status[player] == 3 :
+                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True })
+            else :
+                self.socket.emit('change_state', { 'state' : 'summer' })
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
 
     # Raymond: for now do the same for autumn and winter lol
 
-    def waiting_transition(self) :
+    def waiting_start(self) :
         self.ready = [True] * len(self.players)
         self.roles = []
         self.perspectives = []

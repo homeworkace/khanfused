@@ -8,7 +8,6 @@ flask = "*"
 flask-cors = "*"
 flask-apscheduler = "*"
 flask-socketio = "*"
-transitions = "*"
 
 [dev-packages]
 
