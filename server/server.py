@@ -163,7 +163,8 @@ def clear_sessions():
             for player in range(len(the_lobby.players)) :
                 if the_lobby.players[player][0] != session :
                     continue
-                the_lobby.players[player] = the_lobby.players[player] + (True, )
+                print(the_lobby.players)
+                the_lobby.players[player] += [True]
         else :
             the_lobby.leave_lobby(session)
             if len(the_lobby.players) < 1 :
@@ -176,8 +177,8 @@ def clear_sessions():
     # Routinely remove players who could not be removed.
     for code in list(rooms.keys()) :
         the_lobby = rooms[code]
-        for player in [player for player in rooms[code].players if len(player) > 2] :
-            socket_app.emit('player_left', { 'session' : player[0] }, room = code, namespace = '/')
+        for session in [player[0] for player in rooms[code].players if len(player) > 2] :
+            socket_app.emit('player_left', { 'session' : session }, room = code, namespace = '/')
         the_lobby.players = [player for player in rooms[code].players if len(player) < 3]
         if len(rooms[code].players) < 1 :
             del rooms[code]
@@ -207,19 +208,19 @@ def socket_on_join(data):
     del lobby_info['choices']
     # spring: king chooses double harvest. only the king should know their choice
     if lobby_info['state'] == 'spring' :
-        if lobby_info['role'][player_index] == 0:
+        if lobby_info['roles'][player_index] == 0:
             lobby_info['choices'] = choices[0]
     # summer: lords choose what to do. session id for scout, -1 for farm, -2 for double
     elif lobby_info['state'] == 'summer' :
-        if lobby_info['role'][player_index] == 1 and lobby_info['status'][player_index] == 0:
+        if lobby_info['roles'][player_index] == 1 and lobby_info['status'][player_index] == 0:
             lobby_info['choices'] = choices[player_index]
     # autumn: king chooses banish. only the king should know their choice. session id for banish, -1 for none
     elif lobby_info['state'] == 'autumn' :
-        if lobby_info['role'][player_index] == 0:
+        if lobby_info['roles'][player_index] == 0:
             lobby_info['choices'] = choices[0]
     # winter: khans choose pillage. the khans should know each others decisions. session id for pillage, -1 for none
     elif lobby_info['state'] == 'winter' :
-        if lobby_info['role'][player_index] == 0:
+        if lobby_info['roles'][player_index] == 0:
             lobby_info['choices'] = choices
 
     emit('join', lobby_info)
@@ -251,9 +252,7 @@ def socket_on_confirm_name(data):
 
         if the_lobby.players[player][1] != data['name']:
             name_is_different = True
-
-            # the_lobby.players[player][1] = data['name']
-            the_lobby.players[player] = (int(data['session']), data['name'])
+            the_lobby.players[player][1] = data['name']
             
         the_lobby.ready[player] = True
         break

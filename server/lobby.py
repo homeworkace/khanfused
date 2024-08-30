@@ -50,20 +50,20 @@ class lobby :
         if self.state != 'waiting' :
             return False
 
-        self.players.append((session, name))
+        self.players.append([session, name])
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
 
         # Testing 10-man lobby
         self.players += [
-            (0, 'Jules'),
-            (1, 'Sofia'),
-            (2, 'Wilford'),
-            (3, 'Vivienne'),
-            (4, 'Clemens'),
-            (5, 'Oliver'),
-            (6, 'Qasym'),
-            (7, 'Zhuldyz'),
-            (8, 'Aytac'),
+            [0, 'Jules'],
+            [1, 'Sofia'],
+            [2, 'Wilford'],
+            [3, 'Vivienne'],
+            [4, 'Clemens'],
+            [5, 'Oliver'],
+            [6, 'Qasym'],
+            [7, 'Zhuldyz'],
+            [8, 'Aytac'],
         ]
         self.ready += [True] * 9
 
