@@ -40,6 +40,9 @@ function RoomPage() {
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
+    // const [scout, setScout] = useState([]);
+    // const [farm, setFarm] = useState([]);
+    // const [doubleHarvest, setDoubleHarvest] = useState([]);
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -210,7 +213,9 @@ function RoomPage() {
                 //    _players
             }
             setPlayers(_players);
+
             setCurrentSeason(data['state']);
+            
 
             //setRole(data['role']);
             //setStatus(data['status']);
@@ -448,8 +453,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            // setCurrentSeason(data["state"]);
-            setCurrentSeason("spring");
+            setCurrentSeason(data["state"]);
+            // setCurrentSeason("spring");
 
             switch (data['state']) {
 
@@ -466,6 +471,21 @@ function RoomPage() {
                 case "spring":
                     // set every player to unready state at start of spring
                     setPlayers(p => p.map(player => ({ ...player, ready: false })));
+
+                case "summer":
+                    // set every player to unready state at start of summer
+                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+
+                    if ("double_harvest" in data) {
+                        if (role !== "lord") return;
+
+                        // assuming "double_harvest" is a session ID
+                        let thePlayer = players.find(player => player.session === data['double_harvest']);
+                        if (thePlayer) {
+                            // setDoubleHarvest(data['session']);
+                            // setGrain(g => g + 2);
+                        }
+                    }
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -530,7 +550,6 @@ function RoomPage() {
             return;
         }
 
-        
         
         return () => {
 
