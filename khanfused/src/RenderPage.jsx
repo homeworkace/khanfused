@@ -151,6 +151,7 @@ function RoomPage() {
 
                 case "summer":
                     return <SummerGamePlay
+                        players = {players}
                         // handleSummerStage = {handleSummerStage}
                         role = {role}
                 />
@@ -421,7 +422,7 @@ function RoomPage() {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
             if (currentSeason === "spring") setPageToRender("spring");
-            if (currentSeason === "summer") setPageToRender("summerStage");
+            if (currentSeason === "summer") setPageToRender("summer");
             if (currentSeason === "autumn") setPageToRender("autumnStage");
             if (currentSeason === "winter") setPageToRender("winterStage");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
@@ -447,8 +448,8 @@ function RoomPage() {
             console.log(data);
 
             // sync client's state with server's state
-            setCurrentSeason(data["state"]);
-
+            // setCurrentSeason(data["state"]);
+            setCurrentSeason("summer");
             switch (data['state']) {
 
                 case "role_assignment":
