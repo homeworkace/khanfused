@@ -119,7 +119,8 @@ class lobby :
         self.status += [0] * len(self.players)
         #self.grain = 0 # Uncomment if we have a starting grain rule
 
-        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
+        #self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
+        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 2, id = 'spring_start')
     
     def spring_start(self):
         self.state = 'spring'
@@ -127,12 +128,20 @@ class lobby :
         # Ready everyone who is banished and unready everyone else.
         self.ready = [True if player > 1 else False for player in self.status]
 
+        # Set placeholder choice of lord to perform a double harvest.
+        for i in range(len(self.roles)) :
+            if self.roles[i] != 0 :
+                continue
+            eligible_choices = [j for j in range(len(self.roles)) if j != i]
+            self.choices.append(self.players[random.choice(eligible_choices)][0])
+
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'spring' })
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start')
+        #self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start')
+        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 5, id = 'summer_start')
 
     def summer_start(self) :
         self.state = 'summer'
@@ -148,6 +157,26 @@ class lobby :
         # Reset the list of choices so that it represents the lords' decisions.
         self.choices = [(-1 if self.status[player] == 0 and self.roles[player] == 1 else None) for player in range(len(self.status))]
 
+        # Determine which of them will have the placeholder decision of scouting. The rest of the lords shall farm.
+        eligible_lords = [choice for choice in self.choices if choice == -1]
+        scouting_lords = len(eligible_lords) - math.floor(len(self.players)) / 2 + 2 # Subtract the minimum number of lords who need to farm to break even on grain, assuming the chosen lord isn't a khan.
+        while scouting_lords > 0 :
+            eligible_lords[scouting_lords - 1] = -2
+            scouting_lords -= 1
+        random.shuffle(eligible_lords)
+        self.choices = [(None if self.choices[i] is None else eligible_lords.pop()) for i in self.choices] # Put the choices back in place.
+
+        # Of the scouting lords, pick an eligible candidate.
+        for i in range(len(self.choices)) :
+            if self.choices[i] != -2 :
+                continue
+            
+            eligible_choices = [j for j in range(len(self.perspectives[i])) if self.perspectives[i][j] == -1] # Find the acceptable indices to select based on the roles they don't already know.
+            if len(eligible_choices) < 1 : # If they already know who everyone is, get them to farm instead.
+                self.choices[i] = -1
+            else :
+                self.choices[i] = self.players[random.choice[eligible_choices]][0] # Otherwise, assign the corresponding session ID of the randomly chosen index to their choice.
+
         # Unready everyone who is active and ready everyone else.
         self.ready = [False if player == 0 else True for player in self.status]
 
@@ -160,8 +189,11 @@ class lobby :
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 30, id = 'summer_result_start')
+        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 5, id = 'summer_result_start')
 
-    # Raymond: for now do the same for autumn and winter lol
+    def summer_result_start() :
+        pass
 
     def waiting_start(self) :
         self.ready = [True] * len(self.players)
