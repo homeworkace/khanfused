@@ -40,7 +40,7 @@ function RoomPage() {
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
-    const [action, setAction] = useState("");
+    const [scoutedRole, setScoutedRole] = useState("");
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -155,6 +155,9 @@ function RoomPage() {
                         // handleSummerStage = {handleSummerStage}
                         role = {role}
                 />
+
+                case "summerResults":
+                    // return <SummerResults />
 
                 case "double_harvest":
                     return <SpringDouble
@@ -423,6 +426,7 @@ function RoomPage() {
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
             if (currentSeason === "spring") setPageToRender("spring");
             if (currentSeason === "summer") setPageToRender("summer");
+            if (currentSeason === "summer_results") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumnStage");
             if (currentSeason === "winter") setPageToRender("winterStage");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
@@ -463,7 +467,7 @@ function RoomPage() {
                     setKing(players[index]['session']);
 
                 case "spring":
-                    // if not pillaged or banished
+                    
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
@@ -475,27 +479,49 @@ function RoomPage() {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
 
-                        // if key "double_harvest" is found in data payload
+                        // if double harvest found in data
                         if ("double_harvest" in data) {
+
                             if (role !== "lord") return;
 
-                            // assuming "double harvest" is a session ID
-                            if (data['double_harvest'] !== getSession()) {
-                                return;
+                            // if true
+                            if (data['double_harvest']) {
+                                setStatus(3); // set player as double harvest status
                             }
 
-                            // set current player status as double harvest
-                            setStatus(3);
                         }
+                    }
+
+                case "summer_results":
+                    setScoutedRole(""); // clears scouted role first
+
+                    // assuming "scout" is a number eg. 1 or 2
+                    if ("scout" in data) {
+
+                        if (role !== "lord") return;
+
+                        if (data['scout'] === 1) {
+                            setScoutedRole("Lord"); // role reveal to be lord
+                        } else if (data['scout'] === 2) {
+                            setScoutedRole("Khan"); // role reveal to be khan
+                        }
+                    }
+
+                    if ("farm" in data) {
+
+                        // grains + 1 ??
+                        // setGrain(g => g + 1);
                     }
                 
                 case "autumn":
+
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
 
                 case "winter":
+
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
