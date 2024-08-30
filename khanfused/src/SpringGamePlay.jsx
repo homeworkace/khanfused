@@ -8,7 +8,7 @@ import PlayerList from "./PlayerList";
 function SpringGamePlay({ socket, role, players}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setDoubleHarvestListOpen] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
 
   const toggleChat = () => {
@@ -24,15 +24,14 @@ function SpringGamePlay({ socket, role, players}) {
   };
 
   const handlePlayerSelect = (player) => {
-    setSelectedPlayer(player);
-    // emit to server selected double harvest player.session can go here
+    setSelectedPlayerSession(player.session); 
   };
 
   const springReadyClick = () => {
 
     // check if double harvest is selected first
     if (role === "king") {
-      if (selectedPlayer === null) {
+      if (selectedPlayerSession === null) {
         console.log("King select a player for DH");
         return;
       }
@@ -41,9 +40,11 @@ function SpringGamePlay({ socket, role, players}) {
     if(!isReady) {
       
       socket.current.emit('ready', {
-        session: getSession()
+        session: getSession(),
+        doubleHarvest : role === 'king' ? selectedPlayerSession : null
       });
       console.log(`Player ${getSession()} is ready`);
+      console.log(`Double Harvest: ${selectedPlayerSession}`);
     } else {
       socket.current.emit('unready', {
         session: getSession()
@@ -68,7 +69,7 @@ function SpringGamePlay({ socket, role, players}) {
                   <li 
                     key={player.session} 
                     onClick={() => handlePlayerSelect(player)}
-                    className={selectedPlayer?.session === player.session ? "selected" : ""}
+                    className={selectedPlayerSession === player.session ? "selected" : ""}
                   >
                     {player.name}
                   </li>
