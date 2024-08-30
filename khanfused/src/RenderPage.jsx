@@ -453,8 +453,8 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            setCurrentSeason(data["state"]);
-            // setCurrentSeason("spring");
+            // setCurrentSeason(data["state"]);
+            setCurrentSeason("spring");
 
             switch (data['state']) {
 
@@ -483,7 +483,7 @@ function RoomPage() {
                         let thePlayer = players.find(player => player.session === data['double_harvest']);
                         if (thePlayer) {
                             // setDoubleHarvest(data['session']);
-                            // setGrain(g => g + 2);
+                            // setGrain(g => g + data['grain']);
                         }
                     }
             }
@@ -493,7 +493,7 @@ function RoomPage() {
         return () => {
             socket.current.off("change_state", handleChangeState);
         }
-    }, [hasConnected]);
+    }, []);
 
     useEffect(() => {
         if (!hasConnected) {

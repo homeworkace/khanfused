@@ -9,6 +9,7 @@ function SpringGamePlay({ socket, role, players}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setDoubleHarvestListOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -24,6 +25,7 @@ function SpringGamePlay({ socket, role, players}) {
 
   const handlePlayerSelect = (player) => {
     setSelectedPlayer(player);
+    // emit to server selected double harvest player.session can go here
   };
 
   const springReadyClick = () => {
@@ -35,12 +37,22 @@ function SpringGamePlay({ socket, role, players}) {
         return;
       }
     }
-
-    socket.current.emit('ready', {
+    
+    if(!isReady) {
+      
+      socket.current.emit('ready', {
         session: getSession()
-    });
+      });
+      console.log(`Player ${getSession()} is ready`);
+    } else {
+      socket.current.emit('unready', {
+        session: getSession()
+      });
+      console.log(`Player ${getSession()} is unready`);
+    }
 
-    console.log(`Player ${getSession()} is ready`);
+    setIsReady(!isReady);
+
 };
 
   const renderRoleSpecificContent = () => {
@@ -52,7 +64,7 @@ function SpringGamePlay({ socket, role, players}) {
           {isDoubleHarvestListOpen && (
             <div className="double-harvest-list active">
               <ul>
-                {players.map((player) => (
+                {players.filter(player => player.session != getSession()).map((player) => (
                   <li 
                     key={player.session} 
                     onClick={() => handlePlayerSelect(player)}
@@ -92,7 +104,7 @@ function SpringGamePlay({ socket, role, players}) {
           <HelpButton />
         
           <button onClick={springReadyClick}>
-            Ready
+            {isReady ? "Unready" : "Ready"}
           </button>
         </div>
 
