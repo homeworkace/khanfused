@@ -11,26 +11,26 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
     let sanitizedInput = myName.trim();
 
     const placeholderNames = [
-        "Anonymous Serf", "Anonymous Nomad", "Anonymous Bandit", "Anonymous Burgher", "Anonymous Tanner",
-        "Anonymous Hunter", "Anonymous Farmer", "Anonymous Sailor", "Anonymous Miller", "Anonymous Merchant",
-        "Anonymous Blacksmith", "Anonymous Fisher", "Anonymous Miner", "Anonymous Brewer", "Anonymous Baker",
-        "Anonymous Knight", "Anonymous Scribe", "Anonymous Alchemist", "Anonymous Shepherd", "Anonymous Carpenter",
-        "Anonymous Guard", "Anonymous Soldier", "Anonymous Spy", "Anonymous Archer", "Anonymous Healer",
-        "Anonymous Monk", "Anonymous Priest", "Anonymous Seer", "Anonymous Sage", "Anonymous Scholar",
-        "Anonymous Ranger", "Anonymous Rogue", "Anonymous Wanderer", "Anonymous Vagabond", "Anonymous Troubadour",
-        "Anonymous Peasant", "Anonymous Noble", "Anonymous Page", "Anonymous Jester", "Anonymous Herald",
-        "Anonymous Thief", "Anonymous Mercenary", "Anonymous Outlaw", "Anonymous Pilgrim", "Anonymous Merchant",
-        "Anonymous Noblewoman", "Anonymous Warlord", "Anonymous Shaman", "Anonymous Witch", "Anonymous Warlock",
-        "Anonymous Bard", "Anonymous Cleric", "Anonymous Druid", "Anonymous Barbarian", "Anonymous Berserker",
-        "Anonymous Chieftain", "Anonymous Gladiator", "Anonymous Artisan", "Anonymous Weaver", "Anonymous Potioneer",
-        "Anonymous Cook", "Anonymous Falconer", "Anonymous Navigator", "Anonymous Astrologer", "Anonymous Magician",
-        "Anonymous Artisan", "Anonymous Cartographer", "Anonymous Envoy", "Anonymous Diplomat", "Anonymous Courier",
-        "Anonymous Marshal", "Anonymous General", "Anonymous Admiral", "Anonymous Cavalier", "Anonymous Footman",
-        "Anonymous Squire", "Anonymous Artisan", "Anonymous Vintner", "Anonymous Smuggler", "Anonymous Apprentice",
-        "Anonymous Seafarer", "Anonymous Lorekeeper", "Anonymous Apothecary", "Anonymous Conjurer", "Anonymous Necromancer",
-        "Anonymous Warden", "Anonymous Sentinel", "Anonymous Ward", "Anonymous Mason", "Anonymous Fencer",
-        "Anonymous Gunslinger", "Anonymous Duelist", "Anonymous Engineer", "Anonymous Scout", "Anonymous Explorer",
-        "Anonymous Cartwright", "Anonymous Clockmaker", "Anonymous Stonecutter", "Anonymous Gardener", "Anonymous Chandler"
+        "Serf", "Nomad", "Bandit", "Burgher", "Tanner",
+        "Hunter", "Farmer", "Sailor", "Miller", "Merchant",
+        "Blacksmith", "Fisher", "Miner", "Brewer", "Baker",
+        "Knight", "Scribe", "Alchemist", "Shepherd", "Carpenter",
+        "Guard", "Soldier", "Spy", "Archer", "Healer",
+        "Monk", "Priest", "Seer", "Sage", "Scholar",
+        "Ranger", "Rogue", "Wanderer", "Vagabond", "Troubadour",
+        "Peasant", "Noble", "Page", "Jester", "Herald",
+        "Thief", "Mercenary", "Outlaw", "Pilgrim", "Merchant",
+        "Noblewoman", "Warlord", "Shaman", "Witch", "Warlock",
+        "Bard", "Cleric", "Druid", "Barbarian", "Berserker",
+        "Chieftain", "Gladiator", "Artisan", "Weaver", "Potioneer",
+        "Cook", "Falconer", "Navigator", "Astrologer", "Magician",
+        "Artisan", "Cartographer", "Envoy", "Diplomat", "Courier",
+        "Marshal", "General", "Admiral", "Cavalier", "Footman",
+        "Squire", "Artisan", "Vintner", "Smuggler", "Apprentice",
+        "Seafarer", "Lorekeeper", "Apothecary", "Conjurer", "Necromancer",
+        "Warden", "Sentinel", "Ward", "Mason", "Fencer",
+        "Gunslinger", "Duelist", "Engineer", "Scout", "Explorer",
+        "Cartwright", "Clockmaker", "Stonecutter", "Gardener", "Chandler"
     ];
 
     // Please see the similar handler in RenderPage.jsx.
@@ -122,7 +122,7 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                                     <img src={tick} />
                                 )}
                                 <span key={player.name} className={player.name ? "listed-name" : "grayed-out"}>
-                                    {player.name ? player.name : placeholderNames[player.session % 100]}
+                                    {player.name ? player.name : "Anonymous " + placeholderNames[player.session % 100]}
                                 </span>
                             </div>
                         )
