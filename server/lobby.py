@@ -4,11 +4,10 @@ import string
 from flask_socketio import emit
 from flask_apscheduler import APScheduler
 
-states = ['waiting', 'instructions', 'role_assignment','spring', 'double_harvest','summer', 'autumn', 'winter', 
-            'insufficient_food', 'khans_pillaged', 'lords_killed', 'end_game']
-game_seasons = ['spring', 'double_harvest','summer', 'autumn', 'winter']
+states = ['waiting', 'role_assignment', 'spring', 'summer', 'summer_result', 'autumn', 'banish_result', 'winter', 'pillage_result', 'food_end', 'no_lords_end', 'no_khans_end']
+
 class lobby :
-    def __init__(self, scheduler, password='') :
+    def __init__(self, scheduler, socket, password='') :
         self.state = 'waiting'
         self.password = password
         self.players = []
@@ -18,7 +17,7 @@ class lobby :
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
-        #self.socket = None
+        self.socket = socket
         self.timer = scheduler
         self.next_job = None
 
@@ -35,8 +34,8 @@ class lobby :
         result['grain'] = self.grain
         return result
 
-    def unminified(lobby_to_copy, scheduler) :
-        result = lobby(scheduler)
+    def unminified(lobby_to_copy, scheduler, socket) :
+        result = lobby(scheduler, socket)
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
@@ -51,20 +50,20 @@ class lobby :
         if self.state != 'waiting' :
             return False
 
-        self.players.append((session, name))
+        self.players.append([session, name])
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
 
         # Testing 10-man lobby
         self.players += [
-            (0, 'Jules'),
-            (1, 'Sofia'),
-            (2, 'Wilford'),
-            (3, 'Vivienne'),
-            (4, 'Clemens'),
-            (5, 'Oliver'),
-            (6, 'Qasym'),
-            (7, 'Zhuldyz'),
-            (8, 'Aytac'),
+            [0, 'Jules'],
+            [1, 'Sofia'],
+            [2, 'Wilford'],
+            [3, 'Vivienne'],
+            [4, 'Clemens'],
+            [5, 'Oliver'],
+            [6, 'Qasym'],
+            [7, 'Zhuldyz'],
+            [8, 'Aytac'],
         ]
         self.ready += [True] * 9
 
@@ -91,8 +90,8 @@ class lobby :
             if ready is False :
                 return "Not all players are ready!"
 
+        self.ready = [False] * len(self.players)
         self.role_assignment_start()
-        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
         return None
     
     def role_assignment_start(self):
@@ -119,10 +118,29 @@ class lobby :
         # Initialise all other game variables.
         self.status += [0] * len(self.players)
         #self.grain = 0 # Uncomment if we have a starting grain rule
+
+        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
     
     def spring_start(self):
+        self.state = 'spring'
+        # Emit change in state
+        
+        # Unready everyone who is active and ready everyone who is banished.
+
+        # Finally, set a callback for the next state.
         self.next_job.remove()
-        print('spring_start')
+        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start')
+
+    def summer_start(self) :
+        self.state = 'summer'
+        # Emit change in state
+        
+        # Unready everyone who is active and ready everyone who is banished.
+
+        # Finally, set a callback for the next state.
+        self.next_job.remove()
+
+    # Raymond: for now do the same for autumn and winter lol
 
     def waiting_transition(self) :
         self.ready = [True] * len(self.players)
