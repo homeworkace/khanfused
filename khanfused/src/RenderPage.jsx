@@ -37,9 +37,10 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
-    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished
+    const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
+    const [scoutedRole, setScoutedRole] = useState("");
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -150,9 +151,13 @@ function RoomPage() {
 
                 case "summer":
                     return <SummerGamePlay
+                        players = {players}
                         // handleSummerStage = {handleSummerStage}
                         role = {role}
                 />
+
+                case "summerResults":
+                    // return <SummerResults />
 
                 case "double_harvest":
                     return <SpringDouble
@@ -210,14 +215,10 @@ function RoomPage() {
                 //    _players
             }
             setPlayers(_players);
-            setCurrentSeason(data['state']);
 
-            //setRole(data['role']);
-            //setStatus(data['status']);
-            //if ('king' in data) {
-            //  setKing(data['king']);
-            //}
-            //setGrain(data['grain']);
+            // renders page based on current state for joining players
+            setCurrentSeason(data['state']);
+        
 
             setHasConnected(true);
         }
@@ -419,11 +420,13 @@ function RoomPage() {
             return;
         }
 
+        // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
             if (currentSeason === "spring") setPageToRender("spring");
-            if (currentSeason === "summer") setPageToRender("summerStage");
+            if (currentSeason === "summer") setPageToRender("summer");
+            if (currentSeason === "summer_results") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumnStage");
             if (currentSeason === "winter") setPageToRender("winterStage");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
@@ -448,9 +451,9 @@ function RoomPage() {
         const handleChangeState = (data) => {
             console.log(data);
 
-            //setCurrentSeason(data["state"]);
-            setCurrentSeason("spring");
-
+            // sync client's state with server's state
+            // setCurrentSeason(data["state"]);
+            setCurrentSeason("summer");
             switch (data['state']) {
 
                 case "role_assignment":
@@ -464,8 +467,65 @@ function RoomPage() {
                     setKing(players[index]['session']);
 
                 case "spring":
-                    // set every player to unready state at start of spring
-                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    }
+
+                case "summer":
+                    
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+
+                        // if double harvest found in data
+                        if ("double_harvest" in data) {
+
+                            if (role !== "lord") return;
+
+                            // if true
+                            if (data['double_harvest']) {
+                                setStatus(3); // set player as double harvest status
+                            }
+
+                        }
+                    }
+
+                case "summer_results":
+                    setScoutedRole(""); // clears scouted role first
+
+                    // assuming "scout" is a number eg. 1 or 2
+                    if ("scout" in data) {
+
+                        if (role !== "lord") return;
+
+                        if (data['scout'] === 1) {
+                            setScoutedRole("Lord"); // role reveal to be lord
+                        } else if (data['scout'] === 2) {
+                            setScoutedRole("Khan"); // role reveal to be khan
+                        }
+                    }
+
+                    if ("farm" in data) {
+
+                        // grains + 1 ??
+                        // setGrain(g => g + 1);
+                    }
+                
+                case "autumn":
+
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    }
+
+                case "winter":
+
+                    if (status === 0) {
+                        // set every player to unready state at start of spring
+                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                    }
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -517,7 +577,7 @@ function RoomPage() {
         return () => {
             socket.current.off("unready", handleUnreadyState);
         }
-    }, []);
+    }, [players]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -530,12 +590,12 @@ function RoomPage() {
             return;
         }
 
-        
+        console.log(players);
         
         return () => {
 
         }
-    }, []);
+    }, [players]);
 
     // useEffect for debugging
     useEffect(() => {
