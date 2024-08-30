@@ -213,6 +213,7 @@ def socket_on_join(data):
     elif lobby_info['state'] == 'summer' :
         if lobby_info['roles'][player_index] == 1 and lobby_info['status'][player_index] == 0:
             lobby_info['choices'] = choices[player_index]
+        lobby_info['status'] = [(status if status < 3 else 0) for status in lobby_info['status']]
     # autumn: king chooses banish. only the king should know their choice. session id for banish, -1 for none
     elif lobby_info['state'] == 'autumn' :
         if lobby_info['roles'][player_index] == 0:
