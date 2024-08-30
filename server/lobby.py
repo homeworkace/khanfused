@@ -8,6 +8,7 @@ states = ['waiting', 'role_assignment', 'spring', 'summer', 'summer_result', 'au
 
 class lobby :
     def __init__(self, scheduler, socket, password='') :
+        self.lobby_code = ''
         self.state = 'waiting'
         self.password = password
         self.players = []
@@ -23,6 +24,7 @@ class lobby :
 
     def minified(self) :
         result = {}
+        result['lobby_code'] = self.lobby_code
         result['state'] = self.state
         result['password'] = self.password
         result['players'] = self.players
@@ -36,6 +38,7 @@ class lobby :
 
     def unminified(lobby_to_copy, scheduler, socket) :
         result = lobby(scheduler, socket)
+        result.lobby_code = lobby_to_copy['lobby_code']
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
@@ -128,8 +131,15 @@ class lobby :
         # Ready everyone who is banished and unready everyone else.
         self.ready = [True if player > 1 else False for player in self.status]
 
+        # Set placeholder choice of lord to perform a double harvest.
+        for i in range(len(self.roles)) :
+            if self.roles[i] != 0 :
+                continue
+            eligible_choices = [j for j in range(len(self.roles)) if j != i]
+            self.choices.append(self.players[random.choice(eligible_choices)][0])
+
         # Emit change in state.
-        self.socket.emit('change_state', { 'state' : 'spring' })
+        self.socket.emit('change_state', { 'state' : 'spring' }, room = self.lobby_code, namespace = '/')
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
@@ -152,12 +162,12 @@ class lobby :
 
         # Determine which of them will have the placeholder decision of scouting. The rest of the lords shall farm.
         eligible_lords = [choice for choice in self.choices if choice == -1]
-        scouting_lords = len(eligible_lords) - len(self.players) / 2 + 2 # Subtract the minimum number of lords who need to farm to break even on grain, assuming the chosen lord isn't a khan.
+        scouting_lords = len(eligible_lords) - math.floor(len(self.players) / 2) + 2 # Subtract the minimum number of lords who need to farm to break even on grain, assuming the chosen lord isn't a khan.
         while scouting_lords > 0 :
             eligible_lords[scouting_lords - 1] = -2
             scouting_lords -= 1
         random.shuffle(eligible_lords)
-        self.choices = [(None if self.choices[i] is None else eligible_lords.pop()) for i in self.choices] # Put the choices back in place.
+        self.choices = [(None if self.choices[i] is None else eligible_lords.pop()) for i in range(len(self.choices))] # Put the choices back in place.
 
         # Of the scouting lords, pick an eligible candidate.
         for i in range(len(self.choices)) :
@@ -168,7 +178,7 @@ class lobby :
             if len(eligible_choices) < 1 : # If they already know who everyone is, get them to farm instead.
                 self.choices[i] = -1
             else :
-                self.choices[i] = self.players[random.choice[eligible_choices]][0] # Otherwise, assign the corresponding session ID of the randomly chosen index to their choice.
+                self.choices[i] = self.players[random.choice(eligible_choices)][0] # Otherwise, assign the corresponding session ID of the randomly chosen index to their choice.
 
         # Unready everyone who is active and ready everyone else.
         self.ready = [False if player == 0 else True for player in self.status]
@@ -176,9 +186,9 @@ class lobby :
         # Emit change in state.
         for player in range(len(self.players)) :
             if self.status[player] == 3 :
-                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True })
+                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
             else :
-                self.socket.emit('change_state', { 'state' : 'summer' })
+                self.socket.emit('change_state', { 'state' : 'summer' }, room = str(self.players[player][0]), namespace = '/')
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
