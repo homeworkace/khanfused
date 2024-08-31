@@ -36,6 +36,7 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
+    const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
@@ -94,6 +95,13 @@ function RoomPage() {
                         />
                     )
 
+                                   
+                case "reveal_role":
+                    return <Role 
+                        players={players}
+                        king={king}
+                    />
+
                 case "spring":
                     return <SpringGamePlay
                         players={players}
@@ -101,47 +109,10 @@ function RoomPage() {
                         socket={socket}
                 />  
 
-                // insufficentFood scenario -- to be replaced with actual state
-                // case "insufficentFood":
-                //     return <InsufficentFood
-                // />
-
-                // lordWin scenario -- to be replaced with actual state
-                // case lordWin:
-                //     return <LordWin
-                // />
-
-                // khanWin screnario -- to be repladed with actual state
-                // case khanWin:
-                //     return <KhanWin
-                // />
-
-                case "winter":
-                    return <WinterGamePlay
-                        // handleWinterStage = {handleWinterStage}
-                />
-
-                case "autumnResults":
-                    return <AutumnResults
-                    players = {players}
-                    role = {role}
-                    socket = {socket}
-                    />
-
-                case "autumn":
-                    return <AutumnGamePlay 
-                    players = {players}
-                    role = {role}
-                    socket = {socket}
-                />
-
-
-
                 case "summer":
                     return <SummerGamePlay
                         players = {players}
-                        choices = {choices}
-                        setChoices={setChoices}
+                        // handleSummerStage = {handleSummerStage}
                         role = {role}
                         socket = {socket}
                 />
@@ -158,11 +129,20 @@ function RoomPage() {
                         handleSummerChangeClick={handleSummerChangeClick} 
                 />
 
-                case "reveal_role":
-                    return <Role 
-                        players={players}
-                        king={king}
-                    />;
+                // insufficentFood scenario -- to be replaced with actual state
+                case "insufficentFood":
+                    return <InsufficentFood
+                />
+
+                // lordWin scenario -- to be replaced with actual state
+                case "lordWin":
+                    return <LordWin
+                />
+
+                // khanWin screnario -- to be repladed with actual state
+                case "khanWin":
+                    return <KhanWin
+                />
             }
         }
     };
@@ -414,23 +394,32 @@ function RoomPage() {
             return;
         }
 
+        console.log(currentSeason);
         // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
+
             if (currentSeason === "spring") setPageToRender("spring");
             if (currentSeason === "summer") setPageToRender("summer");
-            if (currentSeason === "summer_results") setPageToRender("summerResults");
+            if (currentSeason === "summer_result") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumn");
-            if (currentSeason === "autumn_results") setPageToRender("autumnResults");
-            if (currentSeason === "winter") setPageToRender("winterStage");
-            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
-            
+            if (currentSeason === "winter") setPageToRender("winter");
 
+            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
+
+            if (currentSeason === "food_end") setPageToRender("insufficentFood");
+            if (currentSeason === "no_lords_end") setPageToRender("khanWin");
+            if (currentSeason === "no_khans_end") setPageToRender("lordWin");
+
+            if (currentSeason === "pillage_result") setPageToRender("pillageResult");
+            if (currentSeason === "banish_result") setPageToRender("banishedResult");
+            
         } else {
             setPageToRender("default");
         }
 
+        console.log(currentSeason);
         
         return () => {
 
@@ -447,11 +436,14 @@ function RoomPage() {
             console.log(data);
 
             // sync client's state with server's state
-            // setCurrentSeason(data["state"]);
-            setCurrentSeason("summer");
+            setCurrentSeason(data['state']);
+            console.log(data['state']);
+
             switch (data['state']) {
 
                 case "role_assignment":
+                    
+                    setRoleArray(data['role']);
                     let role_int = Math.max(...data['role']);
 
                     if (role_int === 0) setRole("king"); // king
@@ -461,12 +453,16 @@ function RoomPage() {
                     let index = data['role'].indexOf(0);
                     setKing(players[index]['session']);
 
+                    break;
+
                 case "spring":
                     
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
+
+                    break;
 
                 case "summer":
                     
@@ -487,26 +483,26 @@ function RoomPage() {
                         }
                     }
 
-                case "summer_results":
-                    setScoutedRole(""); // clears scouted role first
+                    break;
 
-                    // assuming "scout" is a number eg. 1 or 2
-                    if ("scout" in data) {
+                case "summer_result":
+
+                    if ("result" in data) {
 
                         if (role !== "lord") return;
 
-                        if (data['scout'] === 1) {
-                            setScoutedRole("Lord"); // role reveal to be lord
-                        } else if (data['scout'] === 2) {
+                        if (data['result']) {
                             setScoutedRole("Khan"); // role reveal to be khan
+                        } else {
+                            setScoutedRole("Lord"); // role reveal to be lord
                         }
                     }
 
-                    if ("farm" in data) {
+                    console.log(data['grain']);
 
-                        // grains + 1 ??
-                        // setGrain(g => g + 1);
-                    }
+                    setGrain(g => g + data['grain']);
+
+                    break;
                 
                 case "autumn":
 
@@ -515,12 +511,20 @@ function RoomPage() {
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
 
+                    break;
+
                 case "winter":
 
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
+
+                    break;
+
+                case "food_end":
+
+                    
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -586,6 +590,7 @@ function RoomPage() {
         }
 
         console.log(players);
+        console.log(roleArray);
         
         return () => {
 
