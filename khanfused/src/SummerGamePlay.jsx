@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './SummerGamePlay.css';
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
@@ -12,6 +12,43 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
   const [isFarm, setIsFarm] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
+  const selectedPlayerSessionRef = useRef(selectedPlayerSession);
+
+  useEffect(() => {
+    selectedPlayerSessionRef.current = selectedPlayerSession;
+  }, [selectedPlayerSession]);
+
+  useEffect(() => {
+    if (isReady) {
+      if (role === 'lord') {
+        if (choices === 1) {
+          socket.current.emit('ready', {
+            session: getSession(),
+            choice: selectedPlayerSessionRef.current 
+          });
+          console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+        } else if (choices === 2) {
+          socket.current.emit('ready', {
+            session: getSession(),
+            choice: -1
+          });
+          console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+        }
+      } else {
+        socket.current.emit('ready', {
+          session: getSession(),
+        });
+      }
+      console.log('Emitted ready state:', isReady);
+      console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+    } else {
+      socket.current.emit('unready', {
+        session: getSession()
+      });
+      console.log('Emitted unready state:', isReady);
+    }
+  }, [isReady, choices, role, socket]);
+
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
@@ -24,8 +61,11 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
     setIsScoutListOpen(!isScoutListOpen);
   };
 
-  const handlePlayerSelect = (player) => {
-    setSelectedPlayerSession(player.session);
+  const handlePlayerSelect = (playerName) => {
+    const selectedPlayer = players.find(p => p.name === playerName);
+    if (selectedPlayer) {
+      setSelectedPlayerSession(selectedPlayer.session);
+    }
     setChoices(1);
   };
 
@@ -40,35 +80,8 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
   };
 
   const summerReadyClick = () => {
-
-    if (!isReady) {
-      if (role === 'lord') {
-        // scout
-        if (choices === 1) {
-          socket.current.emit('ready', {
-            session: getSession(),
-            choice: selectedPlayerSession
-          });
-        // farm
-        } else if (choices === 2) {
-          socket.current.emit('ready', {
-            session: getSession(),
-            choice: -1
-          });
-          console.log('Farm choice selected.');
-        }
-      } else {
-        socket.current.emit('ready', {
-          session: getSession(),
-        });
-      }
-      console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSession}`);
-    } else {
-      socket.current.emit('unready', {
-        session: getSession()
-      });
-    }
     setIsReady(!isReady);
+    
   };
 
   const renderRoleSpecificContent = () => {
@@ -83,7 +96,7 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
                 {players.filter(player => player.session != getSession()).map((player) => (
                   <li
                     key={player.session}
-                    onClick={() => handlePlayerSelect(player)}
+                    onClick={() => handlePlayerSelect(player.name)}
                     className={selectedPlayerSession === player.session ? "selected" : ""}
                   >
                     {player.name}
@@ -113,7 +126,7 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
 
         <div className="summer-button-bar">
           <button onClick={summerReadyClick}>
-            Ready
+            {isReady ? "Unready" : "Ready"}
           </button>
         </div>
 

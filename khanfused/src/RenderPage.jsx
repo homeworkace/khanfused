@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, createContext} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
@@ -453,8 +453,8 @@ function RoomPage() {
             console.log(data);
 
             // sync client's state with server's state
-            setCurrentSeason(data['state']);
-
+            // setCurrentSeason(data['state']);
+            setCurrentSeason('spring');
             switch (data['state']) {
 
                 case "role_assignment":
@@ -524,10 +524,8 @@ function RoomPage() {
                                 // create a copy of current role array and update to 2
                                 const updatedRole = [...r];
                                 updatedRole[index] = 2;
-
                                 return updatedRole;
                             });
-
                         } else {
                             setScoutedRole("lord");
 
@@ -541,7 +539,6 @@ function RoomPage() {
                                 return updatedRole;
                             });
                         }
-
 
                     }
 
@@ -652,14 +649,10 @@ function RoomPage() {
             return;
         }
 
-        console.log(`Players array: ${players}`);
-        console.log(`Role array: ${roleArray}`);
-        console.log(`Grains: ${grain}`);
-        
         return () => {
 
         }
-    }, [players, roleArray, grain]);
+    }, [players, roleArray, grain, scoutedRole]);
 
     // useEffect for debugging
     useEffect(() => {

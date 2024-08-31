@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './SpringGamePlay.css';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import { getSession } from './utility.js';
 import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ socket, role, players}) {
+function SpringGamePlay({ socket, role, players }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isDoubleHarvestListOpen, setDoubleHarvestListOpen] = useState(false);
+  const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
+
+  const selectedPlayerSessionRef = useRef(selectedPlayerSession);
+
+  useEffect(() => {
+    selectedPlayerSessionRef.current = selectedPlayerSession;
+  }, [selectedPlayerSession]);
+
+  useEffect(() => {
+    if (isReady) {
+      socket.current.emit('ready', {
+        session: getSession(),
+        double_harvest: role === 'lord' ? selectedPlayerSessionRef.current : null
+      });
+      console.log(`Player ${getSession()} is ready`);
+      console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
+    } else {
+      socket.current.emit('unready', {
+        session: getSession()
+      });
+      console.log(`Player ${getSession()} is unready`);
+    }
+  }, [isReady, role, socket]); 
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -20,45 +42,30 @@ function SpringGamePlay({ socket, role, players}) {
   };
 
   const toggleDoubleHarvestList = () => {
-    setDoubleHarvestListOpen(!isDoubleHarvestListOpen);
+    setIsDoubleHarvestListOpen(!isDoubleHarvestListOpen);
   };
 
-  const handlePlayerSelect = (player) => {
-    setSelectedPlayerSession(player.session); 
+  const handlePlayerSelect = (playerName) => {
+    const selectedPlayer = players.find(p => p.name === playerName);
+    if (selectedPlayer) {
+      setSelectedPlayerSession(selectedPlayer.session);
+    }
   };
 
   const springReadyClick = () => {
-
-    // check if double harvest is selected first
+    // Check if double harvest is selected first
     if (role === "king") {
-      if (selectedPlayerSession === null) {
-        console.log("King select a player for DH");
+      if (selectedPlayerSessionRef.current === null) {
+        console.log("King select a player for Double Harvest");
         return;
       }
     }
     
-    if(!isReady) {
-      
-      socket.current.emit('ready', {
-        session: getSession(),
-        double_harvest : role === 'king' ? selectedPlayerSession : null
-      });
-      console.log(`Player ${getSession()} is ready`);
-      console.log(`Double Harvest: ${selectedPlayerSession}`);
-    } else {
-      socket.current.emit('unready', {
-        session: getSession()
-      });
-      console.log(`Player ${getSession()} is unready`);
-    }
-
-    setIsReady(!isReady);
-
-};
+    setIsReady(!isReady); 
+  };
 
   const renderRoleSpecificContent = () => {
-    console.log(`Current role is: ${role}`);
-    if (role === "king") {
+    if (role === "lord") {
       return (
         <div>
           <button className="double-harvest-button" onClick={toggleDoubleHarvestList}>Double Harvest</button>
@@ -68,7 +75,7 @@ function SpringGamePlay({ socket, role, players}) {
                 {players.filter(player => player.session != getSession()).map((player) => (
                   <li 
                     key={player.session} 
-                    onClick={() => handlePlayerSelect(player)}
+                    onClick={() => handlePlayerSelect(player.name)}
                     className={selectedPlayerSession === player.session ? "selected" : ""}
                   >
                     {player.name}
@@ -79,7 +86,7 @@ function SpringGamePlay({ socket, role, players}) {
           )}
         </div>
       );
-    } 
+    }
   };
 
   return (
@@ -97,10 +104,10 @@ function SpringGamePlay({ socket, role, players}) {
           </button>
 
           <div className="spring-player-list">
-                <PlayerList players={players} />
+            <PlayerList players={players} />
           </div>
 
-        {renderRoleSpecificContent()} 
+          {renderRoleSpecificContent()} 
 
           <HelpButton />
         
@@ -108,7 +115,6 @@ function SpringGamePlay({ socket, role, players}) {
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>
-
         <Timer duration={10} onTimeUp={handleTimeUp} />
       </div>
     </div>

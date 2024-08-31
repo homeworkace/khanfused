@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AutumnGamePlay.css'; 
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
