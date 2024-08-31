@@ -8,6 +8,7 @@ states = ['waiting', 'role_assignment', 'spring', 'summer', 'summer_result', 'au
 
 class lobby :
     def __init__(self, scheduler, socket, password='') :
+        self.lobby_code = ''
         self.state = 'waiting'
         self.password = password
         self.players = []
@@ -23,6 +24,7 @@ class lobby :
 
     def minified(self) :
         result = {}
+        result['lobby_code'] = self.lobby_code
         result['state'] = self.state
         result['password'] = self.password
         result['players'] = self.players
@@ -36,6 +38,7 @@ class lobby :
 
     def unminified(lobby_to_copy, scheduler, socket) :
         result = lobby(scheduler, socket)
+        result.lobby_code = lobby_to_copy['lobby_code']
         result.state = lobby_to_copy['state']
         result.password = lobby_to_copy['password']
         result.players = lobby_to_copy['players']
@@ -119,7 +122,8 @@ class lobby :
         self.status += [0] * len(self.players)
         #self.grain = 0 # Uncomment if we have a starting grain rule
 
-        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start')
+        #self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 2, id = 'spring_start' + self.lobby_code)
     
     def spring_start(self):
         self.state = 'spring'
@@ -135,11 +139,12 @@ class lobby :
             self.choices.append(self.players[random.choice(eligible_choices)][0])
 
         # Emit change in state.
-        self.socket.emit('change_state', { 'state' : 'spring' })
+        self.socket.emit('change_state', { 'state' : 'spring' }, room = self.lobby_code, namespace = '/')
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start')
+        #self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 5, id = 'summer_start' + self.lobby_code)
 
     def summer_start(self) :
         self.state = 'summer'
@@ -155,20 +160,95 @@ class lobby :
         # Reset the list of choices so that it represents the lords' decisions.
         self.choices = [(-1 if self.status[player] == 0 and self.roles[player] == 1 else None) for player in range(len(self.status))]
 
+        # Determine which of them will have the placeholder decision of scouting. The rest of the lords shall farm.
+        eligible_lords = [choice for choice in self.choices if choice == -1]
+        scouting_lords = len(eligible_lords) - math.floor(len(self.players) / 2) + 2 # Subtract the minimum number of lords who need to farm to break even on grain, assuming the chosen lord isn't a khan.
+        while scouting_lords > 0 :
+            eligible_lords[scouting_lords - 1] = -2
+            scouting_lords -= 1
+        random.shuffle(eligible_lords)
+        self.choices = [(None if self.choices[i] is None else eligible_lords.pop()) for i in range(len(self.choices))] # Put the choices back in place.
+
+        # Of the scouting lords, pick an eligible candidate.
+        for i in range(len(self.choices)) :
+            if self.choices[i] != -2 :
+                continue
+            
+            eligible_choices = [j for j in range(len(self.perspectives[i])) if self.perspectives[i][j] == -1] # Find the acceptable indices to select based on the roles they don't already know.
+            if len(eligible_choices) < 1 : # If they already know who everyone is, get them to farm instead.
+                self.choices[i] = -1
+            else :
+                self.choices[i] = self.players[random.choice(eligible_choices)][0] # Otherwise, assign the corresponding session ID of the randomly chosen index to their choice.
+
         # Unready everyone who is active and ready everyone else.
-        self.ready = [False if player == 0 else True for player in self.status]
+        self.ready = [False if player == 0 or player == 3 else True for player in self.status]
 
         # Emit change in state.
         for player in range(len(self.players)) :
             if self.status[player] == 3 :
-                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True })
+                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
             else :
-                self.socket.emit('change_state', { 'state' : 'summer' })
+                self.socket.emit('change_state', { 'state' : 'summer' }, room = str(self.players[player][0]), namespace = '/')
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
 
-    # Raymond: for now do the same for autumn and winter lol
+    def summer_result_start(self) :
+        self.state = 'summer_result'
+
+        # Perform grain calculation.
+        added_grain = 0
+        if 3 in self.status :
+            added_grain = 2
+            self.status = [status if status < 3 else 0 for status in self.status]
+        added_grain += len([i for i in self.choices if i == -1])
+        self.grain += added_grain - math.floor(len(self.players) / 2)
+
+        # Update results of scouting.
+        for i in range(len(self.players)) :
+            if self.choices[i] is None :
+                continue
+            if self.choices[i] == -1 :
+                continue
+            
+            chosen_player = [player[0] for player in self.players].index(self.choices[i])
+            self.perspectives[i][chosen_player] = self.roles[chosen_player]
+            self.choices[i] = self.roles[chosen_player] == 2
+
+        # Emit change in state.
+        for player in range(len(self.players)) :
+            if self.choices[player] is None :
+                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
+            elif self.choices[player] is -1 :
+                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
+            else :
+                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain, 'result' : self.choices[player] }, room = str(self.players[player][0]), namespace = '/')
+        
+        # Finally, set a callback for the next state.
+        self.next_job.remove()
+        if self.grain < 0 :
+            #self.next_job = self.timer.add_job(func = self.food_end, trigger = 'interval', seconds = 5, id = 'food_end' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.food_end, trigger = 'interval', seconds = 3, id = 'food_end' + self.lobby_code)
+        #self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 5, id = 'autumn_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 3, id = 'autumn_start' + self.lobby_code)
+
+    def autumn_start(self) :
+        self.next_job.remove()
+
+        print('yay?')
+
+    def food_end(self) :
+        self.state = 'food_end'
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'food_end' }, room = self.lobby_code, namespace = '/')
+        
+        # Finally, set a callback for the next state.
+        self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
 
     def waiting_start(self) :
         self.ready = [True] * len(self.players)
@@ -177,6 +257,8 @@ class lobby :
         self.status = []
         self.choices = []
         self.grain = 0
+
+        self.next_job.remove()
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
