@@ -37,6 +37,7 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
+    const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
@@ -93,6 +94,7 @@ function RoomPage() {
                             setMyName={setMyName}
                         />
                     )
+                
 
                 case "role_assignment": 
                     return <RandomTeams
@@ -100,7 +102,8 @@ function RoomPage() {
                         // handleKhanWin = {handleKhanWin}
                         // handleLordWins = {handleLordWins}
                         // handleInsufficentFood = {handleInsufficentFood}
-                />
+                    />;  
+
 
                 case "spring":
                     return <SpringGamePlay
@@ -419,15 +422,16 @@ function RoomPage() {
             return;
         }
 
+        console.log(currentSeason);
         // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
             if (currentSeason === "spring") setPageToRender("spring");
-            if (currentSeason === "summer") setPageToRender("summerStage");
+            if (currentSeason === "summer") setPageToRender("summer");
             if (currentSeason === "summer_results") setPageToRender("summerResults");
-            if (currentSeason === "autumn") setPageToRender("autumnStage");
-            if (currentSeason === "winter") setPageToRender("winterStage");
+            if (currentSeason === "autumn") setPageToRender("autumn");
+            if (currentSeason === "winter") setPageToRender("winter");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
             
 
@@ -435,6 +439,7 @@ function RoomPage() {
             setPageToRender("default");
         }
 
+        console.log(currentSeason);
         
         return () => {
 
@@ -451,11 +456,14 @@ function RoomPage() {
             console.log(data);
 
             // sync client's state with server's state
-            setCurrentSeason(data["state"]);
+            setCurrentSeason(data['state']);
+            console.log(data['state']);
 
             switch (data['state']) {
 
                 case "role_assignment":
+                    
+                    setRoleArray(data['role']);
                     let role_int = Math.max(...data['role']);
 
                     if (role_int === 0) setRole("king"); // king
@@ -465,6 +473,8 @@ function RoomPage() {
                     let index = data['role'].indexOf(0);
                     setKing(players[index]['session']);
 
+                    break;
+
                 case "spring":
                     
                     if (status === 0) {
@@ -472,11 +482,14 @@ function RoomPage() {
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
 
+                    break;
+
                 case "summer":
-                    
+                    console.log("reached here");
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                        console.log("reached here");
 
                         // if double harvest found in data
                         if ("double_harvest" in data) {
@@ -491,26 +504,33 @@ function RoomPage() {
                         }
                     }
 
+                    break;
+
                 case "summer_results":
                     setScoutedRole(""); // clears scouted role first
 
                     // assuming "scout" is a number eg. 1 or 2
-                    if ("scout" in data) {
+                    if ("result" in data) {
+
+                        // true == khan
+                        // false == lord
 
                         if (role !== "lord") return;
 
-                        if (data['scout'] === 1) {
-                            setScoutedRole("Lord"); // role reveal to be lord
-                        } else if (data['scout'] === 2) {
+                        if (data['result']) {
                             setScoutedRole("Khan"); // role reveal to be khan
+                        } else {
+                            setScoutedRole("Lord"); // role reveal to be lord
                         }
                     }
 
-                    if ("farm" in data) {
+                    if ("grain" in data) {
 
                         // grains + 1 ??
                         // setGrain(g => g + 1);
                     }
+
+                    break;
                 
                 case "autumn":
 
@@ -519,12 +539,16 @@ function RoomPage() {
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
 
+                    break;
+
                 case "winter":
 
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
                     }
+
+                    break;
             }
         }
         socket.current.on("change_state", handleChangeState);
