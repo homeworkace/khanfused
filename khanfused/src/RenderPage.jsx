@@ -112,7 +112,6 @@ function RoomPage() {
                 case "summer":
                     return <SummerGamePlay
                         players = {players}
-                        // handleSummerStage = {handleSummerStage}
                         role = {role}
                         socket = {socket}
                 />
@@ -122,12 +121,30 @@ function RoomPage() {
                     players = {players}
                     socket = {socket}
                     role = {role}
-                     />
-
-                case "double_harvest":
-                    return <SpringDouble
-                        handleSummerChangeClick={handleSummerChangeClick} 
                 />
+
+                case "autumn":
+                    return <AutumnGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                case "banishedResult":
+                    return <AutumnResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                />
+                
+                case "winter":
+                    return <WinterGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                // case "pillageResult":
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case "insufficentFood":
@@ -143,6 +160,7 @@ function RoomPage() {
                 case "khanWin":
                     return <KhanWin
                 />
+                
             }
         }
     };
@@ -405,8 +423,6 @@ function RoomPage() {
             if (currentSeason === "summer_result") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumn");
             if (currentSeason === "winter") setPageToRender("winter");
-
-            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
 
             if (currentSeason === "food_end") setPageToRender("insufficentFood");
             if (currentSeason === "no_lords_end") setPageToRender("khanWin");
