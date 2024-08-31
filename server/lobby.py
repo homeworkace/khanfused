@@ -436,7 +436,7 @@ class lobby :
             self.ready[player_index] = True
             
             # The lord has a decision to make.
-            if self.roles[player_index] == 1 :
+            if self.roles[player_index] == 1 and self.status[player_index] == 0 :
                 self.choices[player_index] = data['scout'] # -1 if farming
             
             # If all players are ready, skip the timer.
