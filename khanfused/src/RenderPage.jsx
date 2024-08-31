@@ -413,8 +413,7 @@ function RoomPage() {
         if (!hasConnected) {
             return;
         }
-
-        console.log(currentSeason);
+        
         // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
@@ -455,7 +454,6 @@ function RoomPage() {
 
             // sync client's state with server's state
             setCurrentSeason(data['state']);
-            console.log(data['state']);
 
             switch (data['state']) {
 
@@ -495,7 +493,7 @@ function RoomPage() {
 
                             // if true
                             if (data['double_harvest']) {
-                                setStatus(3); // set player as double harvest status
+                                setStatus(3); // set current player as double harvest status
                             }
 
                         }
@@ -505,18 +503,47 @@ function RoomPage() {
 
                 case "summer_result":
 
+                    // checks if data contains the "result" key
                     if ("result" in data) {
 
                         if (role !== "lord") return;
 
-                        if (data['result']) {
-                            setScoutedRole("Khan"); // role reveal to be khan
-                        } else {
-                            setScoutedRole("Lord"); // role reveal to be lord
-                        }
-                    }
+                        // store session ID of the player who got chosen to get scouted
+                        let sessionID = data['result'][0];
 
-                    console.log(data['grain']);
+                        // store the index of the player found with matching session ID
+                        const index = players.findIndex(player => player.session === sessionID);
+
+                        // true => khan, false => lord
+                        if (data['result'][1]) {
+                            setScoutedRole("khan");
+
+                            // manipulate the respective index in role array to 2
+                            setRoleArray(r => {
+
+                                // create a copy of current role array and update to 2
+                                const updatedRole = [...r];
+                                updatedRole[index] = 2;
+
+                                return updatedRole;
+                            });
+
+                        } else {
+                            setScoutedRole("lord");
+
+                            // manipulate the respecitve index in role array to 1
+                            setRoleArray(r => {
+
+                                // create a copy of current role array and update to 2
+                                const updatedRole = [...r];
+                                updatedRole[index] = 1;
+
+                                return updatedRole;
+                            });
+                        }
+
+
+                    }
 
                     setGrain(g => g + data['grain']);
 
@@ -531,6 +558,19 @@ function RoomPage() {
 
                     break;
 
+                case "banish_result":
+
+                    if (data['banished'] === -1) console.log("King decides not to banish");
+
+                    // if sessionID of banished matches with current sessionID
+                    if (getSession() === data['banished']) {
+                        setStatus(2); // set current player to banished state
+                    }
+
+                    setStatus(0); // else still active
+
+                    break;
+
                 case "winter":
 
                     if (status === 0) {
@@ -539,6 +579,11 @@ function RoomPage() {
                     }
 
                     break;
+
+
+                /**
+                 *  GAME END SCENARIOS
+                 */
 
                 case "food_end":
 
@@ -607,13 +652,14 @@ function RoomPage() {
             return;
         }
 
-        console.log(players);
-        console.log(roleArray);
+        console.log(`Players array: ${players}`);
+        console.log(`Role array: ${roleArray}`);
+        console.log(`Grains: ${grain}`);
         
         return () => {
 
         }
-    }, [players]);
+    }, [players, roleArray, grain]);
 
     // useEffect for debugging
     useEffect(() => {
