@@ -268,17 +268,18 @@ class lobby :
             remaining_lords = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 1]
             if not 0 in remaining_lords :
                 #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 5, id = 'no_lords_end_start' + self.lobby_code)
-                #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 2, id = 'no_lords_end_start' + self.lobby_code)
-                pass
+                self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 2, id = 'no_lords_end_start' + self.lobby_code)
             else :
                 remaining_khans = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 2]
                 if not 0 in remaining_khans :
                     #self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 5, id = 'no_khans_end_start' + self.lobby_code)
-                    #self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 2, id = 'no_khans_end_start' + self.lobby_code)
-                    pass
+                    self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 2, id = 'no_khans_end_start' + self.lobby_code)
         else :
             #self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
             self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 2, id = 'winter_start' + self.lobby_code)
+
+        # Finally, emit change in state.
+        self.socket.emit('change_state', { 'state' : 'banish_result', 'banished' : self.choice[0] }, room = self.lobby_code, namespace = '/')
 
     def winter_start(self) :
         self.state = 'winter'
@@ -292,6 +293,28 @@ class lobby :
 
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'food_end' }, room = self.lobby_code, namespace = '/')
+        
+        # Finally, set a callback for the next state.
+        self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
+
+    def no_lords_end_start(self) :
+        self.state = 'no_lords_end'
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'no_lords_end' }, room = self.lobby_code, namespace = '/')
+        
+        # Finally, set a callback for the next state.
+        self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
+
+    def no_khans_end_start(self) :
+        self.state = 'no_khans_end'
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'no_khans_end' }, room = self.lobby_code, namespace = '/')
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
