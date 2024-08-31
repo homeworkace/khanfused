@@ -3,7 +3,7 @@
     height: 100vh;
     background: url('./Assets/SUMMER CUTSCENE.svg') no-repeat center center;
     background-size: contain;
-    background-color: #799eefb9;
+    background-color: #d79f44b9;
 }
 
 .summer button {
@@ -29,6 +29,15 @@
 .summer-button-bar button:hover,
 .summer-lord-buttons button:hover {
     background-color: #e0e0e0;
+}
+.summer-lord-buttons .farm-button {
+    background-color: #fff;
+    transition: background-color 0.5s;
+}
+
+.summer-lord-buttons .farm-button.active {
+    background-color: #0aa739;
+    color: black;
 }
 
 .chat-button {
@@ -81,6 +90,7 @@
     top: 22rem;
     left: 32em; 
     z-index: 4;
+    border-radius: 10px;
 }
 
 .scout-list.active {

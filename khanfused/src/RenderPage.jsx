@@ -7,13 +7,12 @@ import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
 // Testing 
-import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
 import SpringDouble from './SpringDouble.jsx';
-import SummerDouble from './SummerDouble.jsx';
+import SummerResults from './SummerResults.jsx';
 import SummerGamePlay from './SummerGamePlay.jsx';
 import AutumnGamePlay from './AutumnGamePlay.jsx';
-import AutumnDouble from './AutumnDouble.jsx';
+import AutumnResults from './AutumnResults.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
 import KhanWin from './KhanWin.jsx';
@@ -95,14 +94,6 @@ function RoomPage() {
                         />
                     )
 
-                case "role_assignment": 
-                    return <RandomTeams
-                        handleSpringChangeClick = {handleSpringChangeClick}
-                        // handleKhanWin = {handleKhanWin}
-                        // handleLordWins = {handleLordWins}
-                        // handleInsufficentFood = {handleInsufficentFood}
-                />
-
                 case "spring":
                     return <SpringGamePlay
                         players={players}
@@ -125,43 +116,42 @@ function RoomPage() {
                 //     return <KhanWin
                 // />
 
-                // case "winterStage":
-                //     return <WinterDouble
-                // />
-
                 case "winter":
                     return <WinterGamePlay
                         // handleWinterStage = {handleWinterStage}
                 />
 
-                // case "autumnStage":
-                //     return <AutumnDouble
-                //         handleWinterChangeClick={handleWinterChangeClick}
-                // />
+                case "autumnResults":
+                    return <AutumnResults
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                    />
 
                 case "autumn":
                     return <AutumnGamePlay 
-                        // handleAutumnStage = {handleAutumnStage}
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
                 />
 
-                // case "summerStage":
-                //     return <SummerDouble
-                //         handleAutumnChangeClick={handleAutumnChangeClick}
-                //         role = {role}
-                // />
+
 
                 case "summer":
                     return <SummerGamePlay
                         players = {players}
                         choices = {choices}
                         setChoices={setChoices}
-                        // handleSummerStage = {handleSummerStage}
                         role = {role}
                         socket = {socket}
                 />
 
                 case "summerResults":
-                    // return <SummerResults />
+                    return <SummerResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                     />
 
                 case "double_harvest":
                     return <SpringDouble
@@ -431,7 +421,8 @@ function RoomPage() {
             if (currentSeason === "spring") setPageToRender("spring");
             if (currentSeason === "summer") setPageToRender("summer");
             if (currentSeason === "summer_results") setPageToRender("summerResults");
-            if (currentSeason === "autumn") setPageToRender("autumnStage");
+            if (currentSeason === "autumn") setPageToRender("autumn");
+            if (currentSeason === "autumn_results") setPageToRender("autumnResults");
             if (currentSeason === "winter") setPageToRender("winterStage");
             if (currentSeason === "double_harvest") setPageToRender("double_harvest");
             

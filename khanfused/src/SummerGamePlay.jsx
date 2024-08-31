@@ -34,12 +34,13 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
 
     if (isFarm) {
       setChoices(2);
+    } else {
+      setChoices(null);
     }
   };
 
   const summerReadyClick = () => {
-    console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}`);
-    
+
     if (!isReady) {
       if (role === 'lord') {
         // scout
@@ -48,7 +49,6 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
             session: getSession(),
             choice: selectedPlayerSession
           });
-          console.log(`Scout choice: ${selectedPlayerSession}`);
         // farm
         } else if (choices === 2) {
           socket.current.emit('ready', {
@@ -62,15 +62,11 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
           session: getSession(),
         });
       }
-
-      console.log(`Player ${getSession()} is ready`);
-
+      console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSession}`);
     } else {
       socket.current.emit('unready', {
         session: getSession()
       });
-
-      console.log(`Player ${getSession()} is unready`);
     }
     setIsReady(!isReady);
   };
@@ -79,7 +75,7 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
     if (role === "lord") {
       return (
         <div className="summer-lord-buttons">
-          <button className="farm-button" onClick={handleFarmClick}>Farm</button>
+          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick}>Farm</button>
           <button className="scout-button" onClick={toggleScoutList}>Scout</button>
           {isScoutListOpen && (
             <div className="scout-list active">
