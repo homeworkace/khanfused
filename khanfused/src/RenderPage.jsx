@@ -114,6 +114,8 @@ function RoomPage() {
                         players = {players}
                         role = {role}
                         socket = {socket}
+                        choices = {choices}
+                        setChoices = {setChoices}
                 />
 
                 case "summerResults":

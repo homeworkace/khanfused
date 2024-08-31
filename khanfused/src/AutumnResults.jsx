@@ -1,6 +1,7 @@
 import './AutumnDouble.css';
 
 function AutumnResults ({socket, role, players}) {
+    // show who has been banished
     return (
         <div className="autumnDouble">
             <div className="autumnDouble-container">
