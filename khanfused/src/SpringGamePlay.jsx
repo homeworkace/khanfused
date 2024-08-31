@@ -100,7 +100,7 @@ function SpringGamePlay({ socket, role, players}) {
                 <PlayerList players={players} />
           </div>
 
-          {renderRoleSpecificContent()} 
+        {renderRoleSpecificContent()} 
 
           <HelpButton />
         

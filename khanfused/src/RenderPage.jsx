@@ -95,15 +95,16 @@ function RoomPage() {
                         />
                     )
                 
-
                 case "role_assignment": 
                     return <RandomTeams
                         handleSpringChangeClick = {handleSpringChangeClick}
-                        // handleKhanWin = {handleKhanWin}
-                        // handleLordWins = {handleLordWins}
-                        // handleInsufficentFood = {handleInsufficentFood}
-                    />;  
-
+                    />; 
+                    
+                case "reveal_role":
+                    return <Role 
+                        players={players}
+                        king={king}
+                    />
 
                 case "spring":
                     return <SpringGamePlay
@@ -112,65 +113,50 @@ function RoomPage() {
                         socket={socket}
                 />  
 
-                // insufficentFood scenario -- to be replaced with actual state
-                // case "insufficentFood":
-                //     return <InsufficentFood
-                // />
-
-                // lordWin scenario -- to be replaced with actual state
-                // case lordWin:
-                //     return <LordWin
-                // />
-
-                // khanWin screnario -- to be repladed with actual state
-                // case khanWin:
-                //     return <KhanWin
-                // />
-
-                // case "winterStage":
-                //     return <WinterDouble
-                // />
-
-                case "winter":
-                    return <WinterGamePlay
-                        // handleWinterStage = {handleWinterStage}
-                />
-
-                // case "autumnStage":
-                //     return <AutumnDouble
-                //         handleWinterChangeClick={handleWinterChangeClick}
-                // />
-
-                case "autumn":
-                    return <AutumnGamePlay 
-                        // handleAutumnStage = {handleAutumnStage}
-                />
-
-                // case "summerStage":
-                //     return <SummerDouble
-                //         handleAutumnChangeClick={handleAutumnChangeClick}
-                //         role = {role}
-                // />
-
                 case "summer":
                     return <SummerGamePlay
-                        // handleSummerStage = {handleSummerStage}
+                        players = {players}
                         role = {role}
                 />
 
                 case "summerResults":
-                    // return <SummerResults />
+                    // to be implemented
+
+                
+                case "autumn":
+                    return <AutumnGamePlay />
+
+                
+                case "banishedResult":
+                    // to be implemented
+
+
+                case "winter":
+                    return <WinterGamePlay />
+
+                case "pillageResult":
+                    // to be implemented
+
 
                 case "double_harvest":
                     return <SpringDouble
                         handleSummerChangeClick={handleSummerChangeClick} 
                 />
 
-                case "reveal_role":
-                    return <Role 
-                        players={players}
-                        king={king}
-                    />;
+                // insufficentFood scenario -- to be replaced with actual state
+                case "insufficentFood":
+                    return <InsufficentFood
+                />
+
+                // lordWin scenario -- to be replaced with actual state
+                case "lordWin":
+                    return <LordWin
+                />
+
+                // khanWin screnario -- to be repladed with actual state
+                case "khanWin":
+                    return <KhanWin
+                />
             }
         }
     };
@@ -427,14 +413,22 @@ function RoomPage() {
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
+
             if (currentSeason === "spring") setPageToRender("spring");
             if (currentSeason === "summer") setPageToRender("summer");
-            if (currentSeason === "summer_results") setPageToRender("summerResults");
+            if (currentSeason === "summer_result") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumn");
             if (currentSeason === "winter") setPageToRender("winter");
-            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
-            
 
+            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
+
+            if (currentSeason === "food_end") setPageToRender("insufficentFood");
+            if (currentSeason === "no_lords_end") setPageToRender("khanWin");
+            if (currentSeason === "no_khans_end") setPageToRender("lordWin");
+
+            if (currentSeason === "pillage_result") setPageToRender("pillageResult");
+            if (currentSeason === "banish_result") setPageToRender("banishedResult");
+            
         } else {
             setPageToRender("default");
         }
@@ -485,11 +479,10 @@ function RoomPage() {
                     break;
 
                 case "summer":
-                    console.log("reached here");
+                    
                     if (status === 0) {
                         // set every player to unready state at start of spring
                         setPlayers(p => p.map(player => ({ ...player, ready: false })));
-                        console.log("reached here");
 
                         // if double harvest found in data
                         if ("double_harvest" in data) {
@@ -506,14 +499,9 @@ function RoomPage() {
 
                     break;
 
-                case "summer_results":
-                    setScoutedRole(""); // clears scouted role first
+                case "summer_result":
 
-                    // assuming "scout" is a number eg. 1 or 2
                     if ("result" in data) {
-
-                        // true == khan
-                        // false == lord
 
                         if (role !== "lord") return;
 
@@ -524,11 +512,9 @@ function RoomPage() {
                         }
                     }
 
-                    if ("grain" in data) {
+                    console.log(data['grain']);
 
-                        // grains + 1 ??
-                        // setGrain(g => g + 1);
-                    }
+                    setGrain(g => g + data['grain']);
 
                     break;
                 
@@ -549,6 +535,10 @@ function RoomPage() {
                     }
 
                     break;
+
+                case "food_end":
+
+                    
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -614,6 +604,7 @@ function RoomPage() {
         }
 
         console.log(players);
+        console.log(roleArray);
         
         return () => {
 
