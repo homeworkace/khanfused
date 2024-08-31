@@ -423,7 +423,7 @@ class lobby :
             if self.roles[player_index] == 0 :
                 self.choices[0] = data['double_harvest']
                 
-            # Emit to everyone. This includes the sender, who must wait for this response before it can ready itself in the client.
+            # Emit to everyone. This includes the sender, who can ignore this message.
             self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
                 
             # If all players are ready, skip the timer.
@@ -431,7 +431,17 @@ class lobby :
                 self.summer_start()
             
         elif self.state == 'summer' :
-            pass
+            # Ready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = True
+            
+            # The lord has a decision to make.
+            if self.roles[player_index] == 1 :
+                self.choices[player_index] = data['scout'] # -1 if farming
+            
+            # If all players are ready, skip the timer.
+            if not False in self.ready :
+                self.summer_result_start()
         
     def handle_unready(self, data) :
         if not 'state' in data :
@@ -439,17 +449,19 @@ class lobby :
         if data['state'] != self.state :
             return
         if self.state == 'spring' :
-            # Unready the player in question
+            # Unready the player in question.
             player_index = self.players.index(int(data['state']))
             self.ready[player_index] = False
                 
-            # Emit to everyone. This includes the sender, who must wait for this response before it can unready itself in the client.
+            # Emit to everyone. This includes the sender, who can ignore this message.
             self.socket.emit('unready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
             
         elif self.state == 'summer' :
-            pass
+            # Unready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = False
         
-    def handle_unready(self, data) :
+    def handle_select(self, data) :
         if not 'state' in data :
             return
         if data['state'] != self.state :
