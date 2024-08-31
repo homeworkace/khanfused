@@ -129,13 +129,13 @@ class lobby :
         self.state = 'spring'
         
         # Ready everyone who is banished and unready everyone else.
-        self.ready = [True if player > 1 else False for player in self.status]
+        self.ready = [True if player == 2 else False for player in self.status]
 
         # Set placeholder choice of lord to perform a double harvest.
         for i in range(len(self.roles)) :
             if self.roles[i] != 0 :
                 continue
-            eligible_choices = [j for j in range(len(self.roles)) if j != i]
+            eligible_choices = [j for j in range(len(self.roles)) if j != i and self.status[j] == 0]
             self.choices.append(self.players[random.choice(eligible_choices)][0])
 
         # Emit change in state.
@@ -202,7 +202,7 @@ class lobby :
         added_grain = 0
         if 3 in self.status :
             added_grain = 2
-            self.status = [status if status < 3 else 0 for status in self.status]
+            self.status = [status if status < 3 else 0 for status in self.status] # Reset double harvest status
         added_grain += len([i for i in self.choices if i == -1])
         self.grain += added_grain - math.floor(len(self.players) / 2)
 
@@ -221,7 +221,7 @@ class lobby :
         for player in range(len(self.players)) :
             if self.choices[player] is None :
                 self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
-            elif self.choices[player] is -1 :
+            elif self.choices[player] == -1 :
                 self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
             else :
                 self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain, 'result' : self.choices[player] }, room = str(self.players[player][0]), namespace = '/')
@@ -229,17 +229,65 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         if self.grain < 0 :
-            #self.next_job = self.timer.add_job(func = self.food_end, trigger = 'interval', seconds = 5, id = 'food_end' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.food_end, trigger = 'interval', seconds = 3, id = 'food_end' + self.lobby_code)
+            #self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 5, id = 'food_end_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 3, id = 'food_end_start' + self.lobby_code)
         #self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 5, id = 'autumn_start' + self.lobby_code)
         self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 3, id = 'autumn_start' + self.lobby_code)
 
     def autumn_start(self) :
+        self.state = 'autumn'
+        
+        # Ready everyone who is banished and unready everyone else.
+        self.ready = [True if player == 2 else False for player in self.status]
+
+        # The placeholder choice is not to banish anyone.
+        self.choices = [-1]
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'autumn' }, room = self.lobby_code, namespace = '/')
+        
+        # Finally, set a callback for the next state.
         self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 60, id = 'banish_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5, id = 'banish_result_start' + self.lobby_code)
 
-        print('yay?')
+    def banish_result_start(self) :
+        self.state = 'banish_result'
+        self.next_job.remove()
+        
+        # The king's choice is reflected in the status of the chosen player.
+        if self.choice[0] != -1 :
+            for player in range(len(self.players)) :
+                if self.players[player][0] != self.choices[0] :
+                    continue
+                if self.status[player] == 0 :
+                    self.status[player] = 2
+                break
 
-    def food_end(self) :
+            # Set the next screen to show based on whether there are any active players of that role left.
+            remaining_lords = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 1]
+            if not 0 in remaining_lords :
+                #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 5, id = 'no_lords_end_start' + self.lobby_code)
+                #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 2, id = 'no_lords_end_start' + self.lobby_code)
+                pass
+            else :
+                remaining_khans = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 2]
+                if not 0 in remaining_khans :
+                    #self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 5, id = 'no_khans_end_start' + self.lobby_code)
+                    #self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 2, id = 'no_khans_end_start' + self.lobby_code)
+                    pass
+        else :
+            #self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 2, id = 'winter_start' + self.lobby_code)
+
+    def winter_start(self) :
+        self.state = 'winter'
+
+        self.next_job.remove()
+        #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
+        #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
+
+    def food_end_start(self) :
         self.state = 'food_end'
 
         # Emit change in state.
