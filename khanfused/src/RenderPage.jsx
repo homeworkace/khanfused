@@ -7,13 +7,12 @@ import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
 // Testing 
-import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
 import SpringDouble from './SpringDouble.jsx';
-import SummerDouble from './SummerDouble.jsx';
+import SummerResults from './SummerResults.jsx';
 import SummerGamePlay from './SummerGamePlay.jsx';
 import AutumnGamePlay from './AutumnGamePlay.jsx';
-import AutumnDouble from './AutumnDouble.jsx';
+import AutumnResults from './AutumnResults.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
 import KhanWin from './KhanWin.jsx';
@@ -42,6 +41,7 @@ function RoomPage() {
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
     const [scoutedRole, setScoutedRole] = useState("");
+    const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -94,12 +94,8 @@ function RoomPage() {
                             setMyName={setMyName}
                         />
                     )
-                
-                case "role_assignment": 
-                    return <RandomTeams
-                        handleSpringChangeClick = {handleSpringChangeClick}
-                    />; 
-                    
+
+                                   
                 case "reveal_role":
                     return <Role 
                         players={players}
@@ -117,31 +113,38 @@ function RoomPage() {
                     return <SummerGamePlay
                         players = {players}
                         role = {role}
+                        socket = {socket}
                 />
 
                 case "summerResults":
-                    // to be implemented
-
-                
-                case "autumn":
-                    return <AutumnGamePlay />
-
-                
-                case "banishedResult":
-                    // to be implemented
-
-
-                case "winter":
-                    return <WinterGamePlay />
-
-                case "pillageResult":
-                    // to be implemented
-
-
-                case "double_harvest":
-                    return <SpringDouble
-                        handleSummerChangeClick={handleSummerChangeClick} 
+                    return <SummerResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
                 />
+
+                case "autumn":
+                    return <AutumnGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                case "banishedResult":
+                    return <AutumnResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                />
+                
+                case "winter":
+                    return <WinterGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                // case "pillageResult":
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case "insufficentFood":
@@ -157,6 +160,7 @@ function RoomPage() {
                 case "khanWin":
                     return <KhanWin
                 />
+                
             }
         }
     };
@@ -418,8 +422,6 @@ function RoomPage() {
             if (currentSeason === "summer_result") setPageToRender("summerResults");
             if (currentSeason === "autumn") setPageToRender("autumn");
             if (currentSeason === "winter") setPageToRender("winter");
-
-            // if (currentSeason === "double_harvest") setPageToRender("double_harvest");
 
             if (currentSeason === "food_end") setPageToRender("insufficentFood");
             if (currentSeason === "no_lords_end") setPageToRender("khanWin");

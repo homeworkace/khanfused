@@ -1,6 +1,6 @@
 import './AutumnDouble.css';
 
-function AutumnDouble ({handleWinterChangeClick}) {
+function AutumnResults ({socket, role, players}) {
     return (
         <div className="autumnDouble">
             <div className="autumnDouble-container">
@@ -8,7 +8,7 @@ function AutumnDouble ({handleWinterChangeClick}) {
                     <button>
                         Double Harvest
                     </button>
-                    <button onClick={handleWinterChangeClick}>
+                    <button>
                         Proceed
                     </button>
                 </div>
@@ -17,4 +17,4 @@ function AutumnDouble ({handleWinterChangeClick}) {
     );
 }       
 
-export default AutumnDouble;
+export default AutumnResults;

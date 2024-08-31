@@ -5,90 +5,128 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerGamePlay( {players, handleSummerStage, role}) {
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [isScoutListOpen, setIsScoutListOpen] = useState(false);
-    const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
-    const [isReady, setIsReady] = useState(false);
+function SummerGamePlay({ socket, choices, setChoices, players, role }) {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isScoutListOpen, setIsScoutListOpen] = useState(false);
+  const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
+  const [isFarm, setIsFarm] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-    const toggleChat = () => {
-        setIsChatOpen(!isChatOpen);
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const handleTimeUp = () => {
+    // handleDoubleHarvestChangeClick();
+  };
+
+  const toggleScoutList = () => {
+    setIsScoutListOpen(!isScoutListOpen);
+  };
+
+  const handlePlayerSelect = (player) => {
+    setSelectedPlayerSession(player.session);
+    setChoices(1);
+  };
+
+  const handleFarmClick = () => {
+    setIsFarm(!isFarm);
+
+    if (isFarm) {
+      setChoices(2);
+    } else {
+      setChoices(null);
     }
+  };
 
-    const handleTimeUp = () => {
-      // handleDoubleHarvestChangeClick();
-    };
+  const summerReadyClick = () => {
 
-    const toggleScoutList = () => {
-      setIsScoutListOpen(!isScoutListOpen);
+    if (!isReady) {
+      if (role === 'lord') {
+        // scout
+        if (choices === 1) {
+          socket.current.emit('ready', {
+            session: getSession(),
+            choice: selectedPlayerSession
+          });
+        // farm
+        } else if (choices === 2) {
+          socket.current.emit('ready', {
+            session: getSession(),
+            choice: -1
+          });
+          console.log('Farm choice selected.');
+        }
+      } else {
+        socket.current.emit('ready', {
+          session: getSession(),
+        });
+      }
+      console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSession}`);
+    } else {
+      socket.current.emit('unready', {
+        session: getSession()
+      });
     }
+    setIsReady(!isReady);
+  };
 
-    const handlePlayerSelect = (player) => {
-      setSelectedPlayerSession(player.session); 
-    };
-
-
-    const renderRoleSpecificContent = () => {
-        console.log(`Current role is: ${role}`);
-        if (role === "lord") {
-          return (
-            <div>
-              <button className="scout-button" onClick={toggleScoutList}>Scout</button>
-              {isScoutListOpen && (
-                <div className="scout-list active">
-                  <ul>
-                    {players.filter(player => player.session != getSession()).map((player) => (
-                      <li 
-                        key={player.session} 
-                        onClick={() => handlePlayerSelect(player)}
-                        className={selectedPlayerSession === player.session ? "selected" : ""}
-                      >
-                        {player.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+  const renderRoleSpecificContent = () => {
+    if (role === "lord") {
+      return (
+        <div className="summer-lord-buttons">
+          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick}>Farm</button>
+          <button className="scout-button" onClick={toggleScoutList}>Scout</button>
+          {isScoutListOpen && (
+            <div className="scout-list active">
+              <ul>
+                {players.filter(player => player.session != getSession()).map((player) => (
+                  <li
+                    key={player.session}
+                    onClick={() => handlePlayerSelect(player)}
+                    className={selectedPlayerSession === player.session ? "selected" : ""}
+                  >
+                    {player.name}
+                  </li>
+                ))}
+              </ul>
             </div>
-          );
-        } 
-    }
-    // non role specific content
-    return (
-        <div className="summer">
-            <div className="summer-container">
-                {isChatOpen && (
-                    // ToDo:Retrieve chat content from backend
-                    <div className="chat-box">
-                        <p>Chat content goes here...</p>
-                    </div>
-                )}
-                <div className="summer-button-bar">
-                    <button onClick={toggleChat} className="chat-button">
-                        Chat
-                    </button>
-                    
-                    <button onClick={handleSummerStage}> 
-                        Proceed
-                    </button>
-
-                  {renderRoleSpecificContent()} 
-
-                </div>
-
-                <HelpButton />
-
-                <div className="summer-player-list">
-                  <PlayerList players={players} />
-                </div>
-
-                
-
-                <Timer duration={10} onTimeUp={handleTimeUp} />
-
-            </div>
+          )}
         </div>
-    );
+      );
+    }
+  };
+
+  return (
+    <div className="summer">
+      <div className="summer-container">
+        {isChatOpen && (
+          <div className="chat-box">
+            <p>Chat content goes here...</p>
+          </div>
+        )}
+        <button onClick={toggleChat} className="chat-button">
+          Chat
+        </button>
+
+        {renderRoleSpecificContent()}
+
+        <div className="summer-button-bar">
+          <button onClick={summerReadyClick}>
+            Ready
+          </button>
+        </div>
+
+        <HelpButton />
+
+        <div className="summer-player-list">
+          <PlayerList players={players} />
+        </div>
+
+        <Timer duration={10} onTimeUp={handleTimeUp} />
+      </div>
+    </div>
+  );
 }
 
 export default SummerGamePlay;

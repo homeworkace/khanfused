@@ -41,7 +41,7 @@ function SpringGamePlay({ socket, role, players}) {
       
       socket.current.emit('ready', {
         session: getSession(),
-        doubleHarvest : role === 'king' ? selectedPlayerSession : null
+        double_harvest : role === 'king' ? selectedPlayerSession : null
       });
       console.log(`Player ${getSession()} is ready`);
       console.log(`Double Harvest: ${selectedPlayerSession}`);
