@@ -24,7 +24,7 @@ class lobby :
         self.timer = scheduler
         self.next_job = None
 
-    def minified(self) :
+    def minified(self, dump = False) :
         result = {}
         result['lobby_code'] = self.lobby_code
         result['state'] = self.state
@@ -36,10 +36,11 @@ class lobby :
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
-        if not self.next_job is None and not self.timer.get_jobs(self.next_job.id) is None :
-            result['next_job_id'] = self.next_job.id[:-5]
-            result['next_job_time'] = (self.next_job.next_run_time - datetime.now()).total_seconds()
-            self.next_job.remove()
+        if dump :
+            if not self.next_job is None and not self.timer.get_job(self.next_job.id) is None :
+                result['next_job_id'] = self.next_job.id[:-5]
+                result['next_job_time'] = self.next_job.next_run_time.timestamp() - datetime.now().timestamp()
+                self.next_job.remove()
         return result
 
     def unminified(lobby_to_copy, scheduler, socket) :
@@ -52,13 +53,32 @@ class lobby :
         result.roles = lobby_to_copy['roles']
         result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
+        result.choices = lobby_to_copy['choices']
         result.grain = lobby_to_copy['grain']
-        if 'next_job_id' in result :
+        if 'next_job_id' in lobby_to_copy :
             next_job = None
             if lobby_to_copy['next_job_id'] == 'spring_start' :
                 next_job = result.spring_start
             elif lobby_to_copy['next_job_id'] == 'summer_start' :
                 next_job = result.summer_start
+            elif lobby_to_copy['next_job_id'] == 'summer_result_start' :
+                next_job = result.summer_result_start
+            elif lobby_to_copy['next_job_id'] == 'autumn_start' :
+                next_job = result.autumn_start
+            elif lobby_to_copy['next_job_id'] == 'banish_result_start' :
+                next_job = result.banish_result_start
+            elif lobby_to_copy['next_job_id'] == 'winter_start' :
+                next_job = result.winter_start
+            elif lobby_to_copy['next_job_id'] == 'pillage_result_start' :
+                next_job = result.pillage_result_start
+            elif lobby_to_copy['next_job_id'] == 'food_end_start' :
+                next_job = result.food_end_start
+            elif lobby_to_copy['next_job_id'] == 'no_lords_end_start' :
+                next_job = result.no_lords_end_start
+            elif lobby_to_copy['next_job_id'] == 'no_khans_end_start' :
+                next_job = result.no_khans_end_start
+            elif lobby_to_copy['next_job_id'] == 'waiting_start' :
+                next_job = result.waiting_start
             result.next_job = result.timer.add_job(func = next_job, trigger = 'interval', start_date = datetime.now() + timedelta(seconds = lobby_to_copy['next_job_time']), id = lobby_to_copy['next_job_id'] + result.lobby_code)
         return result
 
@@ -70,18 +90,19 @@ class lobby :
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
 
         # Testing 10-man lobby
-        self.players += [
-            [0, 'Jules'],
-            [1, 'Sofia'],
-            [2, 'Wilford'],
-            [3, 'Vivienne'],
-            [4, 'Clemens'],
-            [5, 'Oliver'],
-            [6, 'Qasym'],
-            [7, 'Zhuldyz'],
-            [8, 'Aytac'],
-        ]
-        self.ready += [True] * 9
+        if len(self.players) == 1:
+            self.players += [
+                [0, 'Jules'],
+                [1, 'Sofia'],
+                [2, 'Wilford'],
+                [3, 'Vivienne'],
+                [4, 'Clemens'],
+                [5, 'Oliver'],
+                [6, 'Qasym'],
+                [7, 'Zhuldyz'],
+                [8, 'Aytac'],
+            ]
+            self.ready += [True] * 9
 
         return True
 

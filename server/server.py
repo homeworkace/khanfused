@@ -323,7 +323,7 @@ if __name__ == '__main__':
     except Exception as e :
         print(e)
     for code in rooms :
-        rooms[code] = rooms[code].minified()
+        rooms[code] = rooms[code].minified(True)
     rooms_file = open('rooms.json', 'w')
     #rooms_file.write(json.dump(rooms))
     json.dump(rooms, rooms_file)
