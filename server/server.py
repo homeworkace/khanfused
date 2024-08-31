@@ -289,7 +289,7 @@ def socket_on_start_game(data):
 
     # Attempt to start the game in the lobby.
     the_lobby = rooms[session[3]]
-    result = the_lobby.start()
+    result = the_lobby.start(int(data['session']))
     if result is None :
         # Notify other players that the game has started.
         for player in range(len(the_lobby.players)) :

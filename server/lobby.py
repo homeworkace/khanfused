@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import math
 import random
 import string
@@ -35,6 +36,10 @@ class lobby :
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
+        if not self.next_job is None and not self.timer.get_jobs(self.next_job.id) is None :
+            result['next_job_id'] = self.next_job.id[:-5]
+            result['next_job_time'] = (self.next_job.next_run_time - datetime.now()).total_seconds()
+            self.next_job.remove()
         return result
 
     def unminified(lobby_to_copy, scheduler, socket) :
@@ -48,6 +53,13 @@ class lobby :
         result.perspectives = lobby_to_copy['perspectives']
         result.status = lobby_to_copy['status']
         result.grain = lobby_to_copy['grain']
+        if 'next_job_id' in result :
+            next_job = None
+            if lobby_to_copy['next_job_id'] == 'spring_start' :
+                next_job = result.spring_start
+            elif lobby_to_copy['next_job_id'] == 'summer_start' :
+                next_job = result.summer_start
+            result.next_job = result.timer.add_job(func = next_job, trigger = 'interval', start_date = datetime.now() + timedelta(seconds = lobby_to_copy['next_job_time']), id = lobby_to_copy['next_job_id'] + result.lobby_code)
         return result
 
     def join_lobby(self, session, name = None) :
@@ -85,14 +97,14 @@ class lobby :
             return True
         
         return False
-
     
-    def start(self) :
+    def start(self, session) :
+        if self.players[0][0] != session :
+            return "Not the host!"
         if len(self.players) < 1 : # Change to 6 when needed
             return "Not enough players!"
-        for ready in self.ready :
-            if ready is False :
-                return "Not all players are ready!"
+        if False in self.ready :
+            return "Not all players are ready!"
 
         self.ready = [False] * len(self.players)
         self.role_assignment_start()
@@ -216,7 +228,7 @@ class lobby :
             
             chosen_player = [player[0] for player in self.players].index(self.choices[i])
             self.perspectives[i][chosen_player] = self.roles[chosen_player]
-            self.choices[i] = self.roles[chosen_player] == 2
+            self.choices[i] = [self.players[chosen_player][0], self.roles[chosen_player] == 2]
 
         # Emit change in state.
         for player in range(len(self.players)) :
