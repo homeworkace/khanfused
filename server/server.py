@@ -306,6 +306,30 @@ def socket_on_start_game(data):
     else :
         emit('start_game_failed', { 'message' : result })
 
+@socket_app.on('ready')
+def socket_on_ready(data) :
+    print(data)
+    # Pass the input into the appropriate lobby.
+    session = db.query_session(data['session'])
+    the_lobby = rooms[session[3]]
+    the_lobby.handle_ready(data)
+    
+@socket_app.on('unready')
+def socket_on_unready(data) :
+    print(data)
+    # Pass the input into the appropriate lobby.
+    session = db.query_session(data['session'])
+    the_lobby = rooms[session[3]]
+    the_lobby.handle_unready(data)
+
+@socket_app.on('select')
+def socket_on_select(data) :
+    print(data)
+    # Pass the input into the appropriate lobby.
+    session = db.query_session(data['session'])
+    the_lobby = rooms[session[3]]
+    the_lobby.handle_select(data)
+
 if __name__ == '__main__':
     random.seed = time.time()
     db = khanfused_db()
