@@ -22,7 +22,8 @@ function SpringGamePlay({ socket, role, players }) {
       socket.current.emit('ready', {
         session: getSession(),
         double_harvest: role === 'lord' ? selectedPlayerSessionRef.current : null
-      });
+      }
+    );
       console.log(`Player ${getSession()} is ready`);
       console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
     } else {
@@ -60,8 +61,8 @@ function SpringGamePlay({ socket, role, players }) {
         return;
       }
     }
-    
     setIsReady(!isReady); 
+    
   };
 
   const renderRoleSpecificContent = () => {

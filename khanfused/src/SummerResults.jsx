@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerResults ({socket, players, role}) {
+function SummerResults ({scoutedRole, socket, players, role}) {
 
     const handleTimeUp = () => {
         // handleDoubleHarvestChangeClick();
@@ -14,13 +14,29 @@ function SummerResults ({socket, players, role}) {
     // lords who choose to 1. scout (display result), 2. farm, else king and khan
     const renderRoleSpecificContent = () => {
 
-        if (role === 'king')
+        console.log("scoutedRole: ", scoutedRole);  
+        if (role === 'lord')
         {
-            return (
-                <div>
-                    <p> Lords </p>
-                </div>
-            )
+            // not equal to empty string
+            if(scoutedRole === "") {
+                return (
+                    <div>
+                        <p> I farmed </p>
+                    </div>
+                )
+            } else if (scoutedRole.role === "khan") {
+                return (
+                    <div>
+                        <p> {scoutedRole["session_id"]} </p>
+                    </div>
+                )
+            } else if (scoutedRole === "lord") {
+                return (
+                    <div>
+                        <p> {scoutedRole} </p>
+                    </div>
+                )
+            }
         } else {
             return (
                 <div className = "nonlord-text">LORDS ARE VIEWING THEIR RESULTS
@@ -34,6 +50,7 @@ function SummerResults ({socket, players, role}) {
     }
 
     // non-role specific content
+    // ToDo: Show grain value and subtraction
     return (
         <div className="summerResults">
             <div className="summerResults-container">

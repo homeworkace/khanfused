@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerGamePlay({ socket, choices, setChoices, players, role }) {
+function SummerGamePlay({ status, socket, choices, setChoices, players, role }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -107,7 +107,12 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
           )}
         </div>
       );
-    }
+    } else if (status === 3) // includes if khan is chosen for DH
+      {
+        return (
+          <p> You have been chosen for double harvest</p>
+        )
+      }
   };
 
   return (

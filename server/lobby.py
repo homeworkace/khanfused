@@ -227,7 +227,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 10, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -264,10 +264,10 @@ class lobby :
         self.next_job.remove()
         if self.grain < 0 :
             #self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 5, id = 'food_end_start' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 3, id = 'food_end_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 50000, id = 'food_end_start' + self.lobby_code)
         else :
             #self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 5, id = 'autumn_start' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 3, id = 'autumn_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 50000, id = 'autumn_start' + self.lobby_code)
 
     def autumn_start(self) :
         self.state = 'autumn'
@@ -284,7 +284,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 60, id = 'banish_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5, id = 'banish_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5000, id = 'banish_result_start' + self.lobby_code)
 
     def banish_result_start(self) :
         self.state = 'banish_result'
