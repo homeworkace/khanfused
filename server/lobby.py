@@ -408,6 +408,54 @@ class lobby :
         self.grain = 0
         
         self.next_job.remove()
+        
+    def handle_ready(self, data) :
+        if not 'state' in data :
+            return
+        if data['state'] != self.state :
+            return
+        if self.state == 'spring' :
+            # Ready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = True
+            
+            # The king has a decision to make.
+            if self.roles[player_index] == 0 :
+                self.choices[0] = data['double_harvest']
+                
+            # Emit to everyone. This includes the sender, who must wait for this response before it can ready itself in the client.
+            self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
+                
+            # If all players are ready, skip the timer.
+            if not False in self.ready :
+                self.summer_start()
+            
+        elif self.state == 'summer' :
+            pass
+        
+    def handle_unready(self, data) :
+        if not 'state' in data :
+            return
+        if data['state'] != self.state :
+            return
+        if self.state == 'spring' :
+            # Unready the player in question
+            player_index = self.players.index(int(data['state']))
+            self.ready[player_index] = False
+                
+            # Emit to everyone. This includes the sender, who must wait for this response before it can unready itself in the client.
+            self.socket.emit('unready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
+            
+        elif self.state == 'summer' :
+            pass
+        
+    def handle_unready(self, data) :
+        if not 'state' in data :
+            return
+        if data['state'] != self.state :
+            return
+        if self.state == 'winter' :
+            pass
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
