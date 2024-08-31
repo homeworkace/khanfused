@@ -6,31 +6,28 @@
     background-color: #799eefb9;
 }
 
-.summer-container {
-    position: relative; 
-    height: 100%; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1; 
-}
-
-.summer-button-bar {
-    display: flex;
-    gap: 20px; 
-}
-
-.summer-button-bar button {
-    padding: 10px 20px;
+.summer button {
     font-size: 16px;
     background-color: #fff; 
     border: none;
     cursor: pointer;
     border-radius: 5px;
+    padding: 10px 20px;
     z-index: 2; 
 }
 
-.summer-button-bar button:hover {
+.summer-container {
+    position: relative; 
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; 
+}
+
+.summer-button-bar button:hover,
+.summer-lord-buttons button:hover {
     background-color: #e0e0e0;
 }
 
@@ -39,7 +36,6 @@
     top: 20px;
     right: 20px;
 }
-
 
 .chat-box {
     position: absolute;
@@ -60,4 +56,55 @@
     position: absolute;
     top: 1rem;
     left: 5rem;
+}
+
+.summer-lord-buttons {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.summer-button-bar {
+    margin-top: 3rem;
+}
+
+.scout-list {
+    display: none; 
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 150px;
+    max-height:150px;
+    position: absolute;
+    overflow-y: auto;
+    top: 22rem;
+    left: 32em; 
+    z-index: 4;
+}
+
+.scout-list.active {
+    display: block; 
+}
+
+.scout-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.scout-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+    text-align: center;
+}
+
+.scout-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.scout-list .selected {
+    background-color: #d0e0ff;
+    font-weight: bold;
 }

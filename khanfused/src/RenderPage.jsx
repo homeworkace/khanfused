@@ -41,6 +41,7 @@ function RoomPage() {
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
     const [scoutedRole, setScoutedRole] = useState("");
+    const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -152,8 +153,11 @@ function RoomPage() {
                 case "summer":
                     return <SummerGamePlay
                         players = {players}
+                        choices = {choices}
+                        setChoices={setChoices}
                         // handleSummerStage = {handleSummerStage}
                         role = {role}
+                        socket = {socket}
                 />
 
                 case "summerResults":

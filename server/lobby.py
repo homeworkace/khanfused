@@ -127,6 +127,13 @@ class lobby :
         # Ready everyone who is banished and unready everyone else.
         self.ready = [True if player > 1 else False for player in self.status]
 
+        # Set placeholder choice of lord to perform a double harvest.
+        for i in range(len(self.roles)) :
+            if self.roles[i] != 0 :
+                continue
+            eligible_choices = [j for j in range(len(self.roles)) if j != i]
+            self.choices.append(self.players[random.choice(eligible_choices)][0])
+
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'spring' })
         

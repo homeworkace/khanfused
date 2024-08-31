@@ -30,7 +30,7 @@ function SpringGamePlay({ socket, role, players}) {
   const springReadyClick = () => {
 
     // check if double harvest is selected first
-    if (role === "king") {
+    if (role === "king" || role === "lord") {
       if (selectedPlayerSession === null) {
         console.log("King select a player for DH");
         return;
@@ -41,7 +41,7 @@ function SpringGamePlay({ socket, role, players}) {
       
       socket.current.emit('ready', {
         session: getSession(),
-        doubleHarvest : role === 'king' ? selectedPlayerSession : null
+        double_harvest : role === 'king' || role === 'lord'? selectedPlayerSession : null
       });
       console.log(`Player ${getSession()} is ready`);
       console.log(`Double Harvest: ${selectedPlayerSession}`);
@@ -58,7 +58,7 @@ function SpringGamePlay({ socket, role, players}) {
 
   const renderRoleSpecificContent = () => {
     console.log(`Current role is: ${role}`);
-    if (role === "king") {
+    if (role === "king" || role === "lord") {
       return (
         <div>
           <button className="double-harvest-button" onClick={toggleDoubleHarvestList}>Double Harvest</button>
