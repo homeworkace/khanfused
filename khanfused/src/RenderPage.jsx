@@ -534,6 +534,8 @@ function RoomPage() {
                 setPlayers(p => p.map(player => ({ ...player, ready: false })));
             }
 
+            // reset the previous data stored in 'banished'
+            setBanished(null);
         }
         socket.current.on("change_state", handleChangeState);
 
@@ -848,6 +850,18 @@ function RoomPage() {
 
             // set current state to "pillage_result"
             setCurrentSeason(data['state']);
+
+            // check if no lord was chosen for pillage
+            if (data['pillaged'] === -1) {
+
+                // to be implemented
+                console.log("Khan(s) decides not to pillage");
+
+            }
+
+            // store session id of player chosen to be pillaged
+            setPillaged(data['pillaged']);
+
         };
         socket.current.on("change_state", handleChangeState);
 
@@ -885,6 +899,9 @@ function RoomPage() {
                 // set current state to "no_lords_end"
                 setCurrentSeason(data['state']);
             }
+
+            // reset the previous data of 'pillaged' to null
+            setPillaged(null);
         };
         socket.current.on("change_state", handleChangeState);
 
@@ -1097,37 +1114,6 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // pass socket to roompageview
-    const handleEditButtonClick = () => {
-        // If in edit mode, this click is to confirm the name.
-            // Do input sanitisation check and reject if it doesn't meet the criteria.
-
-            // Reject if someone else in the room already has the name.
-
-            // Emit the event and ready yourself.
-            //socket.current.emit("confirm_name", {
-            //    session: getSession(),
-            //    name: ""
-            //});
-
-        // If not in edit mode, this click is to edit the name.
-            // Write the previous name to another variable.
-
-            // Emit the event and unready yourself.
-            //socket.current.emit("edit_name", {
-            //    session: getSession()
-            //});
-            
-    }
-
-    //fakerayray
-
-    // const handleStartInstructionsClick = () => {
-    //     socket.current.emit('start_instructions', {
-    //         session: getSession()
-    //     });
-    // };
-
     const handleRoleAssignmentChangeClick = () => {
         socket.current.emit('role_assignment_transition', {
             session: getSession()
@@ -1135,36 +1121,6 @@ function RoomPage() {
         console.log(currentSeason);
 
     };
-
-    const handleSpringChangeClick = () => {
-        socket.current.emit('spring_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-    };
-
-    const handleSummerChangeClick = () => {
-        socket.current.emit('summer_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-    };
-
-    // const handleAutumnChangeClick = () => {
-    //     socket.current.emit('autumn_transition', {
-    //         session: getSession()
-    //     });
-    //     console.log(currentSeason);
-
-    // };
-
-    // const handleWinterChangeClick = () => {
-    //     socket.current.emit('winter_transition', {
-    //         session: getSession()
-    //     });
-    //     console.log(currentSeason);
-
-    // };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
