@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerGamePlay({ socket, choices, setChoices, players, role }) {
+function SummerGamePlay({ socket, choices, setChoices, players, role, currentSeason }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -46,12 +46,14 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
         // scout
         if (choices === 1) {
           socket.current.emit('ready', {
+            state: currentSeason,
             session: getSession(),
             choice: selectedPlayerSession
           });
         // farm
         } else if (choices === 2) {
           socket.current.emit('ready', {
+            state: currentSeason,
             session: getSession(),
             choice: -1
           });
@@ -59,12 +61,14 @@ function SummerGamePlay({ socket, choices, setChoices, players, role }) {
         }
       } else {
         socket.current.emit('ready', {
+          state: currentSeason,
           session: getSession(),
         });
       }
       console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSession}`);
     } else {
       socket.current.emit('unready', {
+        state: currentSeason,
         session: getSession()
       });
     }

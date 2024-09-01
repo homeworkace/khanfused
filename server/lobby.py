@@ -227,7 +227,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 10, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -416,7 +416,7 @@ class lobby :
             return
         if self.state == 'spring' :
             # Ready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = True
             
             # The king has a decision to make.
@@ -433,12 +433,12 @@ class lobby :
             
         elif self.state == 'summer' :
             # Ready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = True
             
             # The lord has a decision to make.
             if self.roles[player_index] == 1 and self.status[player_index] == 0 :
-                self.choices[player_index] = data['scout'] # -1 if farming
+                self.choices[player_index] = data['choice'] # -1 if farming
             
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -446,7 +446,7 @@ class lobby :
 
         elif self.state == 'autumn' :
             # Ready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = True
             
             # The king has a decision to make.
@@ -463,7 +463,7 @@ class lobby :
 
         elif self.state == 'winter' :
             # Ready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = True
 
             # If this is a khan, emit to other khans.
@@ -482,7 +482,7 @@ class lobby :
             return
         if self.state == 'spring' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['state']))
+            player_index = self.players.index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
@@ -491,12 +491,12 @@ class lobby :
             
         elif self.state == 'summer' :
             # Unready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
 
         elif self.state == 'autumn' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['state']))
+            player_index = self.players.index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
@@ -505,7 +505,7 @@ class lobby :
             
         elif self.state == 'winter' :
             # Unready the player in question.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
 
             # If this is a khan, emit to other khans.
@@ -520,7 +520,7 @@ class lobby :
             return
         if self.state == 'winter' :
             # The khan has a decision to make.
-            player_index = [player[0] for player in self.players].index(int(data['state']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.choices[player_index] = data['scout'] # -1 if farming
 
             # If this is a khan, emit to other khans.

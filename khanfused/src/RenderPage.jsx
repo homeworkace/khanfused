@@ -39,7 +39,7 @@ function RoomPage() {
     const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
-    const [grain, setGrain] = useState(0);
+    const [grain, setGrain] = useState({ initial_grain: 0, yearly_deduction: 0, added_grain: 0 }); // initial_grain, yearly_deduction, added_grain
     const [scoutedRole, setScoutedRole] = useState({});
     const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
     const [banished, setBanished] = useState(null); // store session id of banished player temporarily
@@ -109,6 +109,7 @@ function RoomPage() {
                         players={players}
                         role ={role}
                         socket={socket}
+                        currentSeason={currentSeason}
                 />  
 
                 case "summer":
@@ -118,6 +119,7 @@ function RoomPage() {
                         socket = {socket}
                         choices={choices}
                         setChoices={setChoices}
+                        currentSeason={currentSeason}
                 />
 
                 case "summerResults":
@@ -470,6 +472,9 @@ function RoomPage() {
 
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
+
+            // update 'grains' of how much of grains to be deducted every loop
+            setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
             // store the array 'role'
             setRoleArray(data['role']);
@@ -664,8 +669,8 @@ function RoomPage() {
                 }
             }
 
-            // update the 'grain' value
-            setGrain(g => g + data['grain']);
+            // update the 'grain' how much of grains are added
+            setGrain({ ...grain, added_grain: data['grain'] });
 
             // reset double harvest guy to active status
             if (status === 3) {
