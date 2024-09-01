@@ -5,7 +5,7 @@ import Timer from './Timer';
 import { getSession } from './utility.js';
 import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ socket, role, players}) {
+function SpringGamePlay({ socket, role, players, currentSeason}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -40,6 +40,7 @@ function SpringGamePlay({ socket, role, players}) {
     if(!isReady) {
       
       socket.current.emit('ready', {
+        state: currentSeason,
         session: getSession(),
         double_harvest : role === 'king' ? selectedPlayerSession : null
       });
@@ -47,6 +48,7 @@ function SpringGamePlay({ socket, role, players}) {
       console.log(`Double Harvest: ${selectedPlayerSession}`);
     } else {
       socket.current.emit('unready', {
+        state: currentSeason,
         session: getSession()
       });
       console.log(`Player ${getSession()} is unready`);

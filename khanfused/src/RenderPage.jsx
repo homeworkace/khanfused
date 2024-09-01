@@ -109,6 +109,7 @@ function RoomPage() {
                         players={players}
                         role ={role}
                         socket={socket}
+                        currentSeason={currentSeason}
                 />  
 
                 case "summer":
@@ -118,6 +119,7 @@ function RoomPage() {
                         socket = {socket}
                         choices={choices}
                         setChoices={setChoices}
+                        currentSeason={currentSeason}
                 />
 
                 case "summerResults":
