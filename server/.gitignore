@@ -1,5 +1,5 @@
 khanfused.db
 rooms.json
-debug
-10players
+/debug
 __pycache__
+/build

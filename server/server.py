@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='/')
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SCHEDULER_API_ENABLED'] = True
 
@@ -19,10 +19,13 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-# Dummy event
+# When the browser queries any of the React router endpoints, the server provides the entire React app.
 @app.route('/')
-def home():
-    return 'Hello, World!'
+@app.route('/create-room')
+@app.route('/join-room')
+@app.route('/room/<code>')
+def serve_app(code = ''):
+    return app.send_static_file('index.html')
 
 # Event handler for the home page
 @app.route('/check-session', methods=['POST'])
