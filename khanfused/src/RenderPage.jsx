@@ -38,8 +38,8 @@ function RoomPage() {
     const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
-    const [grain, setGrain] = useState(0);
-    const [scoutedRole, setScoutedRole] = useState({}); //scoutedrole stores sessionID and role
+    const [grain, setGrain] = useState({ initial_grain: 0, yearly_deduction: 0, added_grain: 0 }); // initial_grain, yearly_deduction, added_grain
+    const [scoutedRole, setScoutedRole] = useState({});
     const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
     const [banished, setBanished] = useState(null); // store session id of banished player temporarily
     const [pillaged, setPillaged] = useState(null); 
@@ -101,6 +101,7 @@ function RoomPage() {
                         players={players}
                         role ={role}
                         socket={socket}
+                        currentSeason={currentSeason}
                 />  
 
                 case "summer":
@@ -111,6 +112,7 @@ function RoomPage() {
                         choices={choices}
                         setChoices={setChoices}
                         status = {status}
+                        currentSeason={currentSeason}
                 />
 
                 case "summerResults":
@@ -473,7 +475,9 @@ function RoomPage() {
 
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
-            // setCurrentSeason('banish_result');
+
+            // update 'grains' of how much of grains to be deducted every loop
+            setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
             // store the array 'role'
             setRoleArray(data['role']);
@@ -668,8 +672,8 @@ function RoomPage() {
                 }
             }
 
-            // update the 'grain' value
-            setGrain(g => g + data['grain']);
+            // update the 'grain' how much of grains are added
+            setGrain({ ...grain, added_grain: data['grain'] });
 
             // reset double harvest guy to active status
             if (status === 3) {
@@ -686,7 +690,7 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     *      FROM SUMMER RESULT TO AUTUMN
+     *      FROM SUMMER RESULT TO AUTUMN OR FOOD END
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -702,18 +706,21 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
-            // check if 'state' received from server is not "autumn"
-            if (data['state'] !== "autumn") {
-                return;
+            // check if 'state' received from server is "autumn"
+            if (data['state'] === "autumn") {
+                // set current state to "autumn"
+                setCurrentSeason(data['state']);
+
+                // if current player is still active
+                if (status === 0) {
+                    // set every player to unready state at start of autumn
+                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                }
             }
-
-            // set current state to "autumn"
-            setCurrentSeason(data['state']);
-
-            // if current player is still active
-            if (status === 0) {
-                // set every player to unready state at start of autumn
-                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            // check if 'state' received from server is "food_end"
+            else if (data["state"] === "food_end") {
+                // set current state to "food_end"
+                setCurrentSeason(data['state']);
             }
         };
         socket.current.on("change_state", handleChangeState);
@@ -741,7 +748,7 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
-            // check if 'state' received from server is not "banish_result"
+            // check if 'state' received from server is "banish_result"
             if (data['state'] !== "banish_result") {
                 return;
             }
@@ -754,13 +761,13 @@ function RoomPage() {
 
                 // to be implemented
                 console.log("King decides not to banish anyone");
-            } 
+            }
 
             // checks if session id of chosen player matches with current player session id
             if (data['banished'] === getSession()) {
 
                 // set current player status to banished
-                setStatus(2); 
+                setStatus(2);
             }
 
             // store session id of player chosen to be banished
@@ -775,7 +782,7 @@ function RoomPage() {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     *      FROM BANISH RESULT TO WINTER
+     *      FROM BANISH RESULT TO WINTER OR NO KHANS END OR NO LORDS END
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -791,15 +798,22 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
-            // check if 'state' received from server is not "winter"
-            if (data['state'] !== "winter") {
-                return;
+            // check if 'state' received from server is "winter"
+            if (data['state'] === "winter") {
+                // set current state to "winter"
+                setCurrentSeason(data['state']);
+
+                // to be implemented
+            }
+            else if (data['state'] === "no_khans_end") {
+                // set current state to "no_khans_end"
+                setCurrentSeason(data['state']);
+            }
+            else if (data['state'] === "no_lords_end") {
+                // set current state to "no_lords_end"
+                setCurrentSeason(data['state']);
             }
 
-            // set current state to "winter"
-            setCurrentSeason(data['state']);
-        
-            // to be implemented
         };
         socket.current.on("change_state", handleChangeState);
 
@@ -815,11 +829,104 @@ function RoomPage() {
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "winter") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is "pillage_result"
+            if (data['state'] !== "pillage_result") {
+                return;
+            }
+
+            // set current state to "pillage_result"
+            setCurrentSeason(data['state']);
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+
+    }, [hasConnected, currentSeason, pillaged, status, players]);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     *      GAME END STATES
+     *      PILLAGED RESULT TO SPRING OR NO LORDS END
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "pillage_result") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is "spring"
+            if (data['state'] === "spring") {
+                // set current state to "spring"
+                setCurrentSeason(data['state']);
+            }
+            // check if 'state' received from server is "no_lords_end"
+            else if (data['state'] === "no_lords_end") {
+                // set current state to "no_lords_end"
+                setCurrentSeason(data['state']);
+            }
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+
+    }, [hasConnected, currentSeason, pillaged, status, players]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      GAME END STATES TO WAITING
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "food_end" && currentSeason !== "no_khans_end" && currentSeason !== "no_lords_end") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is "waiting"
+            if (data['state'] !== "waiting") {
+                return;
+            }
+
+            // set current state to "waiting"
+            setCurrentSeason(data['state']);
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+
+    }, [hasConnected, currentSeason]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**

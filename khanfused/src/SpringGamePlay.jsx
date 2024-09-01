@@ -5,7 +5,7 @@ import Timer from './Timer';
 import { getSession } from './utility.js';
 import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ socket, role, players }) {
+function SpringGamePlay({ socket, role, players, currentSeason}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -61,9 +61,27 @@ function SpringGamePlay({ socket, role, players }) {
         return;
       }
     }
-    setIsReady(!isReady); 
     
-  };
+    if(!isReady) {
+      
+      socket.current.emit('ready', {
+        state: currentSeason,
+        session: getSession(),
+        double_harvest : role === 'king' ? selectedPlayerSession : null
+      });
+      console.log(`Player ${getSession()} is ready`);
+      console.log(`Double Harvest: ${selectedPlayerSession}`);
+    } else {
+      socket.current.emit('unready', {
+        state: currentSeason,
+        session: getSession()
+      });
+      console.log(`Player ${getSession()} is unready`);
+    }
+
+    setIsReady(!isReady);
+
+};
 
   const renderRoleSpecificContent = () => {
     if (role === "lord") {
