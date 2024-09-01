@@ -34,3 +34,10 @@
     background-color: #e0e0e0;
 }
 
+.autumnResults-player-list {
+    position: absolute;
+    top: 1rem;
+    left: 5rem;
+}
+
+

@@ -1,40 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './SummerResults.css';
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerResults ({scoutedRole, socket, players, role}) {
+function SummerResults ({grain, scoutedRole, socket, players, role}) {
 
+    const [totalGrain, setTotalGrain] = useState(0);
+
+    useEffect(() => {
+      setTotalGrain(prevTotal => prevTotal + grain - 3);
+    }, [grain]);
+  
     const handleTimeUp = () => {
         // handleDoubleHarvestChangeClick();
-      };
+    };
 
     // lords who choose to 1. scout (display result), 2. farm, else king and khan
     const renderRoleSpecificContent = () => {
 
-        console.log("scoutedRole: ", scoutedRole);  
+        console.log("scoutedRole: ", scoutedRole);
         if (role === 'lord')
         {
-            // not equal to empty string
-            if(scoutedRole === "") {
+            const scoutedPlayer = players.find(p => p.session === scoutedRole.session_id);
+            if(scoutedRole.role === "khan") {
                 return (
-                    <div>
-                        <p> I farmed </p>
-                    </div>
+                <div>
+                    <p> {scoutedPlayer.name} is a KHAN </p>
+                </div>
                 )
-            } else if (scoutedRole.role === "khan") {
+            }  else if (scoutedRole.role === "lord") {
                 return (
-                    <div>
-                        <p> {scoutedRole["session_id"]} </p>
-                    </div>
-                )
-            } else if (scoutedRole === "lord") {
-                return (
-                    <div>
-                        <p> {scoutedRole} </p>
-                    </div>
+                <div>
+                    <p> {scoutedPlayer.name} is a LORD </p>
+                </div>
                 )
             }
         } else {
@@ -50,7 +50,6 @@ function SummerResults ({scoutedRole, socket, players, role}) {
     }
 
     // non-role specific content
-    // ToDo: Show grain value and subtraction
     return (
         <div className="summerResults">
             <div className="summerResults-container">
@@ -62,6 +61,12 @@ function SummerResults ({scoutedRole, socket, players, role}) {
 
             <div className = "summerResults-player-list">
                 <PlayerList players={players} />
+            </div>
+
+            <div className ="grain-info"> THE LORDS HAVE HARVESTED {grain} GRAINS.
+                <br/>
+                <p>THE KINGDOM INITIALLY HAD {totalGrain + 3 - grain} GRAINS AND WILL CONSUME 3 GRAINS</p>
+                <p>THE KINGDOM NOW HAS {totalGrain} GRAINS IN SURPLUS.</p>
             </div>
             
             </div>

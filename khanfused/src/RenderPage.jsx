@@ -8,7 +8,6 @@ import './RoomPageView.css';
 
 // Testing 
 import SpringGamePlay from "./SpringGamePlay.jsx";
-import SpringDouble from './SpringDouble.jsx';
 import SummerResults from './SummerResults.jsx';
 import SummerGamePlay from './SummerGamePlay.jsx';
 import AutumnGamePlay from './AutumnGamePlay.jsx';
@@ -44,14 +43,6 @@ function RoomPage() {
     const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
     const [banished, setBanished] = useState(null); // store session id of banished player temporarily
     const [pillaged, setPillaged] = useState(null); 
-
-    // Test switch case purposes -- to be changed to states
-    const [summerStage, setSummerStage] = useState(false);
-    const [autumnStage, setAutumnStage] = useState(false);
-    const [winterStage, setWinterStage] = useState(false);
-    const [khanWin, setKhanWin] = useState(false);
-    const [lordWin, setLordWin] = useState(false);
-    const [insufficentFood, setInsufficentFood] = useState(false);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +93,9 @@ function RoomPage() {
                     return <Role 
                         players={players}
                         king={king}
-                    />
+                />
 
+                // grain deduction per year
                 case "spring":
                     return <SpringGamePlay
                         players={players}
@@ -127,6 +119,7 @@ function RoomPage() {
                     socket = {socket}
                     role = {role}
                     scoutedRole = {scoutedRole}
+                    grain = {grain}
                 />
 
                 case "autumn":
@@ -141,8 +134,10 @@ function RoomPage() {
                     players = {players}
                     socket = {socket}
                     role = {role}
+                    banished = {banished}
+                    status = {status}
                 />
-                
+                // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
                     players = {players}
@@ -150,7 +145,13 @@ function RoomPage() {
                     socket = {socket}
                 />
 
-                // case "pillageResult":
+                case "pillageResult":
+                    return <WinterDouble
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                    pillaged = {pillaged}
+                />    
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case "insufficentFood":
@@ -472,6 +473,7 @@ function RoomPage() {
 
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
+            // setCurrentSeason('banish_result');
             
             // store the array 'role'
             setRoleArray(data['role']);

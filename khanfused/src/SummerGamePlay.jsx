@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerGamePlay({ status, socket, choices, setChoices, players, role }) {
+function SummerGamePlay({  status, socket, choices, setChoices, players, role }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -18,6 +18,7 @@ function SummerGamePlay({ status, socket, choices, setChoices, players, role }) 
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
 
+  //useEffect for emission
   useEffect(() => {
     if (isReady) {
       if (role === 'lord') {
@@ -52,7 +53,7 @@ function SummerGamePlay({ status, socket, choices, setChoices, players, role }) 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
-
+  
   const handleTimeUp = () => {
     // handleDoubleHarvestChangeClick();
   };
@@ -115,6 +116,7 @@ function SummerGamePlay({ status, socket, choices, setChoices, players, role }) 
       }
   };
 
+
   return (
     <div className="summer">
       <div className="summer-container">
@@ -123,6 +125,7 @@ function SummerGamePlay({ status, socket, choices, setChoices, players, role }) 
             <p>Chat content goes here...</p>
           </div>
         )}
+
         <button onClick={toggleChat} className="chat-button">
           Chat
         </button>
@@ -134,6 +137,7 @@ function SummerGamePlay({ status, socket, choices, setChoices, players, role }) 
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>
+
 
         <HelpButton />
 
