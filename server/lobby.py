@@ -227,7 +227,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 10, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -264,10 +264,10 @@ class lobby :
         self.next_job.remove()
         if self.grain < 0 :
             #self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 5, id = 'food_end_start' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 50000, id = 'food_end_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 2, id = 'food_end_start' + self.lobby_code)
         else :
             #self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 5, id = 'autumn_start' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 50000, id = 'autumn_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 2, id = 'autumn_start' + self.lobby_code)
 
     def autumn_start(self) :
         self.state = 'autumn'
@@ -284,7 +284,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 60, id = 'banish_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5000, id = 'banish_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5, id = 'banish_result_start' + self.lobby_code)
 
     def banish_result_start(self) :
         self.state = 'banish_result'
@@ -423,8 +423,9 @@ class lobby :
             if self.roles[player_index] == 0 :
                 self.choices[0] = data['double_harvest']
                 
-            # Emit to everyone. This includes the sender, who can ignore this message.
-            self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
+            # Emit to everyone except the sender.
+            for player in [i for i in range(len(self.players)) if i != player_index] :
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
                 
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -442,6 +443,37 @@ class lobby :
             # If all players are ready, skip the timer.
             if not False in self.ready :
                 self.summer_result_start()
+
+        elif self.state == 'autumn' :
+            # Ready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = True
+            
+            # The king has a decision to make.
+            if self.roles[player_index] == 0 :
+                self.choices[0] = data['banish']
+                
+            # Emit to everyone except the sender.
+            for player in [i for i in range(len(self.players)) if i != player_index] :
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                
+            # If all players are ready, skip the timer.
+            if not False in self.ready :
+                self.banish_result_start()
+
+        elif self.state == 'winter' :
+            # Ready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = True
+
+            # If this is a khan, emit to other khans.
+            if self.roles[player_index] == 2 :
+                for player in [i for i in range(len(self.roles)) if self.roles[i] == 2 and i != player_index] :
+                    self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
+                
+            # If all players are ready, skip the timer.
+            if not False in self.ready :
+                self.pillage_result_start()
         
     def handle_unready(self, data) :
         if not 'state' in data :
@@ -453,13 +485,33 @@ class lobby :
             player_index = self.players.index(int(data['state']))
             self.ready[player_index] = False
                 
-            # Emit to everyone. This includes the sender, who can ignore this message.
-            self.socket.emit('unready', { 'session' : self.players[player_index][0] }, room = self.lobby_code, namespace = '/')
+            # Emit to everyone except the sender.
+            for player in [i for i in range(len(self.players)) if i != player_index] :
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
             
         elif self.state == 'summer' :
             # Unready the player in question.
             player_index = [player[0] for player in self.players].index(int(data['state']))
             self.ready[player_index] = False
+
+        elif self.state == 'autumn' :
+            # Unready the player in question.
+            player_index = self.players.index(int(data['state']))
+            self.ready[player_index] = False
+                
+            # Emit to everyone except the sender.
+            for player in [i for i in range(len(self.players)) if i != player_index] :
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+            
+        elif self.state == 'winter' :
+            # Unready the player in question.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.ready[player_index] = False
+
+            # If this is a khan, emit to other khans.
+            if self.roles[player_index] == 2 :
+                for player in [i for i in range(len(self.roles)) if self.roles[i] == 2 and i != player_index] :
+                    self.socket.emit('unready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
         
     def handle_select(self, data) :
         if not 'state' in data :
@@ -467,7 +519,18 @@ class lobby :
         if data['state'] != self.state :
             return
         if self.state == 'winter' :
-            pass
+            # The khan has a decision to make.
+            player_index = [player[0] for player in self.players].index(int(data['state']))
+            self.choices[player_index] = data['scout'] # -1 if farming
+
+            # If this is a khan, emit to other khans.
+            if self.roles[player_index] == 2 :
+                for player in [i for i in range(len(self.roles)) if self.roles[i] == 2 and i != player_index] :
+                    self.socket.emit('select', { 'session' : self.players[player_index][0], 'choice' : self.choices[player_index] }, room = str(self.players[player][0]), namespace = '/')
+                
+            # If all players are ready, skip the timer.
+            if not False in self.ready :
+                self.pillage_result_start()
 
 def generate_lobby_code(existing_lobby_codes) :
     base_system = list(string.digits + string.ascii_uppercase)
