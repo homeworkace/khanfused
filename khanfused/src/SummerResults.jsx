@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './SummerResults.css';
-import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";

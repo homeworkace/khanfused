@@ -20,6 +20,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
   useEffect(() => {
     if (isReady) {
       socket.current.emit('ready', {
+        state: currentSeason,
         session: getSession(),
         double_harvest: role === 'lord' ? selectedPlayerSessionRef.current : null
       }
@@ -28,6 +29,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
       console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
     } else {
       socket.current.emit('unready', {
+        state: currentSeason,
         session: getSession()
       });
       console.log(`Player ${getSession()} is unready`);
@@ -61,24 +63,6 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
         return;
       }
     }
-    
-    if(!isReady) {
-      
-      socket.current.emit('ready', {
-        state: currentSeason,
-        session: getSession(),
-        double_harvest : role === 'king' ? selectedPlayerSession : null
-      });
-      console.log(`Player ${getSession()} is ready`);
-      console.log(`Double Harvest: ${selectedPlayerSession}`);
-    } else {
-      socket.current.emit('unready', {
-        state: currentSeason,
-        session: getSession()
-      });
-      console.log(`Player ${getSession()} is unready`);
-    }
-
     setIsReady(!isReady);
 
 };

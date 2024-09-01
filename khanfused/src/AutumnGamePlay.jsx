@@ -20,12 +20,14 @@ function AutumnGamePlay({ socket, role, players }) {
   useEffect(() => {
     if (isReady) {
       socket.current.emit('ready', {
+        state: currentSeason,
         session: getSession(),
         banish: role === 'king' || role === "lord" ? selectedPlayerSessionRef.current : null
       });
       console.log(`Banish: ${selectedPlayerSessionRef.current}`)
     } else {
       socket.current.emit('unready', {
+        state: currentSeason,
         session: getSession()
       });
     }
