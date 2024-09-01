@@ -7,13 +7,12 @@ import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
 // Testing 
-import RandomTeams from "./RandomTeams.jsx";
 import SpringGamePlay from "./SpringGamePlay.jsx";
 import SpringDouble from './SpringDouble.jsx';
-import SummerDouble from './SummerDouble.jsx';
+import SummerResults from './SummerResults.jsx';
 import SummerGamePlay from './SummerGamePlay.jsx';
 import AutumnGamePlay from './AutumnGamePlay.jsx';
-import AutumnDouble from './AutumnDouble.jsx';
+import AutumnResults from './AutumnResults.jsx';
 import WinterGamePlay from './WinterGamePlay.jsx';
 import WinterDouble from './WinterDouble.jsx';
 import KhanWin from './KhanWin.jsx';
@@ -37,10 +36,14 @@ function RoomPage() {
     const [myName, setMyName] = useState(getName() ? getName() : "");
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
+    const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState(0);
-    const [scoutedRole, setScoutedRole] = useState("");
+    const [scoutedRole, setScoutedRole] = useState({});
+    const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
+    const [banished, setBanished] = useState(null); // store session id of banished player temporarily
+    const [pillaged, setPillaged] = useState(null); 
 
     // Test switch case purposes -- to be changed to states
     const [summerStage, setSummerStage] = useState(false);
@@ -94,13 +97,12 @@ function RoomPage() {
                         />
                     )
 
-                case "role_assignment": 
-                    return <RandomTeams
-                        handleSpringChangeClick = {handleSpringChangeClick}
-                        // handleKhanWin = {handleKhanWin}
-                        // handleLordWins = {handleLordWins}
-                        // handleInsufficentFood = {handleInsufficentFood}
-                />
+                                   
+                case "reveal_role":
+                    return <Role 
+                        players={players}
+                        king={king}
+                    />
 
                 case "spring":
                     return <SpringGamePlay
@@ -109,66 +111,60 @@ function RoomPage() {
                         socket={socket}
                 />  
 
-                // insufficentFood scenario -- to be replaced with actual state
-                // case "insufficentFood":
-                //     return <InsufficentFood
-                // />
-
-                // lordWin scenario -- to be replaced with actual state
-                // case lordWin:
-                //     return <LordWin
-                // />
-
-                // khanWin screnario -- to be repladed with actual state
-                // case khanWin:
-                //     return <KhanWin
-                // />
-
-                // case "winterStage":
-                //     return <WinterDouble
-                // />
-
-                case "winter":
-                    return <WinterGamePlay
-                        // handleWinterStage = {handleWinterStage}
-                />
-
-                // case "autumnStage":
-                //     return <AutumnDouble
-                //         handleWinterChangeClick={handleWinterChangeClick}
-                // />
-
-                case "autumn":
-                    return <AutumnGamePlay 
-                        // handleAutumnStage = {handleAutumnStage}
-                />
-
-                // case "summerStage":
-                //     return <SummerDouble
-                //         handleAutumnChangeClick={handleAutumnChangeClick}
-                //         role = {role}
-                // />
-
                 case "summer":
                     return <SummerGamePlay
                         players = {players}
-                        // handleSummerStage = {handleSummerStage}
                         role = {role}
+                        socket = {socket}
+                        choices={choices}
+                        setChoices={setChoices}
                 />
 
                 case "summerResults":
-                    // return <SummerResults />
-
-                case "double_harvest":
-                    return <SpringDouble
-                        handleSummerChangeClick={handleSummerChangeClick} 
+                    return <SummerResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
                 />
 
-                case "reveal_role":
-                    return <Role 
-                        players={players}
-                        king={king}
-                    />;
+                case "autumn":
+                    return <AutumnGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                case "banishedResult":
+                    return <AutumnResults
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                />
+                
+                case "winter":
+                    return <WinterGamePlay
+                    players = {players}
+                    role = {role}
+                    socket = {socket}
+                />
+
+                // case "pillageResult":
+
+                // insufficentFood scenario -- to be replaced with actual state
+                case "insufficentFood":
+                    return <InsufficentFood
+                />
+
+                // lordWin scenario -- to be replaced with actual state
+                case "lordWin":
+                    return <LordWin
+                />
+
+                // khanWin screnario -- to be repladed with actual state
+                case "khanWin":
+                    return <KhanWin
+                />
+                
             }
         }
     };
@@ -419,113 +415,169 @@ function RoomPage() {
         if (!hasConnected) {
             return;
         }
-
+        
         // determines what page to render based on currentSeason
         if (currentSeason !== "waiting") {
 
             if (currentSeason === "role_assignment") setPageToRender("reveal_role");
+
             if (currentSeason === "spring") setPageToRender("spring");
             if (currentSeason === "summer") setPageToRender("summer");
-            if (currentSeason === "summer_results") setPageToRender("summerResults");
-            if (currentSeason === "autumn") setPageToRender("autumnStage");
-            if (currentSeason === "winter") setPageToRender("winterStage");
-            if (currentSeason === "double_harvest") setPageToRender("double_harvest");
-            
+            if (currentSeason === "summer_result") setPageToRender("summerResults");
+            if (currentSeason === "autumn") setPageToRender("autumn");
+            if (currentSeason === "winter") setPageToRender("winter");
 
+            if (currentSeason === "food_end") setPageToRender("insufficentFood");
+            if (currentSeason === "no_lords_end") setPageToRender("khanWin");
+            if (currentSeason === "no_khans_end") setPageToRender("lordWin");
+
+            if (currentSeason === "pillage_result") setPageToRender("pillageResult");
+            if (currentSeason === "banish_result") setPageToRender("banishedResult");
+            
         } else {
             setPageToRender("default");
         }
 
+        console.log(currentSeason);
         
         return () => {
 
         }
     }, [currentSeason]);
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM WAITING TO ROLE ASSIGNMENT
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     useEffect(() => {
         if (!hasConnected) {
             return;
         }
 
+        if (currentSeason !== "waiting") {
+            return;
+        }
+
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
-            console.log(data);
+            
+            // check if 'state' received from server is not "role_assignment"
+            if (data['state'] !== "role_assignment") {
+                return;
+            }
 
-            // sync client's state with server's state
-            // setCurrentSeason(data["state"]);
-            setCurrentSeason("summer");
-            switch (data['state']) {
+            // set state to "role_assignment"
+            setCurrentSeason(data['state']);
+            
+            // store the array 'role'
+            setRoleArray(data['role']);
 
-                case "role_assignment":
-                    let role_int = Math.max(...data['role']);
+            // find max number from the array and assign the respective role
+            let role_int = Math.max(...data['role']);
+            if (role_int === 0) setRole("king"); // king
+            if (role_int === 1) setRole("lord"); // lord
+            if (role_int === 2) setRole("khan"); // khan
+            
+            // find the index of 0 (King) in 'role' array
+            let index = data['role'].indexOf(0);
 
-                    if (role_int === 0) setRole("king"); // king
-                    if (role_int === 1) setRole("lord"); // lord
-                    if (role_int === 2) setRole("khan"); // khan   
+            // store the session id of king based on the corresponding index in 'players' array
+            setKing(players[index]['session']);
+        }
+        socket.current.on("change_state", handleChangeState);
 
-                    let index = data['role'].indexOf(0);
-                    setKing(players[index]['session']);
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
 
-                case "spring":
-                    
-                    if (status === 0) {
-                        // set every player to unready state at start of spring
-                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
-                    }
+    }, [hasConnected, currentSeason]);
 
-                case "summer":
-                    
-                    if (status === 0) {
-                        // set every player to unready state at start of spring
-                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM ROLE ASSIGNMENT TO SPRING
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                        // if double harvest found in data
-                        if ("double_harvest" in data) {
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
 
-                            if (role !== "lord") return;
+        if (currentSeason !== "role_assignment") {
+            return;
+        }
 
-                            // if true
-                            if (data['double_harvest']) {
-                                setStatus(3); // set player as double harvest status
-                            }
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+            
+            // check if 'state' received from server is not "spring"
+            if (data['state'] !== "spring") {
+                return;
+            }
 
-                        }
-                    }
+            // set current state to "spring"
+            setCurrentSeason(data['state']);
 
-                case "summer_results":
-                    setScoutedRole(""); // clears scouted role first
+            // if current player is still active
+            if (status === 0) {
+                // set every player to unready state at start of spring
+                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            }
 
-                    // assuming "scout" is a number eg. 1 or 2
-                    if ("scout" in data) {
+        }
+        socket.current.on("change_state", handleChangeState);
 
-                        if (role !== "lord") return;
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
 
-                        if (data['scout'] === 1) {
-                            setScoutedRole("Lord"); // role reveal to be lord
-                        } else if (data['scout'] === 2) {
-                            setScoutedRole("Khan"); // role reveal to be khan
-                        }
-                    }
+    }, [hasConnected, currentSeason, status]);
 
-                    if ("farm" in data) {
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM SPRING TO SUMMER
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                        // grains + 1 ??
-                        // setGrain(g => g + 1);
-                    }
-                
-                case "autumn":
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
 
-                    if (status === 0) {
-                        // set every player to unready state at start of spring
-                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
-                    }
+        if (currentSeason !== "spring") {
+            return;
+        }
 
-                case "winter":
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+            
+            // check if 'state' received from server is not "summer"
+            if (data['state'] !== "summer") {
+                return;
+            }
 
-                    if (status === 0) {
-                        // set every player to unready state at start of spring
-                        setPlayers(p => p.map(player => ({ ...player, ready: false })));
-                    }
+            // set current state to "summer"
+            setCurrentSeason(data['state']);
+
+            // if current player is still active
+            if (status === 0) {
+                // set every player to unready state at start of summer
+                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            }
+
+            // if key "double_harvest" is found in data
+            if ("double_harvest" in data) {
+
+                // if current player role is not lord
+                if (role !== "lord") return;
+
+                // check if the key is a boolean true, then set the player as double harvest status
+                if (data['double_harvest']) {
+                    setStatus(3);
+                }
+
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -533,7 +585,243 @@ function RoomPage() {
         return () => {
             socket.current.off("change_state", handleChangeState);
         }
-    }, [hasConnected]);
+
+    }, [hasConnected, currentSeason, status, role]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM SUMMER TO SUMMER RESULT
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "summer") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is not "summer_result"
+            if (data['state'] !== "summer_result") {
+                return;
+            }
+
+            // set current state to "summer_result"
+            setCurrentSeason(data['state']);
+
+            // checks if data contains the "result" key
+            if ("result" in data) {
+
+                // checks if the role of current player is lord
+                if (role !== "lord") {
+                    return;
+                }
+
+                console.log("Checkpoint 1");
+                console.log(data['result']);
+
+                // store session ID of the player who got chosen to get scouted
+                let sessionID = data['result'][0];
+
+                // store the index of the player found 'players' array based on matching session ID
+                const index = players.findIndex(player => player.session === sessionID);
+
+                // next, checks if the boolean is true
+                if (data['result'][1] === true) {
+
+                    // if it is true, then set scouted role to "khan"
+                    setScoutedRole({ session_id: sessionID, role: "khan" });
+
+                    // manipulate the corresponding index in 'role' array to 2
+                    setRoleArray(r => {
+
+                        // create a copy of current 'role' array and update to 2
+                        const updatedRole = [...r];
+                        updatedRole[index] = 2;
+
+                        return updatedRole;
+                    });
+
+                } else {
+
+                    // else set scouted role to "lord"
+                    setScoutedRole({ session_id: sessionID, role: "lord" });
+
+                    // manipulate the corresponding index in 'role' array to 1
+                    setRoleArray(r => {
+
+                        // create a copy of current 'role' array and update to 1
+                        const updatedRole = [...r];
+                        updatedRole[index] = 1;
+
+                        return updatedRole;
+                    });
+                }
+            }
+
+            // update the 'grain' value
+            setGrain(g => g + data['grain']);
+
+            // reset double harvest guy to active status
+            if (status === 3) {
+                setStatus(0);
+            }
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+
+    }, [hasConnected, currentSeason, role, players, grain, status]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM SUMMER RESULT TO AUTUMN
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "summer_result") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is not "autumn"
+            if (data['state'] !== "autumn") {
+                return;
+            }
+
+            // set current state to "autumn"
+            setCurrentSeason(data['state']);
+
+            // if current player is still active
+            if (status === 0) {
+                // set every player to unready state at start of autumn
+                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            }
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+    }, [hasConnected, currentSeason, status, players, role, grain]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM AUTUMN TO BANISH RESULT
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "autumn") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is not "banish_result"
+            if (data['state'] !== "banish_result") {
+                return;
+            }
+
+            // set current state to "banish_result"
+            setCurrentSeason(data['state']);
+
+            // checks if there is no banishment
+            if (data['banished'] === -1) {
+
+                // to be implemented
+                console.log("King decides not to banish anyone");
+            } 
+
+            // checks if session id of chosen player matches with current player session id
+            if (data['banished'] === getSession()) {
+
+                // set current player status to banished
+                setStatus(2); 
+            }
+
+            // store session id of player chosen to be banished
+            setBanished(data['banished']);
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+    }, [hasConnected, currentSeason, status, players, grain, banished]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      FROM BANISH RESULT TO WINTER
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        if (!hasConnected) {
+            return;
+        }
+
+        if (currentSeason !== "banish_result") {
+            return;
+        }
+
+        socket.current.removeAllListeners("change_state");
+        const handleChangeState = (data) => {
+
+            // check if 'state' received from server is not "winter"
+            if (data['state'] !== "winter") {
+                return;
+            }
+
+            // set current state to "winter"
+            setCurrentSeason(data['state']);
+        
+            // to be implemented
+        };
+        socket.current.on("change_state", handleChangeState);
+
+        return () => {
+            socket.current.off("change_state", handleChangeState);
+        }
+
+    }, [hasConnected, currentSeason, banished, status, players]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      WINTER TO PILLAGED RESULT
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      GAME END STATES
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     *      END OF STATE TRANSITIONS
+     */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         if (!hasConnected) {
@@ -581,7 +869,9 @@ function RoomPage() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *      USE EFFECT TEMPLATE / DEBUG
+ */
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -590,12 +880,12 @@ function RoomPage() {
             return;
         }
 
-        console.log(players);
+        console.log(`Role: ${roleArray}`);
         
         return () => {
 
         }
-    }, [players]);
+    }, [role, currentSeason]);
 
     // useEffect for debugging
     useEffect(() => {
