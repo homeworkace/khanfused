@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function AutumnGamePlay({ socket, role, players }) {
+function AutumnGamePlay({ socket, role, players, currentSeason }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);

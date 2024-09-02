@@ -9,7 +9,7 @@ function SummerResults ({grain, scoutedRole, socket, players, role}) {
     const [totalGrain, setTotalGrain] = useState(0);
 
     useEffect(() => {
-      setTotalGrain(prevTotal => prevTotal + grain - 3);
+      setTotalGrain(grain.initial_grain + grain.added_grain - grain.yearly_deduction);
     }, [grain]);
   
     const handleTimeUp = () => {
@@ -62,9 +62,9 @@ function SummerResults ({grain, scoutedRole, socket, players, role}) {
                 <PlayerList players={players} />
             </div>
 
-            <div className ="grain-info"> THE LORDS HAVE HARVESTED {grain} GRAINS.
+            <div className ="grain-info"> THE LORDS HAVE HARVESTED {grain.added_grain} GRAINS.
                 <br/>
-                <p>THE KINGDOM INITIALLY HAD {totalGrain + 3 - grain} GRAINS AND WILL CONSUME 3 GRAINS</p>
+                <p>THE KINGDOM INITIALLY HAD {grain.initial_grain} GRAINS AND WILL CONSUME {grain.yearly_deduction} GRAINS</p>
                 <p>THE KINGDOM NOW HAS {totalGrain} GRAINS IN SURPLUS.</p>
             </div>
             

@@ -129,6 +129,7 @@ function RoomPage() {
                     players = {players}
                     role = {role}
                     socket = {socket}
+                    currentSeason={currentSeason}
                 />
 
                 case "banishedResult":
@@ -145,6 +146,7 @@ function RoomPage() {
                     players = {players}
                     role = {role}
                     socket = {socket}
+                    currentSeason={currentSeason}
                 />
 
                 case "pillageResult":
@@ -475,7 +477,6 @@ function RoomPage() {
 
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
-
             // update 'grains' of how much of grains to be deducted every loop
             setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
@@ -569,8 +570,8 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            setCurrentSeason(data['state']);
-
+            // setCurrentSeason(data['state']);
+            setCurrentSeason('winter');
             // if current player is still active
             if (status === 0) {
                 // set every player to unready state at start of summer
@@ -804,6 +805,7 @@ function RoomPage() {
             if (data['state'] === "winter") {
                 // set current state to "winter"
                 setCurrentSeason(data['state']);
+
 
                 // to be implemented
             }

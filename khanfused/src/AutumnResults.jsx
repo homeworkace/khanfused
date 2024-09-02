@@ -27,6 +27,7 @@ function AutumnResults ({banished, status, socket, role, players}) {
                 )
             }
         } else {
+            // no one has been banished
             <div>
                 <p>THE KING HAS CHOSEN NOT TO BANISH</p>
             </div>
