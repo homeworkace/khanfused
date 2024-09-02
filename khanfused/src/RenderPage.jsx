@@ -570,8 +570,8 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            // setCurrentSeason(data['state']);
-            setCurrentSeason('winter');
+            setCurrentSeason(data['state']);
+            
             // if current player is still active
             if (status === 0) {
                 // set every player to unready state at start of summer
@@ -806,7 +806,7 @@ function RoomPage() {
                 // set current state to "winter"
                 setCurrentSeason(data['state']);
 
-
+                
                 // to be implemented
             }
             else if (data['state'] === "no_khans_end") {
@@ -1011,12 +1011,10 @@ function RoomPage() {
         }
 
         console.log(`Role: ${roleArray}`);
-        console.log(scoutedRole);
-        console.log(status)
         return () => {
 
         }
-    }, [players, roleArray, scoutedRole, status]);
+    }, [roleArray]);
 
     // useEffect for debugging
     useEffect(() => {

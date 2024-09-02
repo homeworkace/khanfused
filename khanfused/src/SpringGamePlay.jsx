@@ -68,7 +68,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
 };
 
   const renderRoleSpecificContent = () => {
-    if (role === "lord") {
+    if (role === "king") {
       return (
         <div>
           <button className="double-harvest-button" onClick={toggleDoubleHarvestList}>Double Harvest</button>
