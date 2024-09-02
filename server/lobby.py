@@ -227,7 +227,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 10, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -310,7 +310,7 @@ class lobby :
             self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 2, id = 'no_khans_end_start' + self.lobby_code)
         else :
             #self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
-            self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5000, id = 'winter_start' + self.lobby_code)
+            self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 2, id = 'winter_start' + self.lobby_code)
 
         # Finally, emit change in state.
         self.socket.emit('change_state', { 'state' : 'banish_result', 'banished' : self.choices[0] }, room = self.lobby_code, namespace = '/')
