@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, createContext} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client"
 import { checkSession, leaveLobby } from './restBoilerplate.js';
@@ -8,7 +8,6 @@ import './RoomPageView.css';
 
 // Testing 
 import SpringGamePlay from "./SpringGamePlay.jsx";
-import SpringDouble from './SpringDouble.jsx';
 import SummerResults from './SummerResults.jsx';
 import SummerGamePlay from './SummerGamePlay.jsx';
 import AutumnGamePlay from './AutumnGamePlay.jsx';
@@ -44,14 +43,6 @@ function RoomPage() {
     const [choices, setChoices] = useState(0); // 0 is default, 1 is scout, 2 is farm
     const [banished, setBanished] = useState(null); // store session id of banished player temporarily
     const [pillaged, setPillaged] = useState(null); 
-
-    // Test switch case purposes -- to be changed to states
-    const [summerStage, setSummerStage] = useState(false);
-    const [autumnStage, setAutumnStage] = useState(false);
-    const [winterStage, setWinterStage] = useState(false);
-    const [khanWin, setKhanWin] = useState(false);
-    const [lordWin, setLordWin] = useState(false);
-    const [insufficentFood, setInsufficentFood] = useState(false);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +93,9 @@ function RoomPage() {
                     return <Role 
                         players={players}
                         king={king}
-                    />
+                />
 
+                // grain deduction per year
                 case "spring":
                     return <SpringGamePlay
                         players={players}
@@ -119,6 +111,7 @@ function RoomPage() {
                         socket = {socket}
                         choices={choices}
                         setChoices={setChoices}
+                        status = {status}
                         currentSeason={currentSeason}
                 />
 
@@ -127,6 +120,8 @@ function RoomPage() {
                     players = {players}
                     socket = {socket}
                     role = {role}
+                    scoutedRole = {scoutedRole}
+                    grain = {grain}
                 />
 
                 case "autumn":
@@ -134,6 +129,7 @@ function RoomPage() {
                     players = {players}
                     role = {role}
                     socket = {socket}
+                    currentSeason={currentSeason}
                 />
 
                 case "banishedResult":
@@ -141,16 +137,25 @@ function RoomPage() {
                     players = {players}
                     socket = {socket}
                     role = {role}
+                    banished = {banished}
+                    status = {status}
                 />
-                
+                // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
                     players = {players}
                     role = {role}
                     socket = {socket}
+                    currentSeason={currentSeason}
                 />
 
-                // case "pillageResult":
+                case "pillageResult":
+                    return <WinterDouble
+                    players = {players}
+                    socket = {socket}
+                    role = {role}
+                    pillaged = {pillaged}
+                />    
 
                 // insufficentFood scenario -- to be replaced with actual state
                 case "insufficentFood":
@@ -472,7 +477,6 @@ function RoomPage() {
 
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
-
             // update 'grains' of how much of grains to be deducted every loop
             setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
@@ -531,6 +535,8 @@ function RoomPage() {
                 setPlayers(p => p.map(player => ({ ...player, ready: false })));
             }
 
+            // reset the previous data stored in 'banished'
+            setBanished(null);
         }
         socket.current.on("change_state", handleChangeState);
 
@@ -564,8 +570,8 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            setCurrentSeason(data['state']);
-
+            // setCurrentSeason(data['state']);
+            setCurrentSeason('winter');
             // if current player is still active
             if (status === 0) {
                 // set every player to unready state at start of summer
@@ -800,6 +806,7 @@ function RoomPage() {
                 // set current state to "winter"
                 setCurrentSeason(data['state']);
 
+
                 // to be implemented
             }
             else if (data['state'] === "no_khans_end") {
@@ -845,6 +852,18 @@ function RoomPage() {
 
             // set current state to "pillage_result"
             setCurrentSeason(data['state']);
+
+            // check if no lord was chosen for pillage
+            if (data['pillaged'] === -1) {
+
+                // to be implemented
+                console.log("Khan(s) decides not to pillage");
+
+            }
+
+            // store session id of player chosen to be pillaged
+            setPillaged(data['pillaged']);
+
         };
         socket.current.on("change_state", handleChangeState);
 
@@ -882,6 +901,9 @@ function RoomPage() {
                 // set current state to "no_lords_end"
                 setCurrentSeason(data['state']);
             }
+
+            // reset the previous data of 'pillaged' to null
+            setPillaged(null);
         };
         socket.current.on("change_state", handleChangeState);
 
@@ -989,11 +1011,12 @@ function RoomPage() {
         }
 
         console.log(`Role: ${roleArray}`);
-        
+        console.log(scoutedRole);
+        console.log(status)
         return () => {
 
         }
-    }, [role, currentSeason]);
+    }, [players, roleArray, scoutedRole, status]);
 
     // useEffect for debugging
     useEffect(() => {
@@ -1093,37 +1116,6 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // pass socket to roompageview
-    const handleEditButtonClick = () => {
-        // If in edit mode, this click is to confirm the name.
-            // Do input sanitisation check and reject if it doesn't meet the criteria.
-
-            // Reject if someone else in the room already has the name.
-
-            // Emit the event and ready yourself.
-            //socket.current.emit("confirm_name", {
-            //    session: getSession(),
-            //    name: ""
-            //});
-
-        // If not in edit mode, this click is to edit the name.
-            // Write the previous name to another variable.
-
-            // Emit the event and unready yourself.
-            //socket.current.emit("edit_name", {
-            //    session: getSession()
-            //});
-            
-    }
-
-    //fakerayray
-
-    // const handleStartInstructionsClick = () => {
-    //     socket.current.emit('start_instructions', {
-    //         session: getSession()
-    //     });
-    // };
-
     const handleRoleAssignmentChangeClick = () => {
         socket.current.emit('role_assignment_transition', {
             session: getSession()
@@ -1131,36 +1123,6 @@ function RoomPage() {
         console.log(currentSeason);
 
     };
-
-    const handleSpringChangeClick = () => {
-        socket.current.emit('spring_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-    };
-
-    const handleSummerChangeClick = () => {
-        socket.current.emit('summer_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-    };
-
-    // const handleAutumnChangeClick = () => {
-    //     socket.current.emit('autumn_transition', {
-    //         session: getSession()
-    //     });
-    //     console.log(currentSeason);
-
-    // };
-
-    // const handleWinterChangeClick = () => {
-    //     socket.current.emit('winter_transition', {
-    //         session: getSession()
-    //     });
-    //     console.log(currentSeason);
-
-    // };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

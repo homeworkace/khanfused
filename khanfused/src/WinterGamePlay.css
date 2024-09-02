@@ -40,7 +40,6 @@
     right: 20px;
 }
 
-
 .chat-box {
     position: absolute;
     top: 60px; 
@@ -54,4 +53,53 @@
     z-index: 3; 
     display: flex;
     flex-direction: column;
+}
+
+.pillage-button {
+    position: relative;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.pillage-list {
+    display: none; 
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 150px;
+    max-height: 150px;
+    position: absolute;
+    overflow-y: auto;
+    top: 0;
+    left: 0; 
+    z-index: 4;
+    border-radius: 10px;
+}
+
+.pillage-list.active {
+    display: block; 
+}
+
+.pillage-container {
+    position: relative; 
+    display: flex;
+    justify-content: center;
+}
+
+.pillage-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.pillage-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.pillage-list li:hover {
+    background-color: #f0f0f0;
 }

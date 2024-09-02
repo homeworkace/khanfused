@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AutumnGamePlay.css'; 
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function AutumnGamePlay({ socket, role, players }) {
+function AutumnGamePlay({ socket, role, players, currentSeason }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
+
+  const selectedPlayerSessionRef = useRef(selectedPlayerSession);
+
+  useEffect(() => {
+    selectedPlayerSessionRef.current = selectedPlayerSession;
+  }, [selectedPlayerSession]);
+
+  useEffect(() => {
+    if (isReady) {
+      socket.current.emit('ready', {
+        state: currentSeason,
+        session: getSession(),
+        banish: role === 'king' || role === "lord" ? selectedPlayerSessionRef.current : null
+      });
+      console.log(`Banish: ${selectedPlayerSessionRef.current}`)
+    } else {
+      socket.current.emit('unready', {
+        state: currentSeason,
+        session: getSession()
+      });
+    }
+  }, [isReady, role, socket]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -28,17 +50,6 @@ function AutumnGamePlay({ socket, role, players }) {
   };
 
   const autumnReadyClick = () => {
-    if (!isReady) {
-      socket.current.emit('ready', {
-        session: getSession(),
-        banish: role === 'king' || role === "lord" ? selectedPlayerSession : null
-      });
-      console.log(`Banish: ${selectedPlayerSession}`)
-    } else {
-      socket.current.emit('unready', {
-        session: getSession()
-      });
-    }
     setIsReady(!isReady);
   };
 

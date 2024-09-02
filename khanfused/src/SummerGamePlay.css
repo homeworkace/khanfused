@@ -67,15 +67,9 @@
     left: 5rem;
 }
 
-.summer-lord-buttons {
-    display: flex;
-    gap: 1.5rem;
-}
-
 .summer-button-bar {
     margin-top: 3rem;
 }
-
 .scout-list {
     display: none; 
     margin-top: 1rem;
@@ -84,13 +78,19 @@
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: 150px;
-    max-height:150px;
+    max-height: 150px;
     position: absolute;
     overflow-y: auto;
-    top: 22rem;
-    left: 32em; 
+    top: 50px; 
+    left: 0; 
     z-index: 4;
     border-radius: 10px;
+}
+
+.summer-lord-buttons {
+    position: relative; 
+    display: flex;
+    gap: 1.5rem;
 }
 
 .scout-list.active {
