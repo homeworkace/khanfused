@@ -13,7 +13,7 @@ app.config['SCHEDULER_API_ENABLED'] = True
 
 cors = CORS(app)
 
-socket_app = SocketIO(app,debug=True,cors_allowed_origins='*',async_mode='threading')
+socket_app = SocketIO(app, cors_allowed_origins='*', async_mode='threading')
 
 scheduler = APScheduler()
 scheduler.init_app(app)
@@ -28,7 +28,7 @@ def serve_app(code = ''):
     return app.send_static_file('index.html')
 
 # Event handler for the home page
-@app.route('/check-session', methods=['POST'])
+@app.route('/check-session', methods=['POST', 'OPTIONS'])
 def check_session():
     data = request.json
     result = db.query_session(data['session'])
@@ -56,7 +56,7 @@ def check_session():
     return data
 
 # Event handler for lobby creation
-@app.route('/create-lobby', methods=['POST'])
+@app.route('/create-lobby', methods=['POST', 'OPTIONS'])
 def create_lobby():
     data = request.json
 
@@ -80,7 +80,7 @@ def create_lobby():
     return result
 
 # Event handler to join a lobby
-@app.route('/join-lobby', methods=['POST'])
+@app.route('/join-lobby', methods=['POST', 'OPTIONS'])
 def join_lobby():
     data = request.json
 
@@ -122,7 +122,7 @@ def join_lobby():
     return result
 
 # Event handler to leave a lobby
-@app.route('/leave-lobby', methods=['POST'])
+@app.route('/leave-lobby', methods=['POST', 'OPTIONS'])
 def leave_lobby():
     data = request.json
 
@@ -346,7 +346,7 @@ if __name__ == '__main__':
             rooms[code] = lobby.unminified(rooms[code], scheduler, socket_app)
     try :
         # app.run(debug=True, use_reloader=False)
-        socket_app.run(app)
+        socket_app.run(app, host = '0.0.0.0')
     except Exception as e :
         print(e)
     for code in rooms :

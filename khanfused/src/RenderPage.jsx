@@ -198,7 +198,7 @@ function RoomPage() {
         }
 
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
-        socket.current = io("http://localhost:5000", { autoConnect: false });
+        socket.current = io("/", { autoConnect: false });
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
