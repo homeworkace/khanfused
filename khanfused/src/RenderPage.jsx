@@ -37,6 +37,7 @@ function RoomPage() {
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
     const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
+    const [statusArray, setStatusArray] = useState([]);
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState({ initial_grain: 0, yearly_deduction: 0, added_grain: 0 }); // initial_grain, yearly_deduction, added_grain
     const [scoutedRole, setScoutedRole] = useState({});
@@ -483,6 +484,9 @@ function RoomPage() {
             // store the array 'role'
             setRoleArray(data['role']);
 
+            // populate the array 'Status'
+            setStatusArray(Array.from({ length: 3 }).map(() => 0));
+
             // find max number from the array and assign the respective role
             let role_int = Math.max(...data['role']);
             if (role_int === 0) setRole("king"); // king
@@ -529,14 +533,14 @@ function RoomPage() {
             // set current state to "spring"
             setCurrentSeason(data['state']);
 
-            // if current player is still active
-            if (status === 0) {
-                // set every player to unready state at start of spring
-                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            // ready everyone who is banished and unready everyone else
+            let updated_players = [];
+            for (i = 0; i < players.length; ++i) {
+                let player = players[i];
+                player.ready = (statusArray[i] === 2);
+                updated_players.push();
             }
-
-            // reset the previous data stored in 'banished'
-            setBanished(null);
+            setPlayers(updated_players);
         }
         socket.current.on("change_state", handleChangeState);
 
@@ -570,13 +574,16 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            // setCurrentSeason(data['state']);
-            setCurrentSeason('winter');
-            // if current player is still active
-            if (status === 0) {
-                // set every player to unready state at start of summer
-                setPlayers(p => p.map(player => ({ ...player, ready: false })));
+            setCurrentSeason(data['state']);
+
+            // unready everyone who is active and ready everyone else
+            let updated_players = [];
+            for (i = 0; i < players.length; ++i) {
+                let player = players[i];
+                player.ready = (statusArray[i] !== 0);
+                updated_players.push();
             }
+            setPlayers(updated_players);
 
             // if key "double_harvest" is found in data
             if ("double_harvest" in data) {
@@ -714,11 +721,14 @@ function RoomPage() {
                 // set current state to "autumn"
                 setCurrentSeason(data['state']);
 
-                // if current player is still active
-                if (status === 0) {
-                    // set every player to unready state at start of autumn
-                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
+                // ready everyone who is banished and unready everyone else
+                let updated_players = [];
+                for (i = 0; i < players.length; ++i) {
+                    let player = players[i];
+                    player.ready = (statusArray[i] === 2);
+                    updated_players.push();
                 }
+                setPlayers(updated_players);
             }
             // check if 'state' received from server is "food_end"
             else if (data["state"] === "food_end") {
@@ -805,6 +815,9 @@ function RoomPage() {
             if (data['state'] === "winter") {
                 // set current state to "winter"
                 setCurrentSeason(data['state']);
+
+                // reset the previous data stored in 'banished'
+                setBanished(null);
 
 
                 // to be implemented
