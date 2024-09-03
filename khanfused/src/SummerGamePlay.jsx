@@ -11,6 +11,7 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isFarm, setIsFarm] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
@@ -18,41 +19,44 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
 
-  //useEffect for emission
   useEffect(() => {
-    if (isReady) {
-      if (role === 'lord') {
-        if (choices === 1) {
-          socket.current.emit('ready', {
-            state: currentSeason,
-            session: getSession(),
-            choice: selectedPlayerSessionRef.current 
-          });
-          console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-        } else if (choices === 2) {
-          socket.current.emit('ready', {
-            state: currentSeason,
-            session: getSession(),
-            choice: -1
-          });
-          console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-        }
-      } else {
-        socket.current.emit('ready', {
-          state: currentSeason,
-          session: getSession(),
-        });
-      }
-      console.log('Emitted ready state:', isReady);
-      console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
     } else {
-      socket.current.emit('unready', {
-        state: currentSeason,
-        session: getSession()
-      });
-      console.log('Emitted unready state:', isReady);
+      if (isReady) {
+        if (role === 'lord') {
+          if (choices === 1) {
+            socket.current.emit('ready', {
+              state: currentSeason,
+              session: getSession(),
+              choice: selectedPlayerSessionRef.current 
+            });
+            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+          } else if (choices === 2) {
+            socket.current.emit('ready', {
+              state: currentSeason,
+              session: getSession(),
+              choice: -1
+            });
+            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+          }
+        } else {
+          socket.current.emit('ready', {
+            state: currentSeason,
+            session: getSession(),
+          });
+        }
+        console.log('Emitted ready state:', isReady);
+        console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+      } else {
+        socket.current.emit('unready', {
+          state: currentSeason,
+          session: getSession()
+        });
+        console.log('Emitted unready state:', isReady);
+      }
     }
-  }, [isReady, choices, role, socket]);
+  }, [isReady, choices, role, socket, currentSeason]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -89,7 +93,7 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
   };
 
   const renderRoleSpecificContent = () => {
-    if (role === "lord") {
+    if (role === "lord" && status === 0) {
       return (
         <div className="summer-lord-buttons">
           <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick} disabled = {status === 1}>Farm</button>

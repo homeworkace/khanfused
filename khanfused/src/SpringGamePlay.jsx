@@ -10,6 +10,7 @@ function SpringGamePlay({ status, socket, role, players, currentSeason}) {
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
+  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
@@ -18,23 +19,26 @@ function SpringGamePlay({ status, socket, role, players, currentSeason}) {
   }, [selectedPlayerSession]);
 
   useEffect(() => {
-    if (isReady) {
-      socket.current.emit('ready', {
-        state: currentSeason,
-        session: getSession(),
-        double_harvest: role === 'lord' ? selectedPlayerSessionRef.current : null
-      }
-    );
-      console.log(`Player ${getSession()} is ready`);
-      console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
     } else {
-      socket.current.emit('unready', {
-        state: currentSeason,
-        session: getSession()
-      });
-      console.log(`Player ${getSession()} is unready`);
+      if (isReady) {
+        socket.current.emit('ready', {
+          state: currentSeason,
+          session: getSession(),
+          double_harvest: role === 'king' ? selectedPlayerSessionRef.current : null
+        });
+        console.log(`Player ${getSession()} is ready`);
+        console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
+      } else {
+        socket.current.emit('unready', {
+          state: currentSeason,
+          session: getSession()
+        });
+        console.log(`Player ${getSession()} is unready`);
+      }
     }
-  }, [isReady, role, socket]); 
+  }, [isReady, role, socket, currentSeason]); 
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);

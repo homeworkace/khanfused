@@ -26,13 +26,15 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
             if(scoutedRole.role === "khan") {
                 return (
                 <div>
-                    <p> {scoutedPlayer.name} is a KHAN </p>
+                    <p> {scoutedPlayer.name} is a</p>
+                    <p className ="khanRole-text"> KHAN </p>
                 </div>
                 )
             }  else if (scoutedRole.role === "lord") {
                 return (
                 <div>
-                    <p> {scoutedPlayer.name} is a LORD </p>
+                    <p> {scoutedPlayer.name} is a </p>
+                    <p className ="lordRole-text"> LORD </p>
                 </div>
                 )
             }

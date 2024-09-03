@@ -8,16 +8,16 @@ function AutumnResults ({banished, status, socket, role, players}) {
     const renderRoleSpecificContent = () => {
         console.log(banished)
             // if someone has been banished
-            if (banished !== -1){
+            if (banished != -1){
                 const banishedPlayer = players.find(p => p.session === banished);
                 if (!banishedPlayer) {
-                    return;
+                    return ;
                 }
                 
                 if (status === 2) {
                     // show the person he has been banished
                     return (
-                        <div>
+                        <div >
                             <p> YOU HAVE BEEN BANISHED </p>
                         </div>
                     )
@@ -25,15 +25,19 @@ function AutumnResults ({banished, status, socket, role, players}) {
                 // show who the king has banished
                 return (
                     <div>
-                        <p>THE KING HAS CHOSEN TO BANISH {banishedPlayer.name}</p>
+                        <p>THE KING HAS CHOSEN TO BANISH </p>
+                        <p className ="banished-player-name">{banishedPlayer.name}</p>
                     </div>
                 )
             }
         } else {
             // no one has been banished
+            return (
             <div>
                 <p>THE KING HAS CHOSEN NOT TO BANISH</p>
             </div>
+            )
+
         } 
     }
 
@@ -45,7 +49,10 @@ function AutumnResults ({banished, status, socket, role, players}) {
         <div className={`autumnDouble ${status === 1 ? 'greyed-out': ""}`}>
             <div className="autumnDouble-container">
 
-                {renderRoleSpecificContent()}
+                <div className='status-container'>
+                    {renderRoleSpecificContent()}
+                </div>
+
 
                 <HelpButton />
                 <Timer duration={10} onTimeUp={handleTimeUp} />

@@ -25,6 +25,12 @@
     gap: 20px; 
 }
 
+.status-container{
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
 .autumnDouble-button-bar button {
     padding: 10px 20px;
     font-size: 16px;
@@ -42,7 +48,20 @@
 .autumnResults-player-list {
     position: absolute;
     top: 1rem;
-    left: 5rem;
+    left: 5.5rem;
 }
 
+.banished-player-name {
+    animation: fadeIn 1.5s ease-in forwards;
+    color: red;
+}
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+}
 

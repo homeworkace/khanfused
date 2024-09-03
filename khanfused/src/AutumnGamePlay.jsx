@@ -10,28 +10,32 @@ function AutumnGamePlay({status, socket, role, players, currentSeason }) {
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
+  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
   useEffect(() => {
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
-
   useEffect(() => {
-    if (isReady) {
-      socket.current.emit('ready', {
-        state: currentSeason,
-        session: getSession(),
-        banish: role === 'king' || role === "lord" ? selectedPlayerSessionRef.current : null
-      });
-      console.log(`Banish: ${selectedPlayerSessionRef.current}`)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
     } else {
-      socket.current.emit('unready', {
-        state: currentSeason,
-        session: getSession()
-      });
+      if (isReady) {
+        socket.current.emit('ready', {
+          state: currentSeason,
+          session: getSession(),
+          banish: role === 'king' ? selectedPlayerSessionRef.current : null
+        });
+        console.log(`Banish: ${selectedPlayerSessionRef.current}`);
+      } else {
+        socket.current.emit('unready', {
+          state: currentSeason,
+          session: getSession()
+        });
+      }
     }
-  }, [isReady, role, socket]);
+  }, [isReady, role, socket, currentSeason]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
