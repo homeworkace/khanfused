@@ -146,9 +146,10 @@ function RoomPage() {
                 // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
+                    socket = {socket}
                     players = {players}
                     role = {role}
-                    socket = {socket}
+                    roleArray={roleArray}
                     currentSeason={currentSeason}
                 />
 
@@ -222,6 +223,18 @@ function RoomPage() {
                 //    _players
             }
             setPlayers(_players);
+
+            let roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+            if (roleInt === 0) {
+                setRole("king");
+            }
+            else if (roleInt === 1) {
+                setRole("lord");
+            }
+            else {
+                setRole("khan");
+            }
+            setRoleArray(data['roles']);
 
             // renders page based on current state for joining players
             setCurrentSeason(data['state']);

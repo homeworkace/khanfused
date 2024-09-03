@@ -64,11 +64,18 @@
 }
 
 .pillage-button {
-    margin-left: 1rem; /* Align with Ready button */
+    width: 100%; /* Align with Ready button */
+    display: inline-block;
+}
+
+.pillage-button.selected {
+    background-color: lightgreen;
+    font-weight: bold;
 }
 
 .pillage-list {
-    display: none; 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin-top: 1rem;
     padding: 1rem;
     border: 1px solid #ddd;
@@ -84,38 +91,14 @@
     border-radius: 10px;
 }
 
-.pillage-list.active {
-    display: block; 
-}
-
 .pillage-container {
-    position: relative; 
-    display: flex;
-    gap: 1.5rem;
-}
-
-.pillage-list ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-}
-
-.pillage-list li {
-    padding: 0.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    width: 1rem;
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 0.1rem;
+    gap: 0.1rem;
     justify-content: center;
-}
-
-.pillage-list li:hover {
-    background-color: #f0f0f0;
-}
-
-.pillage-list li.selected {
-    background-color: lightgreen;
-    font-weight: bold;
 }
 
 .tick {

@@ -228,7 +228,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 10, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -522,7 +522,7 @@ class lobby :
         if self.state == 'winter' :
             # The khan has a decision to make.
             player_index = [player[0] for player in self.players].index(int(data['session']))
-            self.choices[player_index] = data['scout'] # -1 if farming
+            self.choices[player_index] = data['pillage'] # -1 if not pillaging
 
             # If this is a khan, emit to other khans.
             if self.roles[player_index] == 2 :
