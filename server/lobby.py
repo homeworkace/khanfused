@@ -129,6 +129,7 @@ class lobby :
 
         self.ready = [False] * len(self.players)
         self.role_assignment_start()
+        print(self.ready)
         return None
     
     def role_assignment_start(self):
@@ -330,7 +331,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 7200, id = 'pillage_result_start' + self.lobby_code)
 
     def pillage_result_start(self) :
         self.state = 'pillage_result'
@@ -482,7 +483,7 @@ class lobby :
             return
         if self.state == 'spring' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['session']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
@@ -496,7 +497,7 @@ class lobby :
 
         elif self.state == 'autumn' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['session']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
