@@ -50,7 +50,6 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
     const startGameClick = () => {
         socket.current.emit("start_game", {
             session: getSession()
@@ -146,9 +145,10 @@ function RoomPage() {
                 // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
+                    socket = {socket}
                     players = {players}
                     role = {role}
-                    socket = {socket}
+                    roleArray={roleArray}
                     currentSeason={currentSeason}
                 />
 
@@ -222,6 +222,18 @@ function RoomPage() {
                 //    _players
             }
             setPlayers(_players);
+
+            let roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+            if (roleInt === 0) {
+                setRole("king");
+            }
+            else if (roleInt === 1) {
+                setRole("lord");
+            }
+            else {
+                setRole("khan");
+            }
+            setRoleArray(data['roles']);
 
             // renders page based on current state for joining players
             setCurrentSeason(data['state']);
@@ -947,11 +959,6 @@ function RoomPage() {
         }
 
         console.log("Checkpoint");
-        /**
-         *      ISSUE: For some reason handleChangeState isnt called,
-         *      could be due to listener not receiving anything,
-         *      console only logs "Checkpoint" and then empty afterwards
-         */
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
@@ -961,6 +968,16 @@ function RoomPage() {
             if (data['state'] !== "waiting") {
                 return;
             }
+
+            // ready everyone
+            let readyPlayers = [];
+            for (let i = 0; i < players.length; ++i) {
+                let player = players[i];
+                player.ready = true;
+                readyPlayers.push(player);
+            }
+            setPlayers(readyPlayers);
+
 
             // set current state to "waiting"
             setCurrentSeason(data['state']);
