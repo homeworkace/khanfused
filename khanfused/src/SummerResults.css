@@ -6,6 +6,11 @@
     background-color: #d79f44b9;
 }
 
+.summerResults.greyed-out {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
 .summerResults-container {
     position: relative; 
     height: 100%; 

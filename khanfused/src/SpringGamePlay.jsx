@@ -5,7 +5,7 @@ import Timer from './Timer';
 import { getSession } from './utility.js';
 import PlayerList from "./PlayerList";
 
-function SpringGamePlay({ socket, role, players, currentSeason}) {
+function SpringGamePlay({ status, socket, role, players, currentSeason}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -57,7 +57,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
 
   const springReadyClick = () => {
     // Check if double harvest is selected first
-    if (role === "king") {
+    if (role === "king" && status === 0) {
       if (selectedPlayerSessionRef.current === null) {
         console.log("King select a player for Double Harvest");
         return;
@@ -68,7 +68,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
 };
 
   const renderRoleSpecificContent = () => {
-    if (role === "lord") {
+    if (role === "king") {      // King will not get pillaged
       return (
         <div>
           <button className="double-harvest-button" onClick={toggleDoubleHarvestList}>Double Harvest</button>
@@ -93,7 +93,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
   };
 
   return (
-    <div className="spring">
+    <div className={`spring ${status === 1 ? 'greyed-out' : ""}`}>
       <div className="spring-container">
         {isChatOpen && (
           <div className="chat-box">
@@ -102,7 +102,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
         )}
 
         <div className="spring-button-bar">
-          <button onClick={toggleChat} className="chat-button">
+          <button onClick={toggleChat} className="chat-button" disabled={status === 1}>
             Chat
           </button>
 
@@ -114,7 +114,7 @@ function SpringGamePlay({ socket, role, players, currentSeason}) {
 
           <HelpButton />
         
-          <button onClick={springReadyClick}>
+          <button onClick={springReadyClick} disabled = {status === 1}>
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>

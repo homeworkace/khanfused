@@ -1,9 +1,14 @@
-.winterDouble {
+.pillage {
     width: 100vw;
     height: 100vh;
     background: url('./Assets/WINTER CUTSCENE.svg') no-repeat center center;
     background-size: contain;
     background-color: #799eefb9;
+}
+
+.pillage.greyed-out {
+    filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 .winterDouble-container {

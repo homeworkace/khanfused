@@ -129,6 +129,7 @@ class lobby :
 
         self.ready = [False] * len(self.players)
         self.role_assignment_start()
+        print(self.ready)
         return None
     
     def role_assignment_start(self):
@@ -406,6 +407,9 @@ class lobby :
         self.status = []
         self.choices = []
         self.grain = 0
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'waiting' }, room = self.lobby_code, namespace = '/')
         
         self.next_job.remove()
         
@@ -425,7 +429,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
                 
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -455,7 +459,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
                 
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -482,12 +486,12 @@ class lobby :
             return
         if self.state == 'spring' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['session']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
             
         elif self.state == 'summer' :
             # Unready the player in question.
@@ -496,12 +500,12 @@ class lobby :
 
         elif self.state == 'autumn' :
             # Unready the player in question.
-            player_index = self.players.index(int(data['session']))
+            player_index = [player[0] for player in self.players].index(int(data['session']))
             self.ready[player_index] = False
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
             
         elif self.state == 'winter' :
             # Unready the player in question.
@@ -521,7 +525,7 @@ class lobby :
         if self.state == 'winter' :
             # The khan has a decision to make.
             player_index = [player[0] for player in self.players].index(int(data['session']))
-            self.choices[player_index] = data['scout'] # -1 if farming
+            self.choices[player_index] = data['pillage'] # -1 if not pillaging
 
             # If this is a khan, emit to other khans.
             if self.roles[player_index] == 2 :

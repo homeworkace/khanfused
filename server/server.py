@@ -114,6 +114,8 @@ def join_lobby():
 
     # Send the client a redirect.
     result = {}
+    if new_player_name is None :
+        result['reset_name'] = True
     result['redirect'] = '/room/' + data['lobby_code']
     
     # Notify other players.

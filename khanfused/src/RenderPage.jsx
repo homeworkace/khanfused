@@ -37,6 +37,7 @@ function RoomPage() {
     const [role, setRole] = useState(""); // 0 if king, 1 if lord, 2 if khan
     const [roleArray, setRoleArray] = useState([]);
     const [status, setStatus] = useState(0); // 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
+    const [statusArray, setStatusArray] = useState([]);
     const [king, setKing] = useState(0); // session ID of king
     const [grain, setGrain] = useState({ initial_grain: 0, yearly_deduction: 0, added_grain: 0 }); // initial_grain, yearly_deduction, added_grain
     const [scoutedRole, setScoutedRole] = useState({});
@@ -49,7 +50,6 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
     const startGameClick = () => {
         socket.current.emit("start_game", {
             session: getSession()
@@ -81,7 +81,6 @@ function RoomPage() {
                             players={players}
                             setPlayers={setPlayers}
                             startGameClick={startGameClick}
-                            handleRoleAssignmentChangeClick = {handleRoleAssignmentChangeClick}
                             socket={socket}
                             myName={myName}
                             setMyName={setMyName}
@@ -102,6 +101,7 @@ function RoomPage() {
                         role ={role}
                         socket={socket}
                         currentSeason={currentSeason}
+                        status = {status}
                 />  
 
                 case "summer":
@@ -122,6 +122,7 @@ function RoomPage() {
                     role = {role}
                     scoutedRole = {scoutedRole}
                     grain = {grain}
+                    status = {status}
                 />
 
                 case "autumn":
@@ -130,6 +131,7 @@ function RoomPage() {
                     role = {role}
                     socket = {socket}
                     currentSeason={currentSeason}
+                    status = {status}
                 />
 
                 case "banishedResult":
@@ -143,9 +145,10 @@ function RoomPage() {
                 // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
+                    socket = {socket}
                     players = {players}
                     role = {role}
-                    socket = {socket}
+                    roleArray={roleArray}
                     currentSeason={currentSeason}
                 />
 
@@ -155,6 +158,7 @@ function RoomPage() {
                     socket = {socket}
                     role = {role}
                     pillaged = {pillaged}
+                    status = {status}
                 />    
 
                 // insufficentFood scenario -- to be replaced with actual state
@@ -218,6 +222,18 @@ function RoomPage() {
                 //    _players
             }
             setPlayers(_players);
+
+            let roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+            if (roleInt === 0) {
+                setRole("king");
+            }
+            else if (roleInt === 1) {
+                setRole("lord");
+            }
+            else {
+                setRole("khan");
+            }
+            setRoleArray(data['roles']);
 
             // renders page based on current state for joining players
             setCurrentSeason(data['state']);
@@ -483,6 +499,9 @@ function RoomPage() {
             // store the array 'role'
             setRoleArray(data['role']);
 
+            // populate the array 'Status'
+            setStatusArray(Array.from({ length: 3 }).map(() => 0));
+
             // find max number from the array and assign the respective role
             let role_int = Math.max(...data['role']);
             if (role_int === 0) setRole("king"); // king
@@ -529,14 +548,14 @@ function RoomPage() {
             // set current state to "spring"
             setCurrentSeason(data['state']);
 
-            // if current player is still active
-            if (status === 0) {
-                // set every player to unready state at start of spring
-                setPlayers(p => p.map(player => ({ ...player, ready: false })));
-            }
+            // ready everyone who is banished and unready everyone else
+            let updated_players = players.map((player, index) => {
 
-            // reset the previous data stored in 'banished'
-            setBanished(null);
+                // create a new player object with the updated 'ready' value
+                return { ...player, ready: (statusArray[index]) === 2 };
+            });
+
+            setPlayers(updated_players);
         }
         socket.current.on("change_state", handleChangeState);
 
@@ -570,13 +589,16 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            // setCurrentSeason(data['state']);
-            setCurrentSeason('winter');
-            // if current player is still active
-            if (status === 0) {
-                // set every player to unready state at start of summer
-                setPlayers(p => p.map(player => ({ ...player, ready: false })));
-            }
+            setCurrentSeason(data['state']);
+
+            // unready everyone who is active and ready everyone else
+            let updated_players = players.map((player, index) => {
+
+                // create a new player object with the updated 'ready' value
+                return { ...player, ready: (statusArray[index]) === 2 };
+            });
+
+            setPlayers(updated_players);
 
             // if key "double_harvest" is found in data
             if ("double_harvest" in data) {
@@ -709,19 +731,23 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
+            console.log(`State received from server: ${data['state']}`);
             // check if 'state' received from server is "autumn"
             if (data['state'] === "autumn") {
                 // set current state to "autumn"
                 setCurrentSeason(data['state']);
 
-                // if current player is still active
-                if (status === 0) {
-                    // set every player to unready state at start of autumn
-                    setPlayers(p => p.map(player => ({ ...player, ready: false })));
-                }
+                // ready everyone who is banished and unready everyone else
+                let updated_players = players.map((player, index) => {
+
+                    // create a new player object with the updated 'ready' value
+                    return { ...player, ready: (statusArray[index]) === 2 };
+                });
+
+                setPlayers(updated_players);
             }
             // check if 'state' received from server is "food_end"
-            else if (data["state"] === "food_end") {
+            if (data["state"] === "food_end") {
                 // set current state to "food_end"
                 setCurrentSeason(data['state']);
             }
@@ -805,6 +831,10 @@ function RoomPage() {
             if (data['state'] === "winter") {
                 // set current state to "winter"
                 setCurrentSeason(data['state']);
+
+                // reset the previous data stored in 'banished'
+                setBanished(null);
+
 
 
                 // to be implemented
@@ -928,13 +958,26 @@ function RoomPage() {
             return;
         }
 
+        console.log("Checkpoint");
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
+
+            console.log(`Debug: ${currentSeason} ${data['state']}`);
 
             // check if 'state' received from server is "waiting"
             if (data['state'] !== "waiting") {
                 return;
             }
+
+            // ready everyone
+            let readyPlayers = [];
+            for (let i = 0; i < players.length; ++i) {
+                let player = players[i];
+                player.ready = true;
+                readyPlayers.push(player);
+            }
+            setPlayers(readyPlayers);
+
 
             // set current state to "waiting"
             setCurrentSeason(data['state']);
@@ -945,7 +988,7 @@ function RoomPage() {
             socket.current.off("change_state", handleChangeState);
         }
 
-    }, [hasConnected, currentSeason]);
+    }, [hasConnected, currentSeason, grain]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -1011,12 +1054,10 @@ function RoomPage() {
         }
 
         console.log(`Role: ${roleArray}`);
-        console.log(scoutedRole);
-        console.log(status)
         return () => {
 
         }
-    }, [players, roleArray, scoutedRole, status]);
+    }, [roleArray]);
 
     // useEffect for debugging
     useEffect(() => {
@@ -1030,99 +1071,6 @@ function RoomPage() {
 
         }
     }, []);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    useEffect(() => {
-        if (!hasConnected) {
-            return;
-        }
-
-        //fakerayray
-
-        const handleRoleAssignmentChange = (data) => {
-            console.log("Role Assignment change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-        };
-        socket.current.on("role_assignment_changed", handleRoleAssignmentChange);
-
-        const handleSpringChange = (data) => {
-            console.log("Spring change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-        };
-        socket.current.on("spring_changed", handleSpringChange);
-
-        const handleDoubleHarvestChange = (data) => {
-            console.log("Double Harvest change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-        };
-        socket.current.on("double_harvest_changed", handleDoubleHarvestChange);
-
-        const handleSummerChange = (data) => {
-            console.log("Summer change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-            
-        };
-        socket.current.on("summer_changed", handleSummerChange);
-
-        const handleAutumnChange = (data) => {
-            console.log("Autumn change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-            
-        };
-        socket.current.on("autumn_changed", handleAutumnChange);
-
-        const handleWinterChange = (data) => {
-            console.log("Winter change received:", data);  // Debugging
-            setCurrentSeason(data.state);
-            
-        };
-        socket.current.on("winter_changed", handleWinterChange);
-
-        // A reference to the cleanup function
-        const cleanup = () => {
-            socket.current.emit("leave", {
-                session: getSession()
-            });
-
-            // socket.current.off("confirm_name_name_exists", handleConfirmNameNameExists);
-            //fakerayray
-            socket.current.off("role_assignment_changed", handleRoleAssignmentChange);
-            socket.current.off("spring_changed", handleSpringChange);
-            socket.current.off("double_harvest_changed", handleDoubleHarvestChange);
-            socket.current.off("summer_changed", handleSummerChange);
-            socket.current.off("autumn_changed", handleAutumnChange);
-            socket.current.off("winter_changed", handleWinterChange);
-            socket.current.disconnect();
-            //console.log("disconnected");
-        }
-
-        // Clean up if the browser refreshes
-        window.addEventListener("beforeunload", cleanup);
-
-        // Clean up when component dismounts gracefully
-        return () => {
-            window.removeEventListener("beforeunload", cleanup);
-            cleanup();
-        };
-    }, [hasConnected]);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    const handleRoleAssignmentChangeClick = () => {
-        socket.current.emit('role_assignment_transition', {
-            session: getSession()
-        });
-        console.log(currentSeason);
-
-    };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

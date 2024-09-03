@@ -10,6 +10,7 @@
     position: relative; 
     height: 100%; 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 1; 
@@ -18,9 +19,10 @@
 .winter-button-bar {
     display: flex;
     gap: 20px; 
+    margin-bottom: 1rem; /* Add margin to separate from list */
 }
 
-.winter-button-bar button {
+.winter-button-bar button, .pillage-button {
     padding: 10px 20px;
     font-size: 16px;
     background-color: #fff; 
@@ -30,7 +32,7 @@
     z-index: 2; 
 }
 
-.winter-button-bar button:hover {
+.winter-button-bar button:hover, .pillage-button:hover {
     background-color: #e0e0e0;
 }
 
@@ -55,14 +57,25 @@
     flex-direction: column;
 }
 
+.winter-player-list {
+    position: absolute;
+    top: 1rem;
+    left: 5rem;
+}
+
 .pillage-button {
-    position: relative;
-    display: flex;
-    gap: 1.5rem;
+    width: 100%; /* Align with Ready button */
+    display: inline-block;
+}
+
+.pillage-button.selected {
+    background-color: lightgreen;
+    font-weight: bold;
 }
 
 .pillage-list {
-    display: none; 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin-top: 1rem;
     padding: 1rem;
     border: 1px solid #ddd;
@@ -72,34 +85,25 @@
     max-height: 150px;
     position: absolute;
     overflow-y: auto;
-    top: 0;
-    left: 0; 
+    top: 50px;
+    right: 0; 
     z-index: 4;
     border-radius: 10px;
 }
 
-.pillage-list.active {
-    display: block; 
-}
-
 .pillage-container {
-    position: relative; 
-    display: flex;
+    width: 1rem;
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 0.1rem;
+    gap: 0.1rem;
     justify-content: center;
 }
 
-.pillage-list ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-}
-
-.pillage-list li {
-    padding: 0.5rem;
-    cursor: pointer;
-}
-
-.pillage-list li:hover {
-    background-color: #f0f0f0;
-}
+.tick {
+    display: inline-block;
+    margin-left: 5px; /* Space between ticks */
+    font-size: 16px; /* Adjust size as needed */
+  }
+  

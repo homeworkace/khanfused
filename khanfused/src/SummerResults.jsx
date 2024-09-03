@@ -4,7 +4,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function SummerResults ({grain, scoutedRole, socket, players, role}) {
+function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
     const [totalGrain, setTotalGrain] = useState(0);
 
@@ -13,7 +13,7 @@ function SummerResults ({grain, scoutedRole, socket, players, role}) {
     }, [grain]);
   
     const handleTimeUp = () => {
-        // handleDoubleHarvestChangeClick();
+
     };
 
     // lords who choose to 1. scout (display result), 2. farm, else king and khan
@@ -50,7 +50,7 @@ function SummerResults ({grain, scoutedRole, socket, players, role}) {
 
     // non-role specific content
     return (
-        <div className="summerResults">
+        <div className={`summerResults ${status === 1 ? 'greyed-out' : ""}`}>
             <div className="summerResults-container">
             {renderRoleSpecificContent()}
             

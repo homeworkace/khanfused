@@ -92,8 +92,8 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
     if (role === "lord") {
       return (
         <div className="summer-lord-buttons">
-          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick}>Farm</button>
-          <button className="scout-button" onClick={toggleScoutList}>Scout</button>
+          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick} disabled = {status === 1}>Farm</button>
+          <button className="scout-button" onClick={toggleScoutList} disabled = {status === 1}>Scout</button>
           {isScoutListOpen && (
             <div className="scout-list active">
               <ul>
@@ -121,7 +121,7 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
 
 
   return (
-    <div className="summer">
+    <div className={`summer ${status === 1 ? 'greyed-out': ""}`}>
       <div className="summer-container">
         {isChatOpen && (
           <div className="chat-box">
@@ -136,7 +136,7 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
         {renderRoleSpecificContent()}
 
         <div className="summer-button-bar">
-          <button onClick={summerReadyClick}>
+          <button onClick={summerReadyClick} disabled = {status === 1}>
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>

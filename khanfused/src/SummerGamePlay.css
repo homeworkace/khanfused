@@ -6,6 +6,11 @@
     background-color: #d79f44b9;
 }
 
+.summer.greyed-out {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
 .summer button {
     font-size: 16px;
     background-color: #fff; 
@@ -39,7 +44,10 @@
     background-color: #0aa739;
     color: black;
 }
-
+.summer-lord-buttons button:disabled,
+.summer-button-bar button:disabled {
+    cursor: not-allowed;
+}
 .chat-button {
     position: absolute;
     top: 20px;

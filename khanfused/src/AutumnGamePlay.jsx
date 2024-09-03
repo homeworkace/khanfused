@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function AutumnGamePlay({ socket, role, players, currentSeason }) {
+function AutumnGamePlay({status, socket, role, players, currentSeason }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
@@ -54,7 +54,7 @@ function AutumnGamePlay({ socket, role, players, currentSeason }) {
   };
 
   const renderRoleSpecificContent = () => {
-    if (role === "king" || role === "lord") {
+    if (role === "king" ) {
       return (
         <div>
           <button className="banish-button" onClick={toggleBanishList}>Banish</button>
@@ -79,7 +79,7 @@ function AutumnGamePlay({ socket, role, players, currentSeason }) {
   };
 
   return (
-    <div className="autumn">
+    <div className={`autumn ${status === 1 ? 'greyed-out': ""}`}>
       <div className="autumn-container">
         {isChatOpen && (
           <div className="chat-box">
@@ -98,7 +98,7 @@ function AutumnGamePlay({ socket, role, players, currentSeason }) {
 
           <HelpButton />
         
-          <button onClick={autumnReadyClick}>
+          <button onClick={autumnReadyClick} disabled = {status === 1}>
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>

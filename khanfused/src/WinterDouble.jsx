@@ -1,20 +1,40 @@
 import './WinterDouble.css';
 
-function WinterDouble () {
+function PillageResult ({players, socket, role, pillaged, status}) {
+
+    const renderRoleSpecificContent = () => {
+        if(pillaged != -1){
+            const pillagedPlayer = players.find(p => p.session === pillaged);
+            if (!pillagedPlayer)
+            {
+                return (
+                    <div>
+                        <p>THE KHANS HAS CHOSEN NOT TO PILLAGE</p>
+                    </div>
+                )
+            }
+            if (status === 1) {
+                return (
+                    <div>
+                        <p> YOU HAVE BEEN PILLAGED </p>
+                    </div>
+                )
+            } else {
+                return (
+                    <div>
+                        <p>THE KHANS HAS CHOSEN TO PILLAGE {pillagedPlayer.name}</p>
+                    </div>
+                )
+            }
+        } 
+    }
     return (
-        <div className="winterDouble">
+        <div className={`pillage ${status === 1 ? "greyed-out" : ""}`}>
             <div className="winterDouble-container">
-                <div className="winterDouble-button-bar">
-                    <button>
-                        Double Harvest
-                    </button>
-                    <button> 
-                        Proceed
-                    </button>
-                </div>
+                {renderRoleSpecificContent()}
             </div>
         </div>
     );
 }       
 
-export default WinterDouble;
+export default PillageResult;
