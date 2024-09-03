@@ -331,7 +331,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 7200, id = 'pillage_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
 
     def pillage_result_start(self) :
         self.state = 'pillage_result'
@@ -407,6 +407,9 @@ class lobby :
         self.status = []
         self.choices = []
         self.grain = 0
+
+        # Emit change in state.
+        self.socket.emit('change_state', { 'state' : 'waiting' }, room = self.lobby_code, namespace = '/')
         
         self.next_job.remove()
         
@@ -426,7 +429,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
                 
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -456,7 +459,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
                 
             # If all players are ready, skip the timer.
             if not False in self.ready :
@@ -488,7 +491,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
             
         elif self.state == 'summer' :
             # Unready the player in question.
@@ -502,7 +505,7 @@ class lobby :
                 
             # Emit to everyone except the sender.
             for player in [i for i in range(len(self.players)) if i != player_index] :
-                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, str(self.players[player][0]), namespace = '/')
+                self.socket.emit('ready', { 'session' : self.players[player_index][0] }, room = str(self.players[player][0]), namespace = '/')
             
         elif self.state == 'winter' :
             # Unready the player in question.

@@ -21,6 +21,9 @@ function JoinRoomPage() {
 
     const joinRoomClick = async () => {
         let result = await joinLobby(roomCode.current.value, password.current.value);
+        if ("reset_name" in result) {
+            document.cookie = "name=; Max-Age=1800; path=/";
+        }
         if ("redirect" in result) {
             navigate(result["redirect"], { replace: true });
         }

@@ -50,7 +50,6 @@ function RoomPage() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Because of the update delay bugs, this button will not work at first. Quickly edit and submit your name to refresh the display.
     const startGameClick = () => {
         socket.current.emit("start_game", {
             session: getSession()
@@ -960,11 +959,6 @@ function RoomPage() {
         }
 
         console.log("Checkpoint");
-        /**
-         *      ISSUE: For some reason handleChangeState isnt called,
-         *      could be due to listener not receiving anything,
-         *      console only logs "Checkpoint" and then empty afterwards
-         */
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
@@ -974,6 +968,16 @@ function RoomPage() {
             if (data['state'] !== "waiting") {
                 return;
             }
+
+            // ready everyone
+            let readyPlayers = [];
+            for (let i = 0; i < players.length; ++i) {
+                let player = players[i];
+                player.ready = true;
+                readyPlayers.push(player);
+            }
+            setPlayers(readyPlayers);
+
 
             // set current state to "waiting"
             setCurrentSeason(data['state']);
