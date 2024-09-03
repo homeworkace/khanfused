@@ -12,7 +12,13 @@ function Role({ players, king }) {
     const displayKing = () => {
         const kingName = players.find(p => p.session === king);
 
-        return kingName.name;
+        if (kingName) {
+
+            return kingName.name;
+        }
+
+        console.log(`King not found ${king}`);
+        return;
     };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

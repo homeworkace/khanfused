@@ -10,7 +10,10 @@ function AutumnResults ({banished, status, socket, role, players}) {
             // if someone has been banished
             if (banished !== -1){
                 const banishedPlayer = players.find(p => p.session === banished);
-                console.log(banishedPlayer.name);
+                if (!banishedPlayer) {
+                    return;
+                }
+                
                 if (status === 2) {
                     // show the person he has been banished
                     return (
