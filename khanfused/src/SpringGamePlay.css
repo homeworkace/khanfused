@@ -6,6 +6,12 @@
     background-color: #799eefb9;
 }
 
+.spring.greyed-out {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    /* pointer-events: none; */
+}
+
 .spring-container {
     position: relative; 
     height: 100%; 
@@ -19,6 +25,10 @@
     display: flex;
     gap: 20px; 
     align-items: center; 
+}
+.spring-button-bar button:disabled,
+.double-harvest-button:disabled {
+    cursor: not-allowed;
 }
 
 .spring-button-bar button {

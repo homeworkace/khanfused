@@ -39,7 +39,7 @@ function AutumnResults ({banished, status, socket, role, players}) {
     }
 
     return (
-        <div className="autumnDouble">
+        <div className={`autumnDouble ${status === 1 ? 'greyed-out': ""}`}>
             <div className="autumnDouble-container">
 
                 {renderRoleSpecificContent()}

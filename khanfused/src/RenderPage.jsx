@@ -102,6 +102,7 @@ function RoomPage() {
                         role ={role}
                         socket={socket}
                         currentSeason={currentSeason}
+                        status = {status}
                 />  
 
                 case "summer":
@@ -122,6 +123,7 @@ function RoomPage() {
                     role = {role}
                     scoutedRole = {scoutedRole}
                     grain = {grain}
+                    status = {status}
                 />
 
                 case "autumn":
@@ -130,6 +132,7 @@ function RoomPage() {
                     role = {role}
                     socket = {socket}
                     currentSeason={currentSeason}
+                    status = {status}
                 />
 
                 case "banishedResult":
@@ -155,6 +158,7 @@ function RoomPage() {
                     socket = {socket}
                     role = {role}
                     pillaged = {pillaged}
+                    status = {status}
                 />    
 
                 // insufficentFood scenario -- to be replaced with actual state
@@ -570,8 +574,8 @@ function RoomPage() {
             }
 
             // set current state to "summer"
-            // setCurrentSeason(data['state']);
-            setCurrentSeason('winter');
+            setCurrentSeason(data['state']);
+
             // if current player is still active
             if (status === 0) {
                 // set every player to unready state at start of summer

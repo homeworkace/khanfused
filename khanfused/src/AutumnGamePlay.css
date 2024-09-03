@@ -6,6 +6,11 @@
     background-color: #da7517b9;
 }
 
+.autumn.greyed-out {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
 .autumn-container {
     position: relative; 
     height: 100%; 
@@ -18,6 +23,10 @@
 .autumn-button-bar {
     display: flex;
     gap: 20px; 
+}
+
+.autumn-button-bar button:disabled {
+    cursor: not-allowed;
 }
 
 .autumn-button-bar button {
