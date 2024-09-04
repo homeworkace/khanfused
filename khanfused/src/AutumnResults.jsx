@@ -1,9 +1,9 @@
 import './AutumnDouble.css';
 import HelpButton from './Instructions';
 import Timer from './Timer';
-import PlayerList from "./PlayerList";
+import GrainList from "./PlayerList"
 
-function AutumnResults ({banished, status, socket, role, players}) {
+function AutumnResults ({grain, banished, status, socket, role, players}) {
 
     const renderRoleSpecificContent = () => {
         console.log(banished)
@@ -53,13 +53,9 @@ function AutumnResults ({banished, status, socket, role, players}) {
                     {renderRoleSpecificContent()}
                 </div>
 
-
-                <HelpButton />
+                <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+                <HelpButton role={role} />
                 <Timer duration={10} onTimeUp={handleTimeUp} />
-
-                <div className ="autumnResults-player-list">
-                    <PlayerList players={players} />
-                </div>
 
             </div>
         </div>

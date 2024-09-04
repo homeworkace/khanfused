@@ -3,10 +3,9 @@ import './AutumnGamePlay.css';
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
-import PlayerList from "./PlayerList";
+import GrainList from "./PlayerList";
 
-function AutumnGamePlay({status, socket, role, players, currentSeason }) {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) {
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
@@ -37,9 +36,6 @@ function AutumnGamePlay({status, socket, role, players, currentSeason }) {
     }
   }, [isReady, role, socket, currentSeason]);
 
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
 
   const toggleBanishList = () => {
     setBanishListOpen(!isBanishListOpen);
@@ -79,35 +75,32 @@ function AutumnGamePlay({status, socket, role, players, currentSeason }) {
           )}
         </div>
       );
+    } else if (status === 2) {
+      return (
+      <div className = "banished">
+        <p className="banished-text">YOU HAVE BEEN BANISHED</p>
+      </div>
+      )
     }
   };
 
   return (
-    <div className={`autumn ${status === 1 ? 'greyed-out': ""}`}>
+    <div className={"autumn"}>
       <div className="autumn-container">
-        {isChatOpen && (
-          <div className="chat-box">
-            <p>Chat content goes here...</p>
-          </div>
-        )}
 
         <div className="autumn-button-bar">
-          <button onClick={toggleChat} className="chat-button">Chat</button>
-
-          <div className="autumn-player-list">
-            <PlayerList players={players} />
-          </div>
-
+          <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
           {renderRoleSpecificContent()} 
 
-          <HelpButton />
-        
-          <button onClick={autumnReadyClick} disabled = {status === 1}>
+          <HelpButton role={role}/>
+          {status !== 2 && (
+            <button onClick={autumnReadyClick}>
             {isReady ? "Unready" : "Ready"}
-          </button>
+            </button>
+          )}
         </div>
 
-        <Timer duration={10} onTimeUp={handleTimeUp} />
+        <Timer duration={60} onTimeUp={handleTimeUp} />
       </div>
     </div>
   );

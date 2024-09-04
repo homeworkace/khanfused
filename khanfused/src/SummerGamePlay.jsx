@@ -3,10 +3,9 @@ import './SummerGamePlay.css';
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
-import PlayerList from "./PlayerList";
+import GrainList from "./PlayerList";
 
-function SummerGamePlay({  status, socket, choices, setChoices, players, role, currentSeason }) {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, currentSeason }) {
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isFarm, setIsFarm] = useState(false);
@@ -57,10 +56,6 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
       }
     }
   }, [isReady, choices, role, socket, currentSeason]);
-
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
   
   const handleTimeUp = () => {
     // handleDoubleHarvestChangeClick();
@@ -96,8 +91,8 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
     if (role === "lord" && status === 0) {
       return (
         <div className="summer-lord-buttons">
-          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick} disabled = {status === 1}>Farm</button>
-          <button className="scout-button" onClick={toggleScoutList} disabled = {status === 1}>Scout</button>
+          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick} >Farm</button>
+          <button className="scout-button" onClick={toggleScoutList} >Scout</button>
           {isScoutListOpen && (
             <div className="scout-list active">
               <ul>
@@ -121,38 +116,36 @@ function SummerGamePlay({  status, socket, choices, setChoices, players, role, c
           <p> You have been chosen for double harvest</p>
         )
       }
+      else if (status === 2) {
+        return (
+        <div className = "banished">
+          <p className="banished-text">YOU HAVE BEEN BANISHED</p>
+        </div>
+        )
+      }
   };
 
 
   return (
-    <div className={`summer ${status === 1 ? 'greyed-out': ""}`}>
+    <div className={"summer"}>
       <div className="summer-container">
-        {isChatOpen && (
-          <div className="chat-box">
-            <p>Chat content goes here...</p>
-          </div>
-        )}
 
-        <button onClick={toggleChat} className="chat-button">
-          Chat
-        </button>
 
         {renderRoleSpecificContent()}
-
+        
+        {status !== 2 && status !== 1 && (
         <div className="summer-button-bar">
-          <button onClick={summerReadyClick} disabled = {status === 1}>
+          <button onClick={summerReadyClick}>
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>
+        )}
 
+        <HelpButton role={role}/>
 
-        <HelpButton />
+        <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
 
-        <div className="summer-player-list">
-          <PlayerList players={players} />
-        </div>
-
-        <Timer duration={10} onTimeUp={handleTimeUp} />
+        <Timer duration={30} onTimeUp={handleTimeUp} />
       </div>
     </div>
   );

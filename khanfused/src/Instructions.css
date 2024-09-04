@@ -2,7 +2,7 @@
     position: absolute;
     display: inline-block;
     top: 1.4rem;
-    right: 7rem;
+    right:2rem;
     z-index: 100;
   }
   
@@ -14,7 +14,7 @@
     max-height: 13rem;
     background-color: rgba(0, 0, 0, 0.6); 
     border-radius: 8px;
-    padding: 10px;
+    padding: 1.2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: white;
     z-index: 100;
@@ -30,5 +30,37 @@
   
   .help-icon:hover {
     transform: scale(1.1); 
+  }
+
+  .spring-lord-header,
+  .spring-king-header,
+  .spring-khan-header {
+    font-size: 1rem;
+    font-weight: bold;
+    color: greenyellow
+  }
+
+  .summer-lord-header,
+  .summer-king-header,
+  .summer-khan-header{
+    font-size: 1rem;
+    font-weight: bold;
+    color: orange;
+  }
+
+  .autumn-lord-header,
+  .autumn-king-header,
+  .autumn-khan-header{
+    font-size:1rem;
+    font-weight:bold;
+    color:coral
+  }
+
+  .winter-lord-header,
+  .winter-king-header,
+  .winter-khan-header{
+    font-size:1rem;
+    font-weight:bold;
+    color:lightblue
   }
   

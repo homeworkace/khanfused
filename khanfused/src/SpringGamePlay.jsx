@@ -3,10 +3,9 @@ import './SpringGamePlay.css';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import { getSession } from './utility.js';
-import PlayerList from "./PlayerList";
+import GrainList from "./PlayerList";
 
-function SpringGamePlay({ status, socket, role, players, currentSeason}) {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) {
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
@@ -40,9 +39,6 @@ function SpringGamePlay({ status, socket, role, players, currentSeason}) {
     }
   }, [isReady, role, socket, currentSeason]); 
 
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
 
   const handleTimeUp = () => {
     // handleDoubleHarvestChangeClick();
@@ -93,37 +89,37 @@ function SpringGamePlay({ status, socket, role, players, currentSeason}) {
           )}
         </div>
       );
+    } else if (status === 2) {
+      return (
+      <div className = "banished">
+        <p className="banished-text">YOU HAVE BEEN BANISHED</p>
+      </div>
+      )
     }
   };
 
   return (
-    <div className={`spring ${status === 1 ? 'greyed-out' : ""}`}>
+    <div className={"spring"}>
       <div className="spring-container">
-        {isChatOpen && (
-          <div className="chat-box">
-            <p>Chat content goes here...</p>
-          </div>
-        )}
 
         <div className="spring-button-bar">
-          <button onClick={toggleChat} className="chat-button" disabled={status === 1}>
-            Chat
-          </button>
 
-          <div className="spring-player-list">
-            <PlayerList players={players} />
-          </div>
+          <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
 
           {renderRoleSpecificContent()} 
 
-          <HelpButton />
-        
-          <button onClick={springReadyClick} disabled = {status === 1}>
+          <HelpButton role={role}/>
+
+          {status !== 2 && (
+            <button onClick={springReadyClick}>
             {isReady ? "Unready" : "Ready"}
-          </button>
+            </button>
+          )}
+
         </div>
-        <Timer duration={10} onTimeUp={handleTimeUp} />
+        <Timer duration={60} onTimeUp={handleTimeUp} />
       </div>
+
     </div>
   );
 }

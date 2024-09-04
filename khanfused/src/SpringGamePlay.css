@@ -6,11 +6,6 @@
     background-color: #799eefb9;
 }
 
-.spring.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-    /* pointer-events: none; */
-}
 
 .spring-container {
     position: relative; 
@@ -25,10 +20,6 @@
     display: flex;
     gap: 20px; 
     align-items: center; 
-}
-.spring-button-bar button:disabled,
-.double-harvest-button:disabled {
-    cursor: not-allowed;
 }
 
 .spring-button-bar button {
@@ -46,11 +37,7 @@
     background-color: #e0e0e0;
 }
 
-.spring-player-list {
-    position: absolute;
-    top: 1rem;
-    left: 5.5rem;
-}
+
 
 .chat-button {
     position: absolute;
@@ -129,3 +116,9 @@
     background-color: #d0e0ff;
     font-weight: bold;
 }
+.banished-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold; 
+    color:red;
+} 

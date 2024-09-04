@@ -3,7 +3,7 @@
     height: 100vh;
     background: url('./Assets/AUTUMN CUTSCENE.svg') no-repeat center center;
     background-size: contain;
-    background-color: #799eefb9;
+    background-color: #da7517b9;
 }
 
 .autumnDouble.greyed-out {
@@ -45,14 +45,9 @@
     background-color: #e0e0e0;
 }
 
-.autumnResults-player-list {
-    position: absolute;
-    top: 1rem;
-    left: 5.5rem;
-}
 
 .banished-player-name {
-    animation: fadeIn 1.5s ease-in forwards;
+    animation: fadeIn 1.25s ease-in forwards;
     color: red;
 }
 

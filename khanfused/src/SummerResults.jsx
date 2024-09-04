@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './SummerResults.css';
 import HelpButton from './Instructions';
-import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
 function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
@@ -57,12 +56,6 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
             {renderRoleSpecificContent()}
             
             <HelpButton />
-
-            <Timer duration={10} onTimeUp={handleTimeUp} />
-
-            <div className = "summerResults-player-list">
-                <PlayerList players={players} />
-            </div>
 
             <div className ="grain-info"> THE LORDS HAVE HARVESTED {grain.added_grain} GRAINS.
                 <br/>
