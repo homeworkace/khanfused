@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './WinterGamePlay.css';
+import kingIcon from "./Assets/king.svg";
+import lordIcon from "./Assets/lord.svg";
+import khanIcon from "./Assets/khan.svg";
+import unknownIcon from "./Assets/unknown.svg";
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function WinterGamePlay({ role, roleArray, statusArray, players, currentSeason, socket }) {
+function WinterGamePlay({ role, roleArray, status, statusArray, players, currentSeason, socket }) {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isPillageListOpen, setIsPillageListOpen] = useState(true);
     const [votedPlayerSession, setVotedPlayerSession] = useState(null);
@@ -29,16 +33,12 @@ function WinterGamePlay({ role, roleArray, statusArray, players, currentSeason, 
         // Handle time-up logic here
     };
 
-    const handlePlayerSelect = (playerName) => {
-        console.log("bruh"); 
-        const selectedPlayer = players.find(p => p.name === playerName);
-        if (selectedPlayer) {
-        setVotedPlayerSession(selectedPlayer.session);
-        }
+    const handlePlayerSelect = (playerSession) => {
+        setVotedPlayerSession(playerSession);
         socket.current.emit('select', {
             state: currentSeason,
             session: getSession(),
-            pillage: selectedPlayer.session,
+            pillage: playerSession,
         });
     };
 
@@ -58,26 +58,39 @@ function WinterGamePlay({ role, roleArray, statusArray, players, currentSeason, 
         setIsReady(!isReady);
     };
 
+    const roleIcon = (index) => {
+        switch (roleArray[index]) {
+            case -1:
+                return unknownIcon;
+            case 0:
+                return kingIcon;
+            case 1:
+                return lordIcon;
+            case 2:
+                return khanIcon;
+        }
+    };
+
     const renderRoleSpecificContent = () => {
         switch (role) {
             case "khan":
-                console.log(statusArray);
                 return (
                     <div className="pillage-container">
                         {players.map((player, index) => (
                             <button
                                 key={player.session}
-                                onClick={() => handlePlayerSelect(player.name)}
-                                className={"pillage-button " +
-                                    (votedPlayerSession === player.session ? "selected" : "") +
+                                onClick={() => handlePlayerSelect(player.session)}
+                                className={"pillage-button" +
+                                    (votedPlayerSession === player.session ? " selected" : "") +
                                     (roleArray[index] == 0 ? " king" : "") +
                                     (roleArray[index] == 2 ? " khan" : "") +
                                     (statusArray[index] == 1 ? " pillaged" : "") +
                                     (statusArray[index] == 2 ? " banished" : "")
                                 }
                                 style={{ "--khanColour": (player.session % 256) }}
-                                disabled={roleArray[index] !== 1 || statusArray[index] !== 0}
+                                disabled={status !== 0 || roleArray[index] !== 1 || statusArray[index] !== 0}
                             >
+                                <img src={roleIcon(index)} />
                                 {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
                                 {false && (
                                     <span className="ticks">
@@ -88,12 +101,34 @@ function WinterGamePlay({ role, roleArray, statusArray, players, currentSeason, 
                                 )}
                             </button>
                         ))}
+                        <button
+                            key={-1}
+                            onClick={() => handlePlayerSelect(-1)}
+                            className={"pillage-button"}
+                            disabled={status !== 0}
+                        >
+                            Do not pillage
+                        </button>
                     </div>
                 );
-            default :
-                {
-
-                }
+            default:
+                return (
+                    <div className="player-container">
+                        {players.map((player, index) => (
+                            <button
+                                key={player.session}
+                                className={"player-button" +
+                                    (statusArray[index] == 1 ? " pillaged" : "") +
+                                    (statusArray[index] == 2 ? " banished" : "")
+                                }
+                                disabled={true }
+                            >
+                                <img src={roleIcon(index)} />
+                                {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                            </button>
+                        ))}
+                    </div>
+                );
         }
     };
 

@@ -16,23 +16,27 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
   useEffect(() => {
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      if (isReady) {
-        socket.current.emit('ready', {
-          state: currentSeason,
-          session: getSession(),
-          banish: role === 'king' ? selectedPlayerSessionRef.current : null
-        });
-        console.log(`Banish: ${selectedPlayerSessionRef.current}`);
-      } else {
-        socket.current.emit('unready', {
-          state: currentSeason,
-          session: getSession()
-        });
-      }
+
+    let autumnReadyClick = () => { console.log("yes")};
+    useEffect(() => {
+        console.log("bruh");
+        autumnReadyClick = () => {
+            if (!isReady) {
+                socket.current.emit('ready', {
+                    state: currentSeason,
+                    session: getSession(),
+                    banish: role === 'king' ? selectedPlayerSessionRef.current : null
+                });
+                console.log(`Banish: ${selectedPlayerSessionRef.current}`);
+                setIsReady(true);
+            }
+            else {
+                socket.current.emit('unready', {
+                    state: currentSeason,
+                    session: getSession()
+                });
+                setIsReady(false);
+            };
     }
   }, [isReady, role, socket, currentSeason]);
 
@@ -47,10 +51,6 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
 
   const handlePlayerSelect = (player) => {
     setSelectedPlayerSession(player.session);
-  };
-
-  const autumnReadyClick = () => {
-    setIsReady(!isReady);
   };
 
   const renderRoleSpecificContent = () => {

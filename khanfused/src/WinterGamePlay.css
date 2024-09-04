@@ -22,15 +22,15 @@
     margin-bottom: 1rem; /* Add margin to separate from list */
 }
 
-.winter-button-bar button, .pillage-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #fff; 
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 2; 
-}
+    .winter-button-bar button, .player-button, .pillage-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        z-index: 2;
+    }
 
 .winter-button-bar button:hover, .pillage-button:hover {
     background-color: #e0e0e0;
@@ -63,6 +63,22 @@
     left: 5rem;
 }
 
+.player-button {
+    width: 100%; /* Align with Ready button */
+    height: 2lh;
+    color: black;
+    background-color: grey;
+    display: inline-flex;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0.05rem;
+    white-space: pre;
+}
+
+.player-button img {
+    height: 100%;
+}
+
 .pillage-button {
     width: 100%; /* Align with Ready button */
     height: 2lh;
@@ -71,8 +87,12 @@
     align-items: flex-start;
     text-align: left;
     padding: 0.05rem;
-    padding-left: 2rem;
+    white-space: pre;
 }
+
+    .pillage-button img {
+        height: 100%;
+    }
 
 .pillage-button.selected {
     background-color: green;
@@ -100,6 +120,15 @@
         background-color: grey;
         text-decoration: line-through 2px;
     }
+
+.player-container {
+    width: 30vh;
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1vh;
+    justify-content: center;
+}
 
 .pillage-container {
     width: 30vh;

@@ -152,6 +152,7 @@ function RoomPage() {
                         players={players}
                         role={role}
                         roleArray={roleArray}
+                        status={status }
                         statusArray={statusArray }
                         currentSeason={currentSeason}
                     />
