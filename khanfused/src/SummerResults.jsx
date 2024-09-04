@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './SummerResults.css';
 import HelpButton from './Instructions';
-import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
 function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
@@ -26,13 +25,15 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
             if(scoutedRole.role === "khan") {
                 return (
                 <div>
-                    <p> {scoutedPlayer.name} is a KHAN </p>
+                    <p> {scoutedPlayer.name} is a</p>
+                    <p className ="khanRole-text"> KHAN </p>
                 </div>
                 )
             }  else if (scoutedRole.role === "lord") {
                 return (
                 <div>
-                    <p> {scoutedPlayer.name} is a LORD </p>
+                    <p> {scoutedPlayer.name} is a </p>
+                    <p className ="lordRole-text"> LORD </p>
                 </div>
                 )
             }
@@ -55,12 +56,6 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
             {renderRoleSpecificContent()}
             
             <HelpButton />
-
-            <Timer duration={10} onTimeUp={handleTimeUp} />
-
-            <div className = "summerResults-player-list">
-                <PlayerList players={players} />
-            </div>
 
             <div className ="grain-info"> THE LORDS HAVE HARVESTED {grain.added_grain} GRAINS.
                 <br/>

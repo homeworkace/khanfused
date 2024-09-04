@@ -6,10 +6,6 @@
     background-color: #d79f44b9;
 }
 
-.summer.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
 
 .summer button {
     font-size: 16px;
@@ -44,10 +40,7 @@
     background-color: #0aa739;
     color: black;
 }
-.summer-lord-buttons button:disabled,
-.summer-button-bar button:disabled {
-    cursor: not-allowed;
-}
+
 .chat-button {
     position: absolute;
     top: 20px;
@@ -72,7 +65,7 @@
 .summer-player-list {
     position: absolute;
     top: 1rem;
-    left: 5rem;
+    left: 5.5rem;
 }
 
 .summer-button-bar {
@@ -126,3 +119,10 @@
     background-color: #d0e0ff;
     font-weight: bold;
 }
+
+.banished-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold; 
+    color:red;
+} 

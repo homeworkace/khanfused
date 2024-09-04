@@ -102,6 +102,7 @@ function RoomPage() {
                         socket={socket}
                         currentSeason={currentSeason}
                         status = {status}
+                        grain = {grain}
                 />  
 
                 case "summer":
@@ -113,6 +114,7 @@ function RoomPage() {
                         setChoices={setChoices}
                         status = {status}
                         currentSeason={currentSeason}
+                        grain ={grain}
                 />
 
                 case "summerResults":
@@ -132,6 +134,7 @@ function RoomPage() {
                     socket = {socket}
                     currentSeason={currentSeason}
                     status = {status}
+                    grain ={grain}
                 />
 
                 case "banishedResult":
@@ -141,8 +144,8 @@ function RoomPage() {
                     role = {role}
                     banished = {banished}
                     status = {status}
-                    />
-
+                    grain = {grain}
+                />
                 case "winter":
                     return <WinterGamePlay
                         socket={socket}
