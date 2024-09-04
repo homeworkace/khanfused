@@ -9,7 +9,6 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
   const [isBanishListOpen, setBanishListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
-  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
@@ -17,10 +16,7 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
 
-    let autumnReadyClick = () => { console.log("yes")};
-    useEffect(() => {
-        console.log("bruh");
-        autumnReadyClick = () => {
+    const autumnReadyClick = async () => {
             if (!isReady) {
                 socket.current.emit('ready', {
                     state: currentSeason,
@@ -38,7 +34,6 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
                 setIsReady(false);
             };
     }
-  }, [isReady, role, socket, currentSeason]);
 
 
   const toggleBanishList = () => {

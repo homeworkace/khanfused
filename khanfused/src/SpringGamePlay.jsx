@@ -9,7 +9,6 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
-  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
@@ -17,28 +16,32 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      if (isReady) {
-        socket.current.emit('ready', {
-          state: currentSeason,
-          session: getSession(),
-          double_harvest: role === 'king' ? selectedPlayerSessionRef.current : null
-        });
-        console.log(`Player ${getSession()} is ready`);
-        console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
-      } else {
-        socket.current.emit('unready', {
-          state: currentSeason,
-          session: getSession()
-        });
-        console.log(`Player ${getSession()} is unready`);
-      }
+    const springReadyClick = async () => {
+        if (!isReady) {
+            // Check if double harvest is selected first
+            if (role === "king" && status === 0) {
+                if (selectedPlayerSessionRef.current === null) {
+                    console.log("King select a player for Double Harvest");
+                    return;
+                }
+            }
+            socket.current.emit('ready', {
+                state: currentSeason,
+                session: getSession(),
+                double_harvest: role === 'king' ? selectedPlayerSessionRef.current : null
+            });
+            console.log(`Player ${getSession()} is ready`);
+            console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
+            setIsReady(true);
+        }
+        else {
+            socket.current.emit('unready', {
+                state: currentSeason,
+                session: getSession()
+            });
+            setIsReady(false);
+        };
     }
-  }, [isReady, role, socket, currentSeason]); 
-
 
   const handleTimeUp = () => {
     // handleDoubleHarvestChangeClick();
@@ -54,18 +57,6 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
       setSelectedPlayerSession(selectedPlayer.session);
     }
   };
-
-  const springReadyClick = () => {
-    // Check if double harvest is selected first
-    if (role === "king" && status === 0) {
-      if (selectedPlayerSessionRef.current === null) {
-        console.log("King select a player for Double Harvest");
-        return;
-      }
-    }
-    setIsReady(!isReady);
-
-};
 
   const renderRoleSpecificContent = () => {
     if (role === "king") {      // King will not get pillaged

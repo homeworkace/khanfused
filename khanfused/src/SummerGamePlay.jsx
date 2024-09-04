@@ -10,52 +10,12 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isFarm, setIsFarm] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const isInitialMount = useRef(true);
 
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
   useEffect(() => {
     selectedPlayerSessionRef.current = selectedPlayerSession;
   }, [selectedPlayerSession]);
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      if (isReady) {
-        if (role === 'lord') {
-          if (choices === 1) {
-            socket.current.emit('ready', {
-              state: currentSeason,
-              session: getSession(),
-              choice: selectedPlayerSessionRef.current 
-            });
-            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-          } else if (choices === 2) {
-            socket.current.emit('ready', {
-              state: currentSeason,
-              session: getSession(),
-              choice: -1
-            });
-            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-          }
-        } else {
-          socket.current.emit('ready', {
-            state: currentSeason,
-            session: getSession(),
-          });
-        }
-        console.log('Emitted ready state:', isReady);
-        console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-      } else {
-        socket.current.emit('unready', {
-          state: currentSeason,
-          session: getSession()
-        });
-        console.log('Emitted unready state:', isReady);
-      }
-    }
-  }, [isReady, choices, role, socket, currentSeason]);
   
   const handleTimeUp = () => {
     // handleDoubleHarvestChangeClick();
@@ -83,8 +43,41 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
     }
   };
 
-  const summerReadyClick = () => {
-    setIsReady(!isReady);
+    const summerReadyClick = () => {
+        if (!isReady) {
+            if (role === 'lord') {
+                if (choices === 1) {
+                    socket.current.emit('ready', {
+                        state: currentSeason,
+                        session: getSession(),
+                        choice: selectedPlayerSessionRef.current
+                    });
+                    console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+                } else if (choices === 2) {
+                    socket.current.emit('ready', {
+                        state: currentSeason,
+                        session: getSession(),
+                        choice: -1
+                    });
+                    console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+                }
+            } else {
+                socket.current.emit('ready', {
+                    state: currentSeason,
+                    session: getSession(),
+                });
+            }
+            setIsReady(true);
+            console.log('Emitted ready state:', isReady);
+            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
+        } else {
+            socket.current.emit('unready', {
+                state: currentSeason,
+                session: getSession()
+            });
+            setIsReady(false);
+            console.log('Emitted unready state:', isReady);
+        }
   };
 
   const renderRoleSpecificContent = () => {
