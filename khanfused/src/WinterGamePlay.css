@@ -65,39 +65,48 @@
 
 .pillage-button {
     width: 100%; /* Align with Ready button */
-    display: inline-block;
+    height: 2lh;
+    background-color: lightgreen;
+    display: inline-flex;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0.05rem;
+    padding-left: 2rem;
 }
 
 .pillage-button.selected {
-    background-color: lightgreen;
+    background-color: green;
     font-weight: bold;
 }
 
-.pillage-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-top: 1rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 150px;
-    max-height: 150px;
-    position: absolute;
-    overflow-y: auto;
-    top: 50px;
-    right: 0; 
-    z-index: 4;
-    border-radius: 10px;
-}
+    .pillage-button.king {
+        color: black;
+        background-color: grey;
+    }
+
+    .pillage-button.khan {
+        color: hsl(var(--khanColour), 100%, 50%);
+        background-color: grey;
+    }
+
+    .pillage-button.banished {
+        color: black;
+        background-color: grey;
+        text-decoration: line-through double 1px;
+    }
+
+    .pillage-button.pillaged {
+        color: black;
+        background-color: grey;
+        text-decoration: line-through 2px;
+    }
 
 .pillage-container {
-    width: 1rem;
+    width: 30vh;
     margin: 1rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-column-gap: 0.1rem;
-    gap: 0.1rem;
+    gap: 1vh;
     justify-content: center;
 }
 

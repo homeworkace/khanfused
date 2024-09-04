@@ -5,7 +5,7 @@ import HelpButton from './Instructions';
 import Timer from './Timer';
 import PlayerList from "./PlayerList";
 
-function WinterGamePlay({ role, roleArray, players, currentSeason, socket }) {
+function WinterGamePlay({ role, roleArray, statusArray, players, currentSeason, socket }) {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isPillageListOpen, setIsPillageListOpen] = useState(true);
     const [votedPlayerSession, setVotedPlayerSession] = useState(null);
@@ -38,7 +38,7 @@ function WinterGamePlay({ role, roleArray, players, currentSeason, socket }) {
         socket.current.emit('select', {
             state: currentSeason,
             session: getSession(),
-            pillage: votedPlayerSession,
+            pillage: selectedPlayer.session,
         });
     };
 
@@ -49,8 +49,8 @@ function WinterGamePlay({ role, roleArray, players, currentSeason, socket }) {
                 session: getSession(),
             });
         } else {
-            setVotedPlayerSession(null);
-            setVotes({}); // Reset votes on unready
+            //setVotedPlayerSession(null);
+            //setVotes({}); // Reset votes on unready
             socket.current.emit('unready', {
             session: getSession(),
             });
@@ -61,6 +61,7 @@ function WinterGamePlay({ role, roleArray, players, currentSeason, socket }) {
     const renderRoleSpecificContent = () => {
         switch (role) {
             case "khan":
+                console.log(statusArray);
                 return (
                     <div className="pillage-container">
                         {players.map((player, index) => (
@@ -68,12 +69,16 @@ function WinterGamePlay({ role, roleArray, players, currentSeason, socket }) {
                                 key={player.session}
                                 onClick={() => handlePlayerSelect(player.name)}
                                 className={"pillage-button " +
-                                    (votedPlayerSession === player.session ? "selected" : "") + " " +
-                                    (roleArray[index] == 2 ? "khan" : "")
+                                    (votedPlayerSession === player.session ? "selected" : "") +
+                                    (roleArray[index] == 0 ? " king" : "") +
+                                    (roleArray[index] == 2 ? " khan" : "") +
+                                    (statusArray[index] == 1 ? " pillaged" : "") +
+                                    (statusArray[index] == 2 ? " banished" : "")
                                 }
-                                disabled={roleArray[index] == 2}
+                                style={{ "--khanColour": (player.session % 256) }}
+                                disabled={roleArray[index] !== 1 || statusArray[index] !== 0}
                             >
-                                {player.session === Number(getSession()) ? "That's you!" : player.name}
+                                {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
                                 {false && (
                                     <span className="ticks">
                                         {Array.from({ length: votes[player.session] }, (_, index) => (

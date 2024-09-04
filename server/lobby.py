@@ -92,17 +92,17 @@ class lobby :
         # Testing 10-man lobby
         if len(self.players) == 1:
             self.players += [
-                [0, 'Jules'],
-                [1, 'Sofia'],
-                [2, 'Wilford'],
-                [3, 'Vivienne'],
-                [4, 'Clemens'],
-                [5, 'Oliver'],
-                [6, 'Qasym'],
-                [7, 'Zhuldyz'],
-                [8, 'Aytac'],
+                #[0, 'Jules'],
+                #[1, 'Sofia'],
+                #[2, 'Wilford'],
+                #[3, 'Vivienne'],
+                #[4, 'Clemens'],
+                #[5, 'Oliver'],
+                #[6, 'Qasym'],
+                #[7, 'Zhuldyz'],
+                #[8, 'Aytac'],
             ]
-            self.ready += [True] * 9
+            #self.ready += [True] * 6
 
         return True
 
@@ -126,10 +126,10 @@ class lobby :
             return "Not enough players!"
         if False in self.ready :
             return "Not all players are ready!"
+        print(self.ready)
 
         self.ready = [False] * len(self.players)
         self.role_assignment_start()
-        print(self.ready)
         return None
     
     def role_assignment_start(self):
@@ -331,7 +331,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 600, id = 'pillage_result_start' + self.lobby_code)
 
     def pillage_result_start(self) :
         self.state = 'pillage_result'
