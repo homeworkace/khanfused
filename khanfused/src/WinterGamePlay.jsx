@@ -84,7 +84,7 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                                     (votedPlayerSession === player.session ? " selected" : "") +
                                     (roleArray[index] == 0 ? " king" : "") +
                                     (roleArray[index] == 2 ? " khan" : "") +
-                                    (statusArray[index] == 1 ? " pillaged" : "") +
+                                    (statusArray[index] == 1 ? " pillaged" : "") 
                                     (statusArray[index] == 2 ? " banished" : "")
                                 }
                                 style={{ "--khanColour": (player.session % 256) }}

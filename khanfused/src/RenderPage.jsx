@@ -557,7 +557,6 @@ function RoomPage() {
 
             // set current state to "spring"
             setCurrentSeason(data['state']);
-
             // ready everyone who is banished and unready everyone else
             let updated_players = players.map((player, index) => {
 

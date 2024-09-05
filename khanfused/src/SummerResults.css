@@ -6,11 +6,6 @@
     background-color: #d79f44b9;
 }
 
-.summerResults.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
-
 .summerResults-container {
     position: relative; 
     height: 100%; 
@@ -21,14 +16,12 @@
 }
 
 .nonlord-text {
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     font-size: 1.2rem;
     text-align: center;
     margin-bottom: 1.2rem;
 }
 
 .grain-info {
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     position: absolute; 
     font-size: 0.9rem;
     top: 1rem; 
@@ -57,3 +50,35 @@
       opacity: 1;
     }
 }
+
+.grain-info {
+    position: absolute;
+    font-size: 1.5rem; /* Adjust size as needed */
+    margin-top: 10px;
+  }
+  
+  .grain-change {
+    margin-left: 10px;
+    opacity: 0; /* Start with invisible text */
+  }
+  
+  .fade-animation {
+    animation: fadeInOut 2s ease forwards;
+  }
+  
+  /* Keyframes for fading in and out */
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 1; /* Fade in quickly */
+    }
+    80% {
+      opacity: 1; /* Stay visible */
+    }
+    100% {
+      opacity: 0; /* Fade out gradually */
+    }
+  }
+  

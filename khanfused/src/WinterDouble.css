@@ -6,10 +6,6 @@
     background-color: #799eefb9;
 }
 
-.pillage.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
 
 .winterDouble-container {
     position: relative; 

@@ -80,7 +80,7 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
   };
 
   return (
-    <div className={"autumn"}>
+    <div className="autumn">
       <div className="autumn-container">
 
         <div className="autumn-button-bar">

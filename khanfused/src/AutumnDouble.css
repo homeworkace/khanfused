@@ -6,10 +6,6 @@
     background-color: #da7517b9;
 }
 
-.autumnDouble.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
 
 .autumnDouble-container {
     position: relative; 

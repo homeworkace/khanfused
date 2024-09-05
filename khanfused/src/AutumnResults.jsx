@@ -46,7 +46,7 @@ function AutumnResults ({grain, banished, status, socket, role, players}) {
     }
 
     return (
-        <div className={`autumnDouble ${status === 1 ? 'greyed-out': ""}`}>
+        <div className="autumnDouble">
             <div className="autumnDouble-container">
 
                 <div className='status-container'>
@@ -55,7 +55,7 @@ function AutumnResults ({grain, banished, status, socket, role, players}) {
 
                 <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
                 <HelpButton role={role} />
-                <Timer duration={10} onTimeUp={handleTimeUp} />
+                <Timer duration={5} onTimeUp={handleTimeUp} />
 
             </div>
         </div>

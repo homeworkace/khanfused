@@ -120,13 +120,13 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
 
 
   return (
-    <div className={"summer"}>
+    <div className="summer">
       <div className="summer-container">
 
 
         {renderRoleSpecificContent()}
         
-        {status !== 2 && status !== 1 && (
+        {status === 0 && (
         <div className="summer-button-bar">
           <button onClick={summerReadyClick}>
             {isReady ? "Unready" : "Ready"}

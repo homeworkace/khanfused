@@ -26,10 +26,16 @@ function PillageResult ({players, socket, role, pillaged, status}) {
                     </div>
                 )
             }
+        } else {
+            return (
+                <div>
+                    <p>THE KHANS HAS CHOSEN NOT TO PILLAGE</p>
+                </div>
+            )
         } 
     }
     return (
-        <div className={`pillage ${status === 1 ? "greyed-out" : ""}`}>
+        <div className="pillage">
             <div className="winterDouble-container">
                 {renderRoleSpecificContent()}
             </div>
