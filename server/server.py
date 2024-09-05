@@ -295,6 +295,7 @@ def socket_on_start_game(data):
     if result is None :
         # Notify other players that the game has started.
         for player in range(len(the_lobby.players)) :
+            print(the_lobby.players[player].name)
             emit(
                 'change_state', {
                     'state' : the_lobby.state,
