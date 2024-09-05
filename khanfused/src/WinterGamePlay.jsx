@@ -104,7 +104,9 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                         <button
                             key={-1}
                             onClick={() => handlePlayerSelect(-1)}
-                            className={"pillage-button"}
+                            className={"pillage-button" +
+                                (votedPlayerSession === -1 ? " selected" : "")
+                            }
                             disabled={status !== 0}
                         >
                             Do not pillage

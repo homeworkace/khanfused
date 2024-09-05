@@ -227,8 +227,8 @@ class lobby :
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
+        #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 600, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -330,8 +330,8 @@ class lobby :
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 600, id = 'pillage_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
+        #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
 
     def pillage_result_start(self) :
         self.state = 'pillage_result'
@@ -445,6 +445,7 @@ class lobby :
                 self.choices[player_index] = data['choice'] # -1 if farming
             
             # If all players are ready, skip the timer.
+            print(self.ready)
             if not False in self.ready :
                 self.summer_result_start()
 

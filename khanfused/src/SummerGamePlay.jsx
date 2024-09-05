@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './SummerGamePlay.css';
+import kingIcon from "./Assets/king.svg";
+import lordIcon from "./Assets/lord.svg";
+import khanIcon from "./Assets/khan.svg";
+import unknownIcon from "./Assets/unknown.svg";
 import { getSession } from './utility.js';
 import HelpButton from './Instructions';
 import Timer from './Timer';
 import GrainList from "./PlayerList";
 
-function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, currentSeason }) {
+function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, roleArray, statusArray, currentSeason }) {
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isFarm, setIsFarm] = useState(false);
@@ -21,46 +25,20 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
     // handleDoubleHarvestChangeClick();
   };
 
-  const toggleScoutList = () => {
-    setIsScoutListOpen(!isScoutListOpen);
-  };
-
-  const handlePlayerSelect = (playerName) => {
-    const selectedPlayer = players.find(p => p.name === playerName);
-    if (selectedPlayer) {
-      setSelectedPlayerSession(selectedPlayer.session);
-    }
-    setChoices(1);
-  };
-
-  const handleFarmClick = () => {
-    setIsFarm(!isFarm);
-
-    if (isFarm) {
-      setChoices(2);
-    } else {
-      setChoices(null);
-    }
-  };
+    const handlePlayerSelect = (playerSession) => {
+        setSelectedPlayerSession(playerSession);
+        console.log("bruh");
+    };
 
     const summerReadyClick = () => {
         if (!isReady) {
             if (role === 'lord') {
-                if (choices === 1) {
-                    socket.current.emit('ready', {
-                        state: currentSeason,
-                        session: getSession(),
-                        choice: selectedPlayerSessionRef.current
-                    });
-                    console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-                } else if (choices === 2) {
-                    socket.current.emit('ready', {
-                        state: currentSeason,
-                        session: getSession(),
-                        choice: -1
-                    });
-                    console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
-                }
+                socket.current.emit('ready', {
+                    state: currentSeason,
+                    session: getSession(),
+                    choice: selectedPlayerSession
+                });
+                console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
             } else {
                 socket.current.emit('ready', {
                     state: currentSeason,
@@ -78,45 +56,74 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
             setIsReady(false);
             console.log('Emitted unready state:', isReady);
         }
-  };
+    };
 
-  const renderRoleSpecificContent = () => {
-    if (role === "lord" && status === 0) {
-      return (
-        <div className="summer-lord-buttons">
-          <button className={`farm-button ${isFarm ? "active" : ""}`} onClick={handleFarmClick} >Farm</button>
-          <button className="scout-button" onClick={toggleScoutList} >Scout</button>
-          {isScoutListOpen && (
-            <div className="scout-list active">
-              <ul>
-                {players.filter(player => player.session != getSession()).map((player) => (
-                  <li
-                    key={player.session}
-                    onClick={() => handlePlayerSelect(player.name)}
-                    className={selectedPlayerSession === player.session ? "selected" : ""}
-                  >
-                    {player.name}
-                  </li>
-                ))}
-              </ul>
+    const roleIcon = (index) => {
+        switch (roleArray[index]) {
+            case -1:
+                return unknownIcon;
+            case 0:
+                return kingIcon;
+            case 1:
+                return lordIcon;
+            case 2:
+                return khanIcon;
+        }
+    };
+
+    const renderRoleSpecificContent = () => {
+        let infoText = "";
+        switch (status) {
+            case 1:
+                infoText = "YOU HAVE BEEN PILLAGED";
+                break;
+            case 2:
+                infoText = "YOU HAVE BEEN BANISHED";
+                break;
+            case 3:
+                infoText = "You have been chosen for double harvest";
+                break;
+        }
+        let result = (
+            <div className="banished">
+                <p className="banished-text">{ infoText }</p>
             </div>
-          )}
-        </div>
-      );
-    } else if (status === 3) // includes if khan is chosen for DH
-      {
-        return (
-          <p> You have been chosen for double harvest</p>
-        )
-      }
-      else if (status === 2) {
-        return (
-        <div className = "banished">
-          <p className="banished-text">YOU HAVE BEEN BANISHED</p>
-        </div>
-        )
-      }
-  };
+        );
+
+        if (role === "lord" && status === 0) {
+            console.log(statusArray);
+            return (
+                <div className="scout-container">
+                    {players.map((player, index) => (
+                        <button
+                            key={player.session}
+                            onClick={() => handlePlayerSelect(player.session)}
+                            className={"scout-button" +
+                                (selectedPlayerSession === player.session ? " selected" : "") +
+                                (roleArray[index] !== -1 ? " ineligible" : "") +
+                                (statusArray[index] == 1 ? " pillaged" : "") +
+                                (statusArray[index] == 2 ? " banished" : "")
+                            }
+                            disabled={ roleArray[index] !== -1 || statusArray[index] !== 0}
+                        >
+                            <img src={roleIcon(index)} />
+                            {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                        </button>
+                    ))}
+                    <button
+                        key={-1}
+                        onClick={() => handlePlayerSelect(-1)}
+                        className={"scout-button" +
+                            (selectedPlayerSession === -1 ? " selected" : "")
+                        }
+                        disabled={status !== 0}
+                    >
+                        Farm
+                    </button>
+                </div>
+            );
+        } 
+      };
 
 
   return (
