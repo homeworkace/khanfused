@@ -228,7 +228,7 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 600, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
