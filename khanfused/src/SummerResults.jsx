@@ -5,31 +5,58 @@ import PlayerList from "./PlayerList";
 
 function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
-    const [totalGrain, setTotalGrain] = useState(0);
-    const [currentGrain, setCurrentGrain] = useState(grain[0]); // Initial grain count
-  const [grainChange, setGrainChange] = useState(0); // Grain change amount
-  const [animateChange, setAnimateChange] = useState(false); // Flag to trigger animation
+  const [currentGrain, setCurrentGrain] = useState(grain.initial_grain); // Initial grain count
+  const [grainAddChange, setGrainAddChange] = useState(0); // Grain addition amount
+  const [grainDeductChange, setGrainDeductChange] = useState(0); // Grain deduction amount
+  const [animateAdd, setAnimateAdd] = useState(false); // Trigger animation for addition
+  const [animateDeduct, setAnimateDeduct] = useState(false); // Trigger animation for deduction
+  const [phase,setPhase] = useState(0);
 
-    useEffect(() => {
-      setTotalGrain(grain.initial_grain + grain.added_grain - grain.yearly_deduction);
-    }, [grain]);
-  
     const handleTimeUp = () => {
 
     };
 
     useEffect(() => {
-        // Calculate the new grain count
-        const newGrainCount = grain[0] + grain[2] - grain[1];
-        const changeAmount = newGrainCount - currentGrain;
-    
-        if (changeAmount !== 0) {
-          setGrainChange(changeAmount); // Set the change amount
-          setAnimateChange(true); // Trigger the animation
-          setTimeout(() => setAnimateChange(false), 2000); // Reset animation flag after duration
-          setCurrentGrain(newGrainCount); // Update current grain count
-        }
-      }, [grain, currentGrain]);
+      const addedGrain = grain.added_grain; 
+      const deductedGrain = grain.yearly_deduction; 
+      const newGrainCount = currentGrain + addedGrain - deductedGrain;
+      // switch (phase) {
+      //   case 0: 
+        //   setCurrentGrain(currentGrain);
+        //   setPhase(phase+1);
+        //   break;
+
+      //   case 1:
+      // if (addedGrain > 0) {
+      //   setGrainAddChange(addedGrain); // Set addition change amount
+      //   setAnimateAdd(true); // Trigger addition animation
+      //   setTimeout(() => setAnimateAdd(false), 2000); // Reset animation flag after duration
+      //   setPhase(phase+1);
+      //   break;
+
+      //   case 2:
+      
+
+
+
+      //   case 3:
+      // if (deductedGrain > 0) {
+      //   setGrainDeductChange(-deductedGrain); // Set deduction change amount
+      //   setAnimateDeduct(true); // Trigger deduction animation
+      //   setTimeout(() => setAnimateDeduct(false), 2000); // Reset animation flag after duration
+      // }
+      
+      // }
+
+  
+
+  
+
+      // Update current grain count after animations
+      setCurrentGrain(newGrainCount);
+      console.log(newGrainCount,addedGrain,deductedGrain);
+    }, [grain, currentGrain]);
+  
 
     // lords who choose to 1. scout (display result), 2. farm, else king and khan
     const renderRoleSpecificContent = () => {
@@ -67,23 +94,28 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
     // non-role specific content
     return (
-        <div className="summerResults">
-            <div className="summerResults-container">
-            {renderRoleSpecificContent()}
-            <HelpButton />
-
-        <div className="grain-info">
-          Grains: {currentGrain}
-          {grainChange !== 0 && (
-            <span className={`grain-change ${animateChange ? 'fade-animation' : ''}`}>
-              {grainChange > 0 ? `+${grainChange}` : `${grainChange}`}
-            </span>
-          )}
+      <div className="summerResults">
+        <div className="summerResults-container">
+          {renderRoleSpecificContent()}
+          <HelpButton />
+          <div className="grain-info">
+            Grains: {currentGrain}
+            {grainAddChange > 0 && (
+              <span className={`grain-change add ${animateAdd ? 'fade-animation' : ''}`}>
+                +{grainAddChange}
+              </span>
+            )}
+            {grainDeductChange < 0 && (
+              <span className={`grain-change deduct ${animateDeduct ? 'fade-animation' : ''}`}>
+                {grainDeductChange}
+              </span>
+            )}
+          </div>
         </div>
-            
-            </div>
-        </div>
+      </div>
     );
-}       
+  }
+  
+  export default SummerResults;
 
-export default SummerResults;
+
