@@ -1,7 +1,7 @@
 .autumn {
     width: 100vw;
     height: 100vh;
-    background: url('./Assets/AUTUMN CUTSCENE.svg') no-repeat center center;
+    background: url('../Assets/AUTUMN CUTSCENE.svg') no-repeat center center;
     background-size: contain;
     background-color: #da7517b9;
 }

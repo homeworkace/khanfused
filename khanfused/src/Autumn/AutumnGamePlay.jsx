@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AutumnGamePlay.css'; 
-import { getSession } from './utility.js';
-import HelpButton from './Instructions';
-import Timer from './Timer';
-import GrainList from "./PlayerList";
+import { getSession } from '../utility.js';
+import HelpButton from '../Helper/Instructions.jsx';
+import Timer from '../Helper/Timer.jsx';
+import GrainList from "../Helper/PlayerList.jsx";
 
 function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) {
   const [isBanishListOpen, setBanishListOpen] = useState(false);
@@ -23,7 +23,6 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
                     session: getSession(),
                     banish: role === 'king' ? selectedPlayerSessionRef.current : null
                 });
-                console.log(`Banish: ${selectedPlayerSessionRef.current}`);
                 setIsReady(true);
             }
             else {

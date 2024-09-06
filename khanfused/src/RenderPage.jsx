@@ -7,16 +7,16 @@ import RoomPageView from "./RoomPageView.jsx";
 import './RoomPageView.css';
 
 // Testing 
-import SpringGamePlay from "./SpringGamePlay.jsx";
-import SummerResults from './SummerResults.jsx';
-import SummerGamePlay from './SummerGamePlay.jsx';
-import AutumnGamePlay from './AutumnGamePlay.jsx';
-import AutumnResults from './AutumnResults.jsx';
-import WinterGamePlay from './WinterGamePlay.jsx';
-import WinterDouble from './WinterDouble.jsx';
-import KhanWin from './KhanWin.jsx';
-import LordWin from './LordWin.jsx';
-import InsufficentFood from './InsufficentFood.jsx';
+import SpringGamePlay from "./Spring/SpringGamePlay.jsx";
+import SummerResults from './Summer/SummerResults.jsx';
+import SummerGamePlay from './Summer/SummerGamePlay.jsx';
+import AutumnGamePlay from './Autumn/AutumnGamePlay.jsx';
+import AutumnResults from './Autumn/AutumnResults.jsx';
+import WinterGamePlay from './Winter/WinterGamePlay.jsx';
+import WinterDouble from './Winter/WinterDouble.jsx';
+import KhanWin from './GameEnd/KhanWin.jsx';
+import LordWin from './GameEnd/LordWin.jsx';
+import InsufficentFood from './GameEnd/InsufficentFood.jsx';
 import Role from './Role.jsx';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +110,6 @@ function RoomPage() {
                 />  
 
                 case "summer":
-                    console.log(currentSeason);
-                    console.log(statusArray);
                     return <SummerGamePlay
                         players = {players}
                         role={role}
@@ -256,7 +254,6 @@ function RoomPage() {
             }
             setRoleArray(data['roles']);
 
-            console.log(data['status']);
             setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
             setStatusArray(data['status']);
 
@@ -299,7 +296,6 @@ function RoomPage() {
             if (!_player) {
                 setPlayers(p => [...p, { session: sessionID, name: sessionName, ready: data['name'] !== null }]);
             }
-            console.log(players);
         }
         socket.current.on("new_player", handleNewPlayer);
 
@@ -443,7 +439,7 @@ function RoomPage() {
         socket.current.removeAllListeners('start_game_failed');
         // handle game start failure
         const handleStartGameFailure = (data) => {
-            console.log(data['message']);
+
         };
 
         socket.current.on("start_game_failed", handleStartGameFailure);
@@ -486,7 +482,6 @@ function RoomPage() {
             setPageToRender("default");
         }
 
-        console.log(currentSeason);
         
         return () => {
 
@@ -535,7 +530,6 @@ function RoomPage() {
             
             // find the index of 0 (King) in 'role' array
             let index = data['role'].indexOf(0);
-            console.log(players);
 
             // store the session id of king based on the corresponding index in 'players' array
             setKing(players[index]['session']);
@@ -680,8 +674,6 @@ function RoomPage() {
                     return;
                 }
 
-                console.log(data['result']);
-
                 // store session ID of the player who got chosen to get scouted
                 let sessionID = data['result'][0];
 
@@ -755,7 +747,6 @@ function RoomPage() {
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
-            console.log(`State received from server: ${data['state']}`);
             // check if 'state' received from server is "autumn"
             if (data['state'] === "autumn") {
                 // set current state to "autumn"
@@ -812,8 +803,6 @@ function RoomPage() {
             // checks if there is no banishment
             if (data['banished'] === -1) {
 
-                // to be implemented
-                console.log("King decides not to banish anyone");
             }
 
             // checks if session id of chosen player matches with current player session id
@@ -914,9 +903,6 @@ function RoomPage() {
             // check if no lord was chosen for pillage
             if (data['pillaged'] === -1) {
 
-                // to be implemented
-                console.log("Khan(s) decides not to pillage");
-
             }
             else {
                 //change the status of someone to pillaged
@@ -997,11 +983,9 @@ function RoomPage() {
             return;
         }
 
-        console.log("Checkpoint");
         socket.current.removeAllListeners("change_state");
         const handleChangeState = (data) => {
 
-            console.log(`Debug: ${currentSeason} ${data['state']}`);
 
             // check if 'state' received from server is "waiting"
             if (data['state'] !== "waiting") {
@@ -1046,7 +1030,6 @@ function RoomPage() {
 
         socket.current.removeAllListeners("ready");
         const handleReadyState = (data) => {
-            console.log(data);
 
             setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: true } : player));
         };
@@ -1068,7 +1051,6 @@ function RoomPage() {
 
         socket.current.removeAllListeners("unready");
         const handleUnreadyState = (data) => {
-            console.log(data);
 
             setPlayers((p) => p.map((player) => player.session === data['session'] ? { ...player, ready: false } : player));
         };
@@ -1092,7 +1074,6 @@ function RoomPage() {
             return;
         }
 
-        console.log(`Role: ${roleArray}`);
         return () => {
 
         }

@@ -16,7 +16,6 @@ function Role({ players, king }) {
             return kingName.name;
         }
 
-        console.log(`King not found ${king}`);
         return;
     };
 

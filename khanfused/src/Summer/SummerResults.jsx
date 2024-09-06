@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './SummerResults.css';
-import HelpButton from './Instructions';
-import PlayerList from "./PlayerList";
+import HelpButton from '../Helper/Instructions';
+import PlayerList from "../Helper/PlayerList";
 
 function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
@@ -54,7 +54,6 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
       // Update current grain count after animations
       setCurrentGrain(newGrainCount);
-      console.log(newGrainCount,addedGrain,deductedGrain);
     }, [grain, currentGrain]);
   
 

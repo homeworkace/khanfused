@@ -1,7 +1,7 @@
 .summer {
     width: 100vw;
     height: 100vh;
-    background: url('./Assets/SUMMER CUTSCENE.svg') no-repeat center center;
+    background: url('../Assets/SUMMER CUTSCENE.svg') no-repeat center center;
     background-size: contain;
     background-color: #d79f44b9;
 }

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './SummerGamePlay.css';
-import kingIcon from "./Assets/king.svg";
-import lordIcon from "./Assets/lord.svg";
-import khanIcon from "./Assets/khan.svg";
-import unknownIcon from "./Assets/unknown.svg";
-import { getSession } from './utility.js';
-import HelpButton from './Instructions';
-import Timer from './Timer';
-import GrainList from "./PlayerList";
+import kingIcon from "../Assets/king.svg";
+import lordIcon from "../Assets/lord.svg";
+import khanIcon from "../Assets/khan.svg";
+import unknownIcon from "../Assets/unknown.svg";
+import { getSession } from '../utility.js';
+import HelpButton from '../Helper/Instructions.jsx';
+import Timer from '../Helper/Timer.jsx';
+import GrainList from "../Helper/PlayerList.jsx";
 
 function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, roleArray, statusArray, currentSeason }) {
   const [isScoutListOpen, setIsScoutListOpen] = useState(false);
@@ -22,12 +22,10 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
   }, [selectedPlayerSession]);
   
   const handleTimeUp = () => {
-    // handleDoubleHarvestChangeClick();
   };
 
     const handlePlayerSelect = (playerSession) => {
         setSelectedPlayerSession(playerSession);
-        console.log("bruh");
     };
 
     const summerReadyClick = () => {
@@ -38,7 +36,6 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
                     session: getSession(),
                     choice: selectedPlayerSession
                 });
-                console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
             } else {
                 socket.current.emit('ready', {
                     state: currentSeason,
@@ -46,15 +43,12 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
                 });
             }
             setIsReady(true);
-            console.log('Emitted ready state:', isReady);
-            console.log(`Ready button clicked. isReady: ${isReady}, role: ${role}, choices: ${choices}, selectedPlayerSession: ${selectedPlayerSessionRef.current}`);
         } else {
             socket.current.emit('unready', {
                 state: currentSeason,
                 session: getSession()
             });
             setIsReady(false);
-            console.log('Emitted unready state:', isReady);
         }
     };
 
@@ -91,7 +85,6 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
         );
 
         if (role === "lord" && status === 0) {
-            console.log(statusArray);
             return (
                 <div className="scout-container">
                     {players.map((player, index) => (

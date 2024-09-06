@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import helpIcon from './Assets/help.svg'; 
+import helpIcon from '../Assets/help.svg'; 
 import './Instructions.css'; 
 
 function HelpButton({role}) {

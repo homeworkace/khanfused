@@ -1,7 +1,7 @@
 .spring {
     width: 100vw;
     height: 100vh;
-    background: url('./Assets/SPRING CUTSCENE.svg') no-repeat center center;
+    background: url('../Assets/SPRING CUTSCENE.svg') no-repeat center center;
     background-size: contain;
     background-color: #799eefb9;
 }

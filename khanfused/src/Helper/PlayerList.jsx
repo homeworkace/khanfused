@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import bread from './Assets/bread.svg';
+import bread from '../Assets/bread.svg';
 import './PlayerList.css';
 
 function GrainList({ grain }) {

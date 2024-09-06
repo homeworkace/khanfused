@@ -17,7 +17,7 @@ function RoomPage() {
         };
 
         const handleJoin = (data) => {
-            console.log(data);
+            
         };
 
         const handleBackButton = (event) => {

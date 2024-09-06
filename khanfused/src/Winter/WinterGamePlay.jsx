@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './WinterGamePlay.css';
-import kingIcon from "./Assets/king.svg";
-import lordIcon from "./Assets/lord.svg";
-import khanIcon from "./Assets/khan.svg";
-import unknownIcon from "./Assets/unknown.svg";
-import { getSession } from './utility.js';
-import HelpButton from './Instructions';
-import Timer from './Timer';
-import PlayerList from "./PlayerList";
+import kingIcon from "../Assets/king.svg";
+import lordIcon from "../Assets/lord.svg";
+import khanIcon from "../Assets/khan.svg";
+import unknownIcon from "../Assets/unknown.svg";
+import { getSession } from '../utility.js';
+
 
 function WinterGamePlay({ role, roleArray, status, statusArray, players, currentSeason, socket }) {
     const [isChatOpen, setIsChatOpen] = useState(false);

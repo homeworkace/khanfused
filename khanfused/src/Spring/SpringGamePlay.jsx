@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './SpringGamePlay.css';
-import HelpButton from './Instructions';
-import Timer from './Timer';
-import { getSession } from './utility.js';
-import GrainList from "./PlayerList";
+import HelpButton from '../Helper/Instructions.jsx';
+import Timer from '../Helper/Timer.jsx';
+import { getSession } from '../utility.js';
+import GrainList from "../Helper/PlayerList.jsx";
 
 function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) {
   const [isDoubleHarvestListOpen, setIsDoubleHarvestListOpen] = useState(false);
@@ -21,7 +21,6 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
             // Check if double harvest is selected first
             if (role === "king" && status === 0) {
                 if (selectedPlayerSessionRef.current === null) {
-                    console.log("King select a player for Double Harvest");
                     return;
                 }
             }
@@ -30,8 +29,6 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
                 session: getSession(),
                 double_harvest: role === 'king' ? selectedPlayerSessionRef.current : null
             });
-            console.log(`Player ${getSession()} is ready`);
-            console.log(`Double Harvest: ${selectedPlayerSessionRef.current}`);
             setIsReady(true);
         }
         else {
@@ -44,7 +41,7 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
     }
 
   const handleTimeUp = () => {
-    // handleDoubleHarvestChangeClick();
+    
   };
 
   const toggleDoubleHarvestList = () => {

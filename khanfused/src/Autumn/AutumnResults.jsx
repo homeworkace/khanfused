@@ -1,12 +1,11 @@
 import './AutumnDouble.css';
-import HelpButton from './Instructions';
-import Timer from './Timer';
-import GrainList from "./PlayerList"
+import HelpButton from '../Helper/Instructions';
+import Timer from '../Helper/Timer';
+import GrainList from "../Helper/PlayerList"
 
 function AutumnResults ({grain, banished, status, socket, role, players}) {
 
     const renderRoleSpecificContent = () => {
-        console.log(banished)
             // if someone has been banished
             if (banished != -1){
                 const banishedPlayer = players.find(p => p.session === banished);
