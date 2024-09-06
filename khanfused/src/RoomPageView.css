@@ -1,0 +1,113 @@
+
+.roomPageView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.roomPageView button {
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 0.5rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.roomPageView-logo img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    max-height: 40vh;
+}
+
+.code-section p {
+    margin: 0;
+}
+
+.code-section h1 {
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.roomPageView-container {
+    border-radius: 3px;
+    background-color: hsla(0, 0%, 95%, 0.5);
+    box-shadow: 0.5rem 0.5rem 1rem hsl(0, 0%, 90%);
+    width: 80%;
+}
+
+.roomPageView-container h2 {
+    text-align: center;
+}
+
+.roomPageView-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.roomPageView-container li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.25rem auto;
+    height: auto;
+    min-height: 2.5rem;
+    width: 80%;
+}
+
+.roomPageView-list-container {
+    display: flex;
+
+    /* border: 1px solid black; */
+}
+
+.roomPageView-list-container input {
+    background: transparent;
+    border: transparent;
+    padding-left: 0.5rem;
+    border-bottom: 1px solid black;
+}
+
+.roomPageView-list-container button {
+    margin-left: 0.5rem;
+}
+
+.roomPageView-list-container img {
+    height: auto;
+    max-height: 1.5rem;
+    /* align-self: center; */
+}
+
+
+
+
+.roomPageView-button-bar {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    width: 200px;
+}
+
+.roomPageView-button-bar button {
+    flex: 1;
+}
+
+.roomPageView-button-bar button:hover {
+    background-color: rgb(54, 54, 54);
+}
+
+.grayed-out {
+    color: grey;
+}
+
+
+
+.spacing {
+    flex-grow: 0.5;
+}
+
+.randomise-button {
+    margin-top: 0.5rem;
+}

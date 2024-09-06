@@ -19,6 +19,8 @@ Use your Git client of choice, or if you don't know any of them, do it my way:
   - Ctrl+C to stop.
 
 ## 3. Run the frontend
+### The CLI way
+When there are dependencies to install/update, you must use this.
 - Open another Command Prompt.
 - `cd ..` to go up one level.
 - `cd khanfused` to go down the frontend folder.
@@ -27,6 +29,34 @@ Use your Git client of choice, or if you don't know any of them, do it my way:
   - Periodically run this command as more dependencies are added to the project.
 - When the server is running, `npm start` to start the React framework.
   - Ctrl+C to stop.
+ 
+### The batch script way:
+When you wish to run multiple instances, you must use this.
+- Open Notepad as administrator.
+  - Find Notepad from the Start Menu.
+  - Right-click, and click "Run as administrator".
+- In Notepad, open `C:\\Windows\\System32\\drivers\\etc\\hosts`.
+  - Click on "File", then "Open...".
+  - Paste `C:\\Windows\\System32\\drivers\\etc` in the URL bar.
+  - Find the dropdown menu that says "Text Documents (\*.txt)", and replace it with "All Files (\*.\*)".
+  - Open `hosts`.
+- At the bottom of the file, paste the following and save:
+  ```  
+  127.0.0.1 app3000
+  127.0.0.1 app3001
+  127.0.0.1 app3002
+  127.0.0.1 app3003
+  127.0.0.1 app3004
+  127.0.0.1 app3005
+  127.0.0.1 app3006
+  127.0.0.1 app3007
+  127.0.0.1 app3008
+  127.0.0.1 app3009
+  ```
+- In File Explorer, go to the directory where the frontend is (`\\khanfused`).
+- Double click on `start_instance.bat` to start one instance.
+  - Repeat for up to 10 times for 10 instances.
+  - If you need more, add more lines into `hosts`.
  
 ## 4. Receive and make changes
 - `git pull` updates your local copy of the repository with new changes from the one on GitHub (remote).

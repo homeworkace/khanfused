@@ -1,0 +1,48 @@
+.rolePage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rolePage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./Assets/Khanfused.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: 0.25; /* Adjust opacity here */
+    z-index: -1; /* Ensure it stays behind other content */
+}
+
+.rolePage-player-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.rolePage-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70%;
+}
+
+.rolePage-container h4,
+.rolePage-container h1,
+.rolePage-container button {
+    margin: 0;
+}
+
+.rolePage-container button {
+    min-width: 5rem;
+    width: 30%;
+}

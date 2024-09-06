@@ -1,0 +1,22 @@
+.grain {
+    position: absolute;
+    display: inline-block;
+    margin-top: 0.25rem;
+    cursor: pointer; 
+    top: 3rem;
+    left: 1rem;
+  }
+
+  .grain-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem; 
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+  
+.grain-text {
+  color: black; 
+  font-size: 1.5rem; 
+  margin-left: 10px;
+}

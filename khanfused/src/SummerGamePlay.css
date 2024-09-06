@@ -1,0 +1,111 @@
+.summer {
+    width: 100vw;
+    height: 100vh;
+    background: url('./Assets/SUMMER CUTSCENE.svg') no-repeat center center;
+    background-size: contain;
+    background-color: #d79f44b9;
+}
+
+.summer-container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.summer-button-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 1rem; /* Add margin to separate from list */
+}
+
+.summer-button-bar button, .player-button, .scout-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+}
+
+.summer-button-bar button:hover, .scout-button:hover {
+    background-color: #e0e0e0;
+}
+
+.chat-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.chat-box {
+    position: absolute;
+    top: 60px; 
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background-color: rgba(0, 0, 0, 0.6); 
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 3; 
+    display: flex;
+    flex-direction: column;
+}
+
+.scout-button {
+    width: 100%; /* Align with Ready button */
+    height: 2lh;
+    background-color: lightgreen;
+    display: inline-flex;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0.05rem;
+    white-space: pre;
+}
+
+.scout-button img {
+    height: 100%;
+}
+
+.scout-button.selected {
+    background-color: green;
+    font-weight: bold;
+}
+
+.scout-button.ineligible {
+    color: black;
+    background-color: grey;
+}
+
+.scout-button.banished {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through double 1px;
+}
+
+.scout-button.pillaged {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through 2px;
+}
+
+.scout-container {
+    width: 30vh;
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1vh;
+    justify-content: center;
+}
+
+.banished-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold; 
+    color:red;
+} 
