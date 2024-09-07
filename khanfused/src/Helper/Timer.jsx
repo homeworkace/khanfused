@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Timer.css'; 
-import timer from './Assets/timer.svg';
+import timer from '../Assets/timer.svg';
 
 const Timer = ({ duration, onTimeUp }) => {
   const [timeLeft, setTimeLeft] = useState(duration);

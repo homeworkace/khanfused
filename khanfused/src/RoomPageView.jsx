@@ -94,10 +94,6 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
     const displayPlayerList = () => {
 
         return players.map((player) => {
-            //console.log(player.session);
-            //console.log(Number(getSession()));
-
-
         
             return (
                 <li key={player.session}>

@@ -1,5 +1,4 @@
 import logo from "./Assets/Khanfused.svg";
-import PlayerList from "./PlayerList";
 import './Role.css'
 
 function Role({ players, king }) {
@@ -17,7 +16,6 @@ function Role({ players, king }) {
             return kingName.name;
         }
 
-        console.log(`King not found ${king}`);
         return;
     };
 
@@ -28,11 +26,6 @@ function Role({ players, king }) {
 
     return (
         <div className="rolePage">
-
-            <div className="rolePage-player-list">
-                <PlayerList players={players} />
-            </div>
-
             <div className="rolePage-container">
                 <h4>Our King will be</h4>
                 <h1 className="fade-in-text">{ displayKing() }</h1>

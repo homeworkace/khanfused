@@ -11,7 +11,7 @@ app = Flask(__name__, static_folder='build', static_url_path='/')
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SCHEDULER_API_ENABLED'] = True
 
-cors = CORS(app)
+cors = CORS(app)    
 
 socket_app = SocketIO(app, cors_allowed_origins='*', async_mode='threading')
 
@@ -298,6 +298,7 @@ def socket_on_start_game(data):
     if result is None :
         # Notify other players that the game has started.
         for player in range(len(the_lobby.players)) :
+            print(the_lobby.players[player].name)
             emit(
                 'change_state', {
                     'state' : the_lobby.state,
@@ -313,7 +314,6 @@ def socket_on_start_game(data):
 
 @socket_app.on('ready')
 def socket_on_ready(data) :
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -321,7 +321,6 @@ def socket_on_ready(data) :
     
 @socket_app.on('unready')
 def socket_on_unready(data) :
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -329,11 +328,11 @@ def socket_on_unready(data) :
 
 @socket_app.on('select')
 def socket_on_select(data) :
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
     the_lobby.handle_select(data)
+
 
 if __name__ == '__main__':
     random.seed = time.time()
@@ -347,14 +346,12 @@ if __name__ == '__main__':
         for code in rooms :
             rooms[code] = lobby.unminified(rooms[code], scheduler, socket_app)
     try :
-        # app.run(debug=True, use_reloader=False)
-        socket_app.run(app, host = '0.0.0.0')
+        socket_app.run(app)
     except Exception as e :
         print(e)
     for code in rooms :
         rooms[code] = rooms[code].minified(True)
     rooms_file = open('rooms.json', 'w')
-    #rooms_file.write(json.dump(rooms))
     json.dump(rooms, rooms_file)
     rooms_file.close()
     
