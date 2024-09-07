@@ -349,7 +349,7 @@ class lobby :
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code
+        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
 
     def no_lords_end_start(self) :
         self.state = 'no_lords_end'
