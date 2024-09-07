@@ -89,21 +89,6 @@ class lobby :
         self.players.append([session, name])
         self.ready.append(not name is None) # If the player already has a non-conflicting name in the database, they are immediately ready.
 
-        # Testing 10-man lobby
-        if len(self.players) == 1:
-            self.players += [
-                #[0, 'Jules'],
-                #[1, 'Sofia'],
-                #[2, 'Wilford'],
-                #[3, 'Vivienne'],
-                #[4, 'Clemens'],
-                #[5, 'Oliver'],
-                #[6, 'Qasym'],
-                #[7, 'Zhuldyz'],
-                #[8, 'Aytac'],
-            ]
-            #self.ready += [True] * 6
-
         return True
 
     def leave_lobby(self, session) :
@@ -120,6 +105,8 @@ class lobby :
         return False
     
     def start(self, session) :
+        if self.state != 'waiting' :
+            return "Game is in progress!"
         if self.players[0][0] != session :
             return "Not the host!"
         if len(self.players) < 1 : # Change to 6 when needed
@@ -158,7 +145,6 @@ class lobby :
         #self.grain = 0 # Uncomment if we have a starting grain rule
 
         self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 2, id = 'spring_start' + self.lobby_code)
     
     def spring_start(self):
         self.state = 'spring'
@@ -179,7 +165,6 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 60, id = 'summer_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.summer_start, trigger = 'interval', seconds = 5, id = 'summer_start' + self.lobby_code)
 
     def summer_start(self) :
         self.state = 'summer'
@@ -227,8 +212,7 @@ class lobby :
 
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        #self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
-        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 5, id = 'summer_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.summer_result_start, trigger = 'interval', seconds = 30, id = 'summer_result_start' + self.lobby_code)
 
     def summer_result_start(self) :
         self.state = 'summer_result'
@@ -265,10 +249,8 @@ class lobby :
         self.next_job.remove()
         if self.grain < 0 :
             self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 5, id = 'food_end_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.food_end_start, trigger = 'interval', seconds = 2, id = 'food_end_start' + self.lobby_code)
         else :
             self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 5, id = 'autumn_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.autumn_start, trigger = 'interval', seconds = 2, id = 'autumn_start' + self.lobby_code)
 
     def autumn_start(self) :
         self.state = 'autumn'
@@ -285,7 +267,6 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 60, id = 'banish_result_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 5, id = 'banish_result_start' + self.lobby_code)
 
     def banish_result_start(self) :
         self.state = 'banish_result'
@@ -305,13 +286,10 @@ class lobby :
         remaining_khans = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 2]
         if not 0 in remaining_lords :
             self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 5, id = 'no_lords_end_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 2, id = 'no_lords_end_start' + self.lobby_code)
         elif not 0 in remaining_khans :
             self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 5, id = 'no_khans_end_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.no_khans_end_start, trigger = 'interval', seconds = 2, id = 'no_khans_end_start' + self.lobby_code)
         else :
             self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
 
         # Finally, emit change in state.
         self.socket.emit('change_state', { 'state' : 'banish_result', 'banished' : self.choices[0] }, room = self.lobby_code, namespace = '/')
@@ -331,7 +309,6 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 30, id = 'pillage_result_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.pillage_result_start, trigger = 'interval', seconds = 5, id = 'pillage_result_start' + self.lobby_code)
 
     def pillage_result_start(self) :
         self.state = 'pillage_result'
@@ -361,10 +338,8 @@ class lobby :
         remaining_lords = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 1]
         if not 0 in remaining_lords :
             self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 5, id = 'no_lords_end_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.no_lords_end_start, trigger = 'interval', seconds = 2, id = 'no_lords_end_start' + self.lobby_code)
         else :
             self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 5, id = 'spring_start' + self.lobby_code)
-            #self.next_job = self.timer.add_job(func = self.spring_start, trigger = 'interval', seconds = 2, id = 'spring_start' + self.lobby_code)
 
     def food_end_start(self) :
         self.state = 'food_end'
@@ -374,8 +349,7 @@ class lobby :
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code
 
     def no_lords_end_start(self) :
         self.state = 'no_lords_end'
@@ -386,7 +360,6 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
 
     def no_khans_end_start(self) :
         self.state = 'no_khans_end'
@@ -397,7 +370,6 @@ class lobby :
         # Finally, set a callback for the next state.
         self.next_job.remove()
         self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 5, id = 'waiting_start' + self.lobby_code)
-        #self.next_job = self.timer.add_job(func = self.waiting_start, trigger = 'interval', seconds = 2, id = 'waiting_start' + self.lobby_code)
 
     def waiting_start(self) :
         self.state = 'waiting'

@@ -311,8 +311,6 @@ def socket_on_start_game(data):
 
 @socket_app.on('ready')
 def socket_on_ready(data) :
-    print('ready')
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -320,8 +318,6 @@ def socket_on_ready(data) :
     
 @socket_app.on('unready')
 def socket_on_unready(data) :
-    print('unready')
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -329,8 +325,6 @@ def socket_on_unready(data) :
 
 @socket_app.on('select')
 def socket_on_select(data) :
-    print('select')
-    print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
     the_lobby = rooms[session[3]]
@@ -349,14 +343,12 @@ if __name__ == '__main__':
         for code in rooms :
             rooms[code] = lobby.unminified(rooms[code], scheduler, socket_app)
     try :
-        # app.run(debug=True, use_reloader=False)
         socket_app.run(app)
     except Exception as e :
         print(e)
     for code in rooms :
         rooms[code] = rooms[code].minified(True)
     rooms_file = open('rooms.json', 'w')
-    #rooms_file.write(json.dump(rooms))
     json.dump(rooms, rooms_file)
     rooms_file.close()
     
