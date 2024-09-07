@@ -1,118 +1,102 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './SummerResults.css';
 import HelpButton from '../Helper/Instructions';
 import PlayerList from "../Helper/PlayerList";
 
 function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
-  const [currentGrain, setCurrentGrain] = useState(grain.initial_grain); // Initial grain count
-  const [grainAddChange, setGrainAddChange] = useState(0); // Grain addition amount
-  const [grainDeductChange, setGrainDeductChange] = useState(0); // Grain deduction amount
-  const [animateAdd, setAnimateAdd] = useState(false); // Trigger animation for addition
-  const [animateDeduct, setAnimateDeduct] = useState(false); // Trigger animation for deduction
-  const [phase,setPhase] = useState(0);
+  const [currentGrain, setCurrentGrain] = useState(grain.initial_grain);
+  const [grainAddChange, setGrainAddChange] = useState(0);
+  const [grainDeductChange, setGrainDeductChange] = useState(0); 
+  const [animateAdd, setAnimateAdd] = useState(false);
+  const [animateDeduct, setAnimateDeduct] = useState(false);
 
-    const handleTimeUp = () => {
+  const prevGrainRef = useRef({
+    added_grain: grain.added_grain,
+    yearly_deduction: grain.yearly_deduction
+  });
 
-    };
+  useEffect(() => {
+    const addedGrain = grain.added_grain; 
+    const deductedGrain = grain.yearly_deduction; 
 
-    useEffect(() => {
-      const addedGrain = grain.added_grain; 
-      const deductedGrain = grain.yearly_deduction; 
-      const newGrainCount = currentGrain + addedGrain - deductedGrain;
-      // switch (phase) {
-      //   case 0: 
-        //   setCurrentGrain(currentGrain);
-        //   setPhase(phase+1);
-        //   break;
-
-      //   case 1:
-      // if (addedGrain > 0) {
-      //   setGrainAddChange(addedGrain); // Set addition change amount
-      //   setAnimateAdd(true); // Trigger addition animation
-      //   setTimeout(() => setAnimateAdd(false), 2000); // Reset animation flag after duration
-      //   setPhase(phase+1);
-      //   break;
-
-      //   case 2:
-      
-
-
-
-      //   case 3:
-      // if (deductedGrain > 0) {
-      //   setGrainDeductChange(-deductedGrain); // Set deduction change amount
-      //   setAnimateDeduct(true); // Trigger deduction animation
-      //   setTimeout(() => setAnimateDeduct(false), 2000); // Reset animation flag after duration
-      // }
-      
-      // }
-
-  
-
-  
-
-      // Update current grain count after animations
-      setCurrentGrain(newGrainCount);
-    }, [grain, currentGrain]);
-  
-
-    // lords who choose to 1. scout (display result), 2. farm, else king and khan
-    const renderRoleSpecificContent = () => {
-        if (role === 'lord')
-        {
-            const scoutedPlayer = players.find(p => p.session === scoutedRole.session_id);
-            if(scoutedRole.role === "khan") {
-                return (
-                <div>
-                    <p> {scoutedPlayer.name} is a</p>
-                    <p className ="khanRole-text"> KHAN </p>
-                </div>
-                )
-            }  else if (scoutedRole.role === "lord") {
-                return (
-                <div>
-                    <p> {scoutedPlayer.name} is a </p>
-                    <p className ="lordRole-text"> LORD </p>
-                </div>
-                )
-            }
-        } else {
-            return (
-                <div className = "nonlord-text">LORDS ARE VIEWING THEIR RESULTS
-                    <br/>
-                    <br/>
-                    Please wait...
-                </div>
-            )
-        }
-
+    // Detect changes in the added grain
+    if (grain.added_grain !== prevGrainRef.current.added_grain) {
+      setGrainAddChange(addedGrain);
+      setAnimateAdd(true);
+      setTimeout(() => setAnimateAdd(false), 2000);
     }
 
-    // non-role specific content
-    return (
-      <div className="summerResults">
-        <div className="summerResults-container">
-          {renderRoleSpecificContent()}
-          <HelpButton />
-          <div className="grain-info">
-            Grains: {currentGrain}
-            {grainAddChange > 0 && (
-              <span className={`grain-change add ${animateAdd ? 'fade-animation' : ''}`}>
-                +{grainAddChange}
-              </span>
-            )}
-            {grainDeductChange < 0 && (
-              <span className={`grain-change deduct ${animateDeduct ? 'fade-animation' : ''}`}>
-                {grainDeductChange}
-              </span>
-            )}
+    // Detect changes in the deducted grain
+    if (grain.yearly_deduction !== prevGrainRef.current.yearly_deduction) {
+      setGrainDeductChange(-deductedGrain);
+      setAnimateDeduct(true);
+      setTimeout(() => setAnimateDeduct(false), 2000);
+    }
+
+    // Update the current grain count after animations
+    const newGrainCount = currentGrain + addedGrain - deductedGrain;
+    setCurrentGrain(newGrainCount);
+
+    // Store the new grain values as previous values for the next comparison
+    prevGrainRef.current = {
+      added_grain: grain.added_grain,
+      yearly_deduction: grain.yearly_deduction
+    };
+
+  }, [grain, currentGrain]);
+
+  const renderRoleSpecificContent = () => {
+    if (role === 'lord') {
+      const scoutedPlayer = players.find(p => p.session === scoutedRole.session_id);
+      if (scoutedRole.role === "khan") {
+        return (
+          <div>
+            <p> {scoutedPlayer.name} is a</p>
+            <p className="khanRole-text"> KHAN </p>
           </div>
+        );
+      } else if (scoutedRole.role === "lord") {
+        return (
+          <div>
+            <p> {scoutedPlayer.name} is a </p>
+            <p className="lordRole-text"> LORD </p>
+          </div>
+        );
+      }
+    } else {
+      return (
+        <div className="nonlord-text">
+          LORDS ARE VIEWING THEIR RESULTS
+          <br />
+          <br />
+          Please wait...
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="summerResults">
+      <div className="summerResults-container">
+        {renderRoleSpecificContent()}
+        <HelpButton />
+        <div className="grain-info">
+          Grains: {currentGrain}
+          {grainAddChange > 0 && (
+            <span className={`grain-change add ${animateAdd ? 'fade-animation' : ''}`}>
+              +{grainAddChange}
+            </span>
+          )}
+          {grainDeductChange < 0 && (
+            <span className={`grain-change deduct ${animateDeduct ? 'fade-animation' : ''}`}>
+              {grainDeductChange}
+            </span>
+          )}
         </div>
       </div>
-    );
-  }
-  
-  export default SummerResults;
+    </div>
+  );
+}
 
-
+export default SummerResults;
