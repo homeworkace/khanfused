@@ -82,6 +82,11 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
     <div className="autumn">
       <div className="autumn-container">
 
+      <div className="intro-container">
+            <span className="autumn-title">AUTUMN</span>
+            <p className="autumn-subtitle">The King makes a choice...</p>
+      </div>
+
         <div className="autumn-button-bar">
           <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
           {renderRoleSpecificContent()} 

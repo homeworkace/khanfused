@@ -29,11 +29,11 @@ function AutumnResults ({grain, banished, status, socket, role, players}) {
                     </div>
                 )
             }
-        } else {
+        } else if(banished === -1) {
             // no one has been banished
             return (
             <div>
-                <p>THE KING HAS CHOSEN NOT TO BANISH</p>
+                <p className ="non-banished-text">THE KING HAS CHOSEN NOT TO BANISH</p>
             </div>
             )
 

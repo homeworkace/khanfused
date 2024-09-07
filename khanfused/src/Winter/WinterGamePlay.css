@@ -22,39 +22,18 @@
     margin-bottom: 1rem; /* Add margin to separate from list */
 }
 
-    .winter-button-bar button, .player-button, .pillage-button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #fff;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        z-index: 2;
-    }
+.winter-button-bar button, .player-button, .pillage-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+}
 
 .winter-button-bar button:hover, .pillage-button:hover {
     background-color: #e0e0e0;
-}
-
-.chat-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.chat-box {
-    position: absolute;
-    top: 60px; 
-    right: 20px;
-    width: 300px;
-    height: 400px;
-    background-color: rgba(0, 0, 0, 0.6); 
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 3; 
-    display: flex;
-    flex-direction: column;
 }
 
 .winter-player-list {
@@ -99,27 +78,27 @@
     font-weight: bold;
 }
 
-    .pillage-button.king {
-        color: black;
-        background-color: grey;
-    }
+.pillage-button.king {
+    color: black;
+    background-color: grey;
+}
 
-    .pillage-button.khan {
-        color: hsl(var(--khanColour), 100%, 50%);
-        background-color: grey;
-    }
+.pillage-button.khan {
+    color: hsl(var(--khanColour), 100%, 50%);
+    background-color: grey;
+}
 
-    .pillage-button.banished {
-        color: black;
-        background-color: grey;
-        text-decoration: line-through double 1px;
-    }
+.pillage-button.banished {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through double 1px;
+}
 
-    .pillage-button.pillaged {
-        color: black;
-        background-color: grey;
-        text-decoration: line-through 2px;
-    }
+.pillage-button.pillaged {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through 2px;
+}
 
 .player-container {
     width: 30vh;
@@ -144,4 +123,23 @@
     margin-left: 5px; /* Space between ticks */
     font-size: 16px; /* Adjust size as needed */
   }
+
+.intro-container {
+    position: relative;
+    bottom :1rem;
+    flex-direction: column;
+    align-items: center;
+}
+
+.winter-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #799eefb9;
+    text-align: center;
+    margin-bottom: 1rem;
+    margin-left: 1.5rem;
+}
+.winter-subtitle {
+    font-size: 0.8rem;
+}
   

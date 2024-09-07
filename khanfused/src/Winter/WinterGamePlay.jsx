@@ -5,9 +5,12 @@ import lordIcon from "../Assets/lord.svg";
 import khanIcon from "../Assets/khan.svg";
 import unknownIcon from "../Assets/unknown.svg";
 import { getSession } from '../utility.js';
+import HelpButton from '../Helper/Instructions.jsx';
+import Timer from '../Helper/Timer.jsx';
+import GrainList from "../Helper/PlayerList.jsx";
 
 
-function WinterGamePlay({ role, roleArray, status, statusArray, players, currentSeason, socket }) {
+function WinterGamePlay({ grain, role, roleArray, status, statusArray, players, currentSeason, socket }) {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isPillageListOpen, setIsPillageListOpen] = useState(true);
     const [votedPlayerSession, setVotedPlayerSession] = useState(null);
@@ -135,20 +138,24 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
     return (
         <div className="winter">
             <div className="winter-container">
-                {isChatOpen && (
-                    <div className="chat-box">
-                        <p>Chat content goes here...</p>
-                    </div>
-                )}
+                
+                <div className="intro-container">
+                    <span className="winter-title">WINTER</span>
+                    <p className="winter-subtitle">The Khans takes action</p>
+                </div>
                 {renderRoleSpecificContent()}
+
                 <div className="winter-button-bar">
-                    <button onClick={toggleChat} className="chat-button">
-                        Chat
-                    </button>
                     <button onClick={handleReadyClick}>
                         {isReady ? "Unready" : "Ready"}
                     </button>
                 </div>
+
+                <HelpButton role={role}/>
+
+                <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+
+                <Timer duration={30} onTimeUp={handleTimeUp} />
             </div>
         </div>
     );

@@ -11,6 +11,7 @@
     position: relative; 
     height: 100%; 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 1; 
@@ -19,11 +20,9 @@
 .autumn-button-bar {
     display: flex;
     gap: 20px; 
+    margin-bottom: 1rem;
 }
 
-.autumn-button-bar button:disabled {
-    cursor: not-allowed;
-}
 
 .autumn-button-bar button {
     padding: 10px 20px;
@@ -37,34 +36,6 @@
 
 .autumn-button-bar button:hover {
     background-color: #e0e0e0;
-}
-
-.chat-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-
-.chat-box {
-    position: absolute;
-    top: 60px; 
-    right: 20px;
-    width: 300px;
-    height: 400px;
-    background-color: rgba(0, 0, 0, 0.6); 
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 3; 
-    display: flex;
-    flex-direction: column;
-}
-
-.autumn-player-list {
-    position: absolute;
-    top: 1rem;
-    left: 5.5rem;
 }
 
 .banish-list {
@@ -112,3 +83,22 @@
     font-weight: bold; 
     color:red;
 } 
+
+.intro-container {
+    position: relative;
+    bottom :1rem;
+    flex-direction: column;
+    align-items: center;
+}
+
+.autumn-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #db8d07;
+    text-align: center;
+    margin-bottom: 1rem;
+    margin-left: 1.5rem;
+}
+.autumn-subtitle {
+    font-size: 0.8rem;
+}

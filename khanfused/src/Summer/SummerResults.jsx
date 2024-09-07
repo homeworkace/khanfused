@@ -59,8 +59,6 @@ function SummerResults ({status, grain, scoutedRole, socket, players, role}) {
 
     // lords who choose to 1. scout (display result), 2. farm, else king and khan
     const renderRoleSpecificContent = () => {
-
-        console.log("scoutedRole: ", scoutedRole);
         if (role === 'lord')
         {
             const scoutedPlayer = players.find(p => p.session === scoutedRole.session_id);
