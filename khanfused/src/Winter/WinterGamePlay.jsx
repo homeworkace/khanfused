@@ -98,7 +98,7 @@ function WinterGamePlay({ grain ,role, roleArray, status, statusArray, players, 
                         <button
                             key={-1}
                             onClick={() => handlePlayerSelect(-1)}
-                            className={"pillage-button"}
+                            // className={"pillage-button"}
                             className={"pillage-button" +
                                 (votedPlayerSession === -1 ? " selected" : "")
                             }

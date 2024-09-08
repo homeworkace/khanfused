@@ -62,7 +62,7 @@ function HelpButton({role}) {
           </div>
         </div>
       );
-    } else if (role === 'lord') {
+    } else if (role === 'king') {
       return (
         <div className ="king-instructions">
           <div className ="king-spring-instructions">
