@@ -107,7 +107,7 @@ class lobby :
     def start(self, session) :
         if self.players[0][0] != session :
             return "Not the host!"
-        if len(self.players) < 1 : # Change to 6 when needed
+        if len(self.players) < 6 : # Change to 6 when needed
             return "Not enough players!"
         if False in self.ready :
             return "Not all players are ready!"
