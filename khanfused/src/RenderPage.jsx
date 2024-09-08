@@ -92,73 +92,94 @@ function RoomPage() {
                     return <Role 
                         players={players}
                         king={king}
+                        roleArray={roleArray}
+                        statusArray={statusArray}
                 />
 
                 // grain deduction per year
                 case "spring":
                     return <SpringGamePlay
                         players={players}
-                        role ={role}
+                        role={role}
+                        roleArray={roleArray}
                         socket={socket}
                         currentSeason={currentSeason}
-                        status = {status}
+                        status={status}
+                        statusArray={statusArray}
+                        grain = {grain}
                 />  
 
                 case "summer":
+                    console.log(currentSeason);
+                    console.log(statusArray);
                     return <SummerGamePlay
                         players = {players}
-                        role = {role}
+                        role={role}
+                        roleArray={roleArray}
                         socket = {socket}
                         choices={choices}
                         setChoices={setChoices}
-                        status = {status}
+                        status={status}
+                        statusArray={statusArray}
                         currentSeason={currentSeason}
+                        grain ={grain}
                 />
 
                 case "summerResults":
                     return <SummerResults
                     players = {players}
                     socket = {socket}
-                    role = {role}
+                        role={role}
+                        roleArray={roleArray}
                     scoutedRole = {scoutedRole}
                     grain = {grain}
-                    status = {status}
+                        status={status}
+                        statusArray={statusArray}
                 />
 
                 case "autumn":
                     return <AutumnGamePlay
                     players = {players}
-                    role = {role}
+                        role={role}
+                        roleArray={roleArray}
                     socket = {socket}
                     currentSeason={currentSeason}
-                    status = {status}
+                        status={status}
+                        statusArray={statusArray}
+                    grain ={grain}
                 />
 
                 case "banishedResult":
                     return <AutumnResults
                     players = {players}
                     socket = {socket}
-                    role = {role}
+                        role={role}
+                        roleArray={roleArray}
                     banished = {banished}
-                    status = {status}
+                        status={status}
+                        statusArray={statusArray}
+                    grain = {grain}
                 />
-                // to be passed in as props
                 case "winter":
                     return <WinterGamePlay
-                    socket = {socket}
-                    players = {players}
-                    role = {role}
-                    roleArray={roleArray}
-                    currentSeason={currentSeason}
-                />
+                        socket={socket}
+                        players={players}
+                        role={role}
+                        roleArray={roleArray}
+                        status={status }
+                        statusArray={statusArray }
+                        currentSeason={currentSeason}
+                    />
 
                 case "pillageResult":
                     return <WinterDouble
                     players = {players}
                     socket = {socket}
-                    role = {role}
+                        role={role}
+                        roleArray={roleArray}
                     pillaged = {pillaged}
-                    status = {status}
+                        status={status}
+                        statusArray={statusArray}
                 />    
 
                 // insufficentFood scenario -- to be replaced with actual state
@@ -234,6 +255,10 @@ function RoomPage() {
                 setRole("khan");
             }
             setRoleArray(data['roles']);
+
+            console.log(data['status']);
+            setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
+            setStatusArray(data['status']);
 
             // renders page based on current state for joining players
             setCurrentSeason(data['state']);
@@ -500,7 +525,7 @@ function RoomPage() {
             setRoleArray(data['role']);
 
             // populate the array 'Status'
-            setStatusArray(Array.from({ length: 3 }).map(() => 0));
+            setStatusArray(Array.from({ length: players.length }).map(() => 0));
 
             // find max number from the array and assign the respective role
             let role_int = Math.max(...data['role']);
@@ -510,6 +535,7 @@ function RoomPage() {
             
             // find the index of 0 (King) in 'role' array
             let index = data['role'].indexOf(0);
+            console.log(players);
 
             // store the session id of king based on the corresponding index in 'players' array
             setKing(players[index]['session']);
@@ -520,7 +546,7 @@ function RoomPage() {
             socket.current.off("change_state", handleChangeState);
         }
 
-    }, [hasConnected, currentSeason]);
+    }, [hasConnected, players, currentSeason]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -655,7 +681,6 @@ function RoomPage() {
                     return;
                 }
 
-                console.log("Checkpoint 1");
                 console.log(data['result']);
 
                 // store session ID of the player who got chosen to get scouted
@@ -835,9 +860,13 @@ function RoomPage() {
                 // reset the previous data stored in 'banished'
                 setBanished(null);
 
+                // unready everyone who is acttive and ready everyone else
+                let updated_players = players.map((player, index) => {
 
-
-                // to be implemented
+                    // create a new player object with the updated 'ready' value
+                    return { ...player, ready: (statusArray[index]) !== 0 };
+                });
+                setPlayers(updated_players);
             }
             else if (data['state'] === "no_khans_end") {
                 // set current state to "no_khans_end"
@@ -890,9 +919,20 @@ function RoomPage() {
                 console.log("Khan(s) decides not to pillage");
 
             }
+            else {
+                //change the status of someone to pillaged
+                let updatedStatus = statusArray;
+                updatedStatus[players.map(p => p[0]).indexOf(data['pillaged'])] = 1;
+                setStatusArray(updatedStatus);
+
+                if (data['pillaged'] === Number(getSession())) {
+                    setStatus(1);
+                }
+            }
 
             // store session id of player chosen to be pillaged
             setPillaged(data['pillaged']);
+
 
         };
         socket.current.on("change_state", handleChangeState);

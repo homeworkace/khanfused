@@ -298,6 +298,7 @@ def socket_on_start_game(data):
     if result is None :
         # Notify other players that the game has started.
         for player in range(len(the_lobby.players)) :
+            print(the_lobby.players[player].name)
             emit(
                 'change_state', {
                     'state' : the_lobby.state,
@@ -313,6 +314,7 @@ def socket_on_start_game(data):
 
 @socket_app.on('ready')
 def socket_on_ready(data) :
+    print('ready')
     print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
@@ -321,6 +323,7 @@ def socket_on_ready(data) :
     
 @socket_app.on('unready')
 def socket_on_unready(data) :
+    print('unready')
     print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])
@@ -329,6 +332,7 @@ def socket_on_unready(data) :
 
 @socket_app.on('select')
 def socket_on_select(data) :
+    print('select')
     print(data)
     # Pass the input into the appropriate lobby.
     session = db.query_session(data['session'])

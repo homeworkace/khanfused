@@ -27,11 +27,6 @@
     margin-bottom: 1.2rem;
 }
 
-.summerResults-player-list {
-    position: absolute;
-    top: 1rem;
-    left: 5rem;
-}
 .grain-info {
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     position: absolute; 
@@ -42,4 +37,23 @@
     padding: 0.5rem; 
     border-radius: 0.5rem; 
     z-index: 2; 
+}
+
+.khanRole-text {
+    animation: fadeIn 1.5s ease-in forwards;
+    color:red;
+}
+
+.lordRole-text{
+    animation: fadeIn 1.5s ease-in forwards;
+    color: green;
+}
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
 }

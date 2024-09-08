@@ -6,10 +6,6 @@
     background-color: #da7517b9;
 }
 
-.autumn.greyed-out {
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
 
 .autumn-container {
     position: relative; 
@@ -68,7 +64,7 @@
 .autumn-player-list {
     position: absolute;
     top: 1rem;
-    left: 5rem;
+    left: 5.5rem;
 }
 
 .banish-list {
@@ -109,3 +105,10 @@
     background-color: #d0e0ff;
     font-weight: bold;
 }
+
+.banished-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold; 
+    color:red;
+} 
