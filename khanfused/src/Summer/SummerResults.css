@@ -52,33 +52,34 @@
 }
 
 .grain-info {
-    position: absolute;
-    font-size: 1.5rem; /* Adjust size as needed */
-    margin-top: 10px;
+  position: absolute;
+  font-size: 1.5rem; /* Adjust size as needed */
+  margin-top: 10px;
+}
+
+.grain-change {
+  margin-left: 10px;
+  opacity: 0; /* Start with invisible text */
+}
+
+.fade-animation {
+  animation: fadeInOut 2s ease forwards;
+}
+
+/* Keyframes for fading in and out */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
   }
-  
-  .grain-change {
-    margin-left: 10px;
-    opacity: 0; /* Start with invisible text */
+  20% {
+    opacity: 1; /* Fade in quickly */
   }
-  
-  .fade-animation {
-    animation: fadeInOut 2s ease forwards;
+  80% {
+    opacity: 1; /* Stay visible */
   }
-  
-  /* Keyframes for fading in and out */
-  @keyframes fadeInOut {
-    0% {
-      opacity: 0;
-    }
-    20% {
-      opacity: 1; /* Fade in quickly */
-    }
-    80% {
-      opacity: 1; /* Stay visible */
-    }
-    100% {
-      opacity: 0; /* Fade out gradually */
-    }
+  100% {
+    opacity: 0; /* Fade out gradually */
   }
+}
+
   

@@ -123,6 +123,10 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
     <div className="summer">
       <div className="summer-container">
 
+        <div className="intro-container">
+            <span className="summer-title">SUMMER</span>
+            <p className="summer-subtitle">The Lords work the Land</p>
+        </div>
 
         {renderRoleSpecificContent()}
         

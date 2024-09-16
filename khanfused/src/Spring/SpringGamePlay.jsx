@@ -90,6 +90,11 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
     <div className={"spring"}>
       <div className="spring-container">
 
+      <div className="intro-container">
+            <span className="spring-title">SPRING</span>
+            <p className="spring-subtitle">Open discussion</p>
+      </div>
+        
         <div className="spring-button-bar">
 
           <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
@@ -98,6 +103,8 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
 
           <HelpButton role={role}/>
 
+
+        
           {status !== 2 && (
             <button onClick={springReadyClick}>
             {isReady ? "Unready" : "Ready"}

@@ -5,15 +5,17 @@ import lordIcon from "../Assets/lord.svg";
 import khanIcon from "../Assets/khan.svg";
 import unknownIcon from "../Assets/unknown.svg";
 import { getSession } from '../utility.js';
+import HelpButton from '../Helper/Instructions.jsx';
+import Timer from '../Helper/Timer.jsx';
+import GrainList from "../Helper/PlayerList.jsx";
 
 
-function WinterGamePlay({ role, roleArray, status, statusArray, players, currentSeason, socket }) {
+function WinterGamePlay({ grain ,role, roleArray, status, statusArray, players, currentSeason, socket }) {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isPillageListOpen, setIsPillageListOpen] = useState(true);
     const [votedPlayerSession, setVotedPlayerSession] = useState(null);
     const [isReady, setIsReady] = useState(false);
     const [votes, setVotes] = useState({}); // To store votes
-
     useEffect(() => {
         if (votedPlayerSession) {
             setVotes(prevVotes => ({
@@ -22,15 +24,12 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
             }));
         }
     }, [votedPlayerSession]);
-
     const toggleChat = () => {
         setIsChatOpen(!isChatOpen);
     };
-
     const handleTimeUp = () => {
         // Handle time-up logic here
     };
-
     const handlePlayerSelect = (playerSession) => {
         setVotedPlayerSession(playerSession);
         socket.current.emit('select', {
@@ -39,7 +38,6 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
             pillage: playerSession,
         });
     };
-
     const handleReadyClick = () => {
         if (!isReady) {
             socket.current.emit('ready', {
@@ -55,7 +53,6 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
         }
         setIsReady(!isReady);
     };
-
     const roleIcon = (index) => {
         switch (roleArray[index]) {
             case -1:
@@ -68,7 +65,6 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                 return khanIcon;
         }
     };
-
     const renderRoleSpecificContent = () => {
         switch (role) {
             case "khan":
@@ -82,7 +78,7 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                                     (votedPlayerSession === player.session ? " selected" : "") +
                                     (roleArray[index] == 0 ? " king" : "") +
                                     (roleArray[index] == 2 ? " khan" : "") +
-                                    (statusArray[index] == 1 ? " pillaged" : "") 
+                                    (statusArray[index] == 1 ? " pillaged" : "") +
                                     (statusArray[index] == 2 ? " banished" : "")
                                 }
                                 style={{ "--khanColour": (player.session % 256) }}
@@ -102,6 +98,7 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                         <button
                             key={-1}
                             onClick={() => handlePlayerSelect(-1)}
+                            // className={"pillage-button"}
                             className={"pillage-button" +
                                 (votedPlayerSession === -1 ? " selected" : "")
                             }
@@ -131,27 +128,24 @@ function WinterGamePlay({ role, roleArray, status, statusArray, players, current
                 );
         }
     };
-
     return (
         <div className="winter">
             <div className="winter-container">
-                {isChatOpen && (
-                    <div className="chat-box">
-                        <p>Chat content goes here...</p>
-                    </div>
-                )}
                 {renderRoleSpecificContent()}
                 <div className="winter-button-bar">
-                    <button onClick={toggleChat} className="chat-button">
-                        Chat
-                    </button>
                     <button onClick={handleReadyClick}>
                         {isReady ? "Unready" : "Ready"}
                     </button>
+
+                    <HelpButton role={role}/>
+
+                    <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+
+                    <Timer duration={30} onTimeUp={handleTimeUp} />
+
                 </div>
             </div>
         </div>
     );
 }
-
 export default WinterGamePlay;

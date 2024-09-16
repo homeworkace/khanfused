@@ -137,26 +137,26 @@ function RoomPage() {
 
                 case "autumn":
                     return <AutumnGamePlay
-                    players = {players}
+                        players = {players}
                         role={role}
                         roleArray={roleArray}
-                    socket = {socket}
-                    currentSeason={currentSeason}
+                        socket = {socket}
+                        currentSeason={currentSeason}
                         status={status}
                         statusArray={statusArray}
-                    grain ={grain}
+                        grain ={grain}
                 />
 
                 case "banishedResult":
                     return <AutumnResults
-                    players = {players}
-                    socket = {socket}
+                        players = {players}
+                        socket = {socket}
                         role={role}
                         roleArray={roleArray}
-                    banished = {banished}
+                        banished = {banished}
                         status={status}
                         statusArray={statusArray}
-                    grain = {grain}
+                        grain = {grain}
                 />
                 case "winter":
                     return <WinterGamePlay
@@ -167,6 +167,8 @@ function RoomPage() {
                         status={status }
                         statusArray={statusArray }
                         currentSeason={currentSeason}
+                        grain = {grain}
+
                     />
 
                 case "pillageResult":

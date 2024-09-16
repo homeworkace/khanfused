@@ -4,7 +4,7 @@ import './RoomPageView.css';
 import { useEffect, useState } from 'react';
 import { getSession, getName } from './utility.js';
 
-function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName, setMyName, leaveRoomClick, startGameClick, handleRoleAssignmentChangeClick }) {
+function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName, setMyName, leaveRoomClick, startGameClick }) {
 
     //const [myName, setMyName] = useState(getName() ? getName() : "");
     const [editMode, setEditMode] = useState(myName === "");
@@ -159,9 +159,6 @@ function RoomPageView({ socket, code, currentSeason, players, setPlayers, myName
                 </button>
             </div>
 
-            <button className="randomise-button" onClick={ handleRoleAssignmentChangeClick }>
-                    Randomise
-            </button>
 
             <div className="current-season">
             <h2>Current Season: {currentSeason}</h2>

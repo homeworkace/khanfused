@@ -56,3 +56,8 @@
     }
 }
 
+
+.non-banished-text {
+    color: green;
+    font-size:1.5rem;
+}
