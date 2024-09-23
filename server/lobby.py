@@ -17,6 +17,7 @@ class lobby :
         self.ready = []
         self.roles = [] # 0 if king, 1 if lord, 2 if khan
         self.perspectives = []
+        self.result_packets = []
         self.status = [] # 0 if active, 1 if pillaged, 2 if banished, 3 if double harvest
         self.choices = [] # spring: the king's choice of lord to double harvest, summer: the lords choices, autumn: the king's choice of lord to banish, winter: the khans' choices of lord to pillage
         self.grain = 0
@@ -33,6 +34,7 @@ class lobby :
         result['ready'] = self.ready
         result['roles'] = self.roles
         result['perspectives'] = self.perspectives
+        result['result_packets'] = self.result_packets
         result['status'] = self.status
         result['choices'] = self.choices
         result['grain'] = self.grain
@@ -52,6 +54,7 @@ class lobby :
         result.ready = lobby_to_copy['ready']
         result.roles = lobby_to_copy['roles']
         result.perspectives = lobby_to_copy['perspectives']
+        result.result_packets = lobby_to_copy['result_packets']
         result.status = lobby_to_copy['status']
         result.choices = lobby_to_copy['choices']
         result.grain = lobby_to_copy['grain']
@@ -238,12 +241,13 @@ class lobby :
 
         # Emit change in state.
         for player in range(len(self.players)) :
-            if self.choices[player] is None :
-                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
-            elif self.choices[player] == -1 :
-                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain }, room = str(self.players[player][0]), namespace = '/')
-            else :
-                self.socket.emit('change_state', { 'state' : 'summer_result', 'grain' : added_grain, 'result' : self.choices[player] }, room = str(self.players[player][0]), namespace = '/')
+            summer_result_packet = {}
+            summer_result_packet['state'] = 'summer_result'
+            summer_result_packet['grain'] = added_grain
+            if not self.choices[player] is None and self.choices[player] != -1 :
+                summer_result_packet['result'] = self.choices[player]
+            self.result_packets.append(summer_result_packet)
+            self.socket.emit('change_state', summer_result_packet, room = str(self.players[player][0]), namespace = '/')
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
@@ -254,6 +258,9 @@ class lobby :
 
     def autumn_start(self) :
         self.state = 'autumn'
+
+        # Having come from summer_result, the result packets should be cleared.
+        self.result_packets = []
         
         # Ready everyone who is banished and unready everyone else.
         self.ready = [True if player == 2 else False for player in self.status]
@@ -343,6 +350,9 @@ class lobby :
 
     def food_end_start(self) :
         self.state = 'food_end'
+
+        # Having come from summer_result, the result packets should be cleared.
+        self.result_packets = []
 
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'food_end' }, room = self.lobby_code, namespace = '/')

@@ -193,6 +193,8 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     lobby_info = rooms[session[3]].minified()
 
+    del lobby_info['result_packets']
+
     # Edit the information that is shown to the player.
     # Find the index of the player. This allows us to reference the same index across other lists.
     player_index = 0
@@ -220,6 +222,9 @@ def socket_on_join(data):
         if lobby_info['roles'][player_index] == 1 and lobby_info['status'][player_index] == 0:
             lobby_info['choices'] = choices[player_index]
         lobby_info['status'] = [(status if status < 3 else 0) for status in lobby_info['status']]
+    # summer result: resend the data that wouldve been sent for state change
+    elif lobby_info['state'] == 'summer_result' :
+        lobby_info.update()
     # autumn: king chooses banish. only the king should know their choice. session id for banish, -1 for none
     elif lobby_info['state'] == 'autumn' :
         if lobby_info['roles'][player_index] == 0:
@@ -298,7 +303,6 @@ def socket_on_start_game(data):
     if result is None :
         # Notify other players that the game has started.
         for player in range(len(the_lobby.players)) :
-            print(the_lobby.players[player].name)
             emit(
                 'change_state', {
                     'state' : the_lobby.state,
