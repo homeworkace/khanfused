@@ -211,7 +211,7 @@ function RoomPage() {
         let promise = checkSession();
         promise.then((sessionDetails) => {
             if (!("redirect" in sessionDetails)) {
-                navigate("/", { replace: true });
+                navigate("http://localhost:5000/", { replace: true });
             }
             else if (sessionDetails["redirect"] !== window.location.pathname) {
                 navigate(sessionDetails["redirect"], { replace: true });
@@ -228,7 +228,7 @@ function RoomPage() {
         }
 
         //WebSockets are easier on the server than long-polling, but Werkzeug doesn't support it. Keep in mind!
-        socket.current = io("/", { autoConnect: false });
+        socket.current = io("http://localhost:5000/", { autoConnect: false });
 
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {

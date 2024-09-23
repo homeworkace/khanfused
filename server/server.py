@@ -28,7 +28,7 @@ def serve_app(code = ''):
     return app.send_static_file('index.html')
 
 # Event handler for the home page
-@app.route('/check-session', methods=['POST', 'OPTIONS'])
+@app.route('/check-session', methods=['POST'])
 def check_session():
     data = request.json
     result = db.query_session(data['session'])
@@ -56,7 +56,7 @@ def check_session():
     return data
 
 # Event handler for lobby creation
-@app.route('/create-lobby', methods=['POST', 'OPTIONS'])
+@app.route('/create-lobby', methods=['POST'])
 def create_lobby():
     data = request.json
 
@@ -80,7 +80,7 @@ def create_lobby():
     return result
 
 # Event handler to join a lobby
-@app.route('/join-lobby', methods=['POST', 'OPTIONS'])
+@app.route('/join-lobby', methods=['POST'])
 def join_lobby():
     data = request.json
 
@@ -124,7 +124,7 @@ def join_lobby():
     return result
 
 # Event handler to leave a lobby
-@app.route('/leave-lobby', methods=['POST', 'OPTIONS'])
+@app.route('/leave-lobby', methods=['POST'])
 def leave_lobby():
     data = request.json
 
