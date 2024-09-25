@@ -9,12 +9,9 @@ import HelpButton from '../Helper/Instructions.jsx';
 import Timer from '../Helper/Timer.jsx';
 import GrainList from "../Helper/PlayerList.jsx";
 
-function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, roleArray, statusArray, currentSeason }) {
-  const [isScoutListOpen, setIsScoutListOpen] = useState(false);
-  const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
-  const [isFarm, setIsFarm] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
+function SummerGamePlay({ grain, status, socket, choices, players, role, roleArray, statusArray, currentSeason }) {
+  const [selectedPlayerSession, setSelectedPlayerSession] = useState(choices);
+  const [isReady, setIsReady] = useState(players.find((p) => p.session === Number(getSession())).ready);
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
   useEffect(() => {

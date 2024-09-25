@@ -116,7 +116,6 @@ class lobby :
             return "Not enough players!"
         if False in self.ready :
             return "Not all players are ready!"
-        print(self.ready)
 
         self.ready = [False] * len(self.players)
         self.role_assignment_start()

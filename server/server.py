@@ -193,7 +193,10 @@ def socket_on_join(data):
     session = db.query_session(data['session'])
     lobby_info = rooms[session[3]].minified()
 
-    del lobby_info['result_packets']
+    # Insert game-specific rules.
+    lobby_info['game_rules'] = {
+        'yearly_deduction' : math.floor(len(lobby_info['players']) / 2)
+        }
 
     # Edit the information that is shown to the player.
     # Find the index of the player. This allows us to reference the same index across other lists.
@@ -205,14 +208,13 @@ def socket_on_join(data):
     if lobby_info['state'] != 'waiting' :
         lobby_info['roles'] = lobby_info['perspectives'][player_index]
     del lobby_info['perspectives']
+    choices = lobby_info['choices'][:] # The choices field broadly represents the choice(s) that the player or other players have made, depending on the season.
+    del lobby_info['choices']
+    del lobby_info['result_packets']
 
     # Except for waiting, spring and autumn, only present whether the player is ready.
     if lobby_info['state'] != 'waiting' and lobby_info['state'] != 'spring' and lobby_info['state'] != 'autumn' :
         lobby_info['ready'] = lobby_info['ready'][player_index]
-
-    # The choices field broadly represents the choice(s) that the player or other players have made, depending on the season.
-    choices = lobby_info['choices'][:]
-    del lobby_info['choices']
     # spring: king chooses double harvest. only the king should know their choice
     if lobby_info['state'] == 'spring' :
         if lobby_info['roles'][player_index] == 0:
@@ -221,10 +223,12 @@ def socket_on_join(data):
     elif lobby_info['state'] == 'summer' :
         if lobby_info['roles'][player_index] == 1 and lobby_info['status'][player_index] == 0:
             lobby_info['choices'] = choices[player_index]
+            if lobby_info['status'][player_index] == 3 :
+                lobby_info['choices'] = -2
         lobby_info['status'] = [(status if status < 3 else 0) for status in lobby_info['status']]
     # summer result: resend the data that wouldve been sent for state change
     elif lobby_info['state'] == 'summer_result' :
-        lobby_info.update()
+        lobby_info.update(lobby_info['result_packets'][player_index])
     # autumn: king chooses banish. only the king should know their choice. session id for banish, -1 for none
     elif lobby_info['state'] == 'autumn' :
         if lobby_info['roles'][player_index] == 0:
