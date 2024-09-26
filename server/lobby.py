@@ -123,9 +123,6 @@ class lobby :
     
     def role_assignment_start(self):
         self.state = 'role_assignment'
-        # temp lol
-        self.roles = []
-        self.perspectives = []
 
         # Populate the roles array in sequence, then shuffle.
         self.roles += [0] # There is always 1 king
@@ -150,6 +147,9 @@ class lobby :
     
     def spring_start(self):
         self.state = 'spring'
+
+        # Having come from pillage_result, the result packets should be cleared.
+        self.result_packets = []
         
         # Ready everyone who is banished and unready everyone else.
         self.ready = [True if player == 2 else False for player in self.status]
@@ -157,12 +157,11 @@ class lobby :
         # Set placeholder choice of lord to perform a double harvest.
         for i in range(len(self.roles)) :
             if self.roles[i] != 0 :
+                self.socket.emit('change_state', { 'state' : 'spring' }, room = str(self.players[i][0]), namespace = '/') # Emit change in state.
                 continue
             eligible_choices = [j for j in range(len(self.roles)) if j != i and self.status[j] == 0]
             self.choices = [self.players[random.choice(eligible_choices)][0]]
-
-        # Emit change in state.
-        self.socket.emit('change_state', { 'state' : 'spring' }, room = self.lobby_code, namespace = '/')
+            self.socket.emit('change_state', { 'state' : 'spring', 'choices' : self.choices }, room = str(self.players[i][0]), namespace = '/') # Emit change in state.
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
@@ -209,6 +208,8 @@ class lobby :
         for player in range(len(self.players)) :
             if self.status[player] == 3 :
                 self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
+            elif not self.choice[player] is None :
+                self.socket.emit('change_state', { 'state' : 'summer',  'choice' : self.choice[player]}, room = str(self.players[player][0]), namespace = '/')
             else :
                 self.socket.emit('change_state', { 'state' : 'summer' }, room = str(self.players[player][0]), namespace = '/')
 
@@ -298,10 +299,17 @@ class lobby :
             self.next_job = self.timer.add_job(func = self.winter_start, trigger = 'interval', seconds = 5, id = 'winter_start' + self.lobby_code)
 
         # Finally, emit change in state.
-        self.socket.emit('change_state', { 'state' : 'banish_result', 'banished' : self.choices[0] }, room = self.lobby_code, namespace = '/')
+        banish_result_packet = {}
+        banish_result_packet['state'] = 'banish_result'
+        banish_result_packet['banished'] = self.choices[0]
+        self.result_packets.append(banish_result_packet)
+        self.socket.emit('change_state', banish_result_packet, room = self.lobby_code, namespace = '/')
 
     def winter_start(self) :
         self.state = 'winter'
+
+        # Having come from banish_result, the result packets should be cleared.
+        self.result_packets = []
         
         # Reset the list of choices so that it represents the khans' decisions.
         self.choices = [(-2 if self.status[player] == 0 and self.roles[player] == 2 else None) for player in range(len(self.status))]
@@ -338,7 +346,11 @@ class lobby :
                 break
 
         # Emit change in state.
-        self.socket.emit('change_state', { 'state' : 'pillage_result', 'pillaged' : result }, room = self.lobby_code, namespace = '/')
+        pillage_result_packet = {}
+        pillage_result_packet['state'] = 'pillage_result'
+        pillage_result_packet['pillaged'] = self.choices[0]
+        self.result_packets.append(pillage_result_packet)
+        self.socket.emit('change_state', pillage_result_packet, room = self.lobby_code, namespace = '/')
         
         # Set the next screen to show based on whether there are any active players of that role left.
         remaining_lords = [self.status[player] for player in range(len(self.roles)) if self.roles[player] == 1]
@@ -363,6 +375,9 @@ class lobby :
     def no_lords_end_start(self) :
         self.state = 'no_lords_end'
 
+        # Having come from pillage_result or banish_result, the result packets should be cleared.
+        self.result_packets = []
+
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'no_lords_end' }, room = self.lobby_code, namespace = '/')
         
@@ -372,6 +387,9 @@ class lobby :
 
     def no_khans_end_start(self) :
         self.state = 'no_khans_end'
+
+        # Having come from banish_result, the result packets should be cleared.
+        self.result_packets = []
 
         # Emit change in state.
         self.socket.emit('change_state', { 'state' : 'no_khans_end' }, room = self.lobby_code, namespace = '/')

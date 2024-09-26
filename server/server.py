@@ -233,10 +233,16 @@ def socket_on_join(data):
     elif lobby_info['state'] == 'autumn' :
         if lobby_info['roles'][player_index] == 0:
             lobby_info['choices'] = choices[0]
+    # banish result: resend the data that wouldve been sent for state change
+    elif lobby_info['state'] == 'banish_result' :
+        lobby_info.update(lobby_info['result_packets'][0])
     # winter: khans choose pillage. the khans should know each others decisions. session id for pillage, -1 for none
     elif lobby_info['state'] == 'winter' :
         if lobby_info['roles'][player_index] == 0:
             lobby_info['choices'] = choices
+    # summer result: resend the data that wouldve been sent for state change
+    elif lobby_info['state'] in 'pillage_result' :
+        lobby_info.update(lobby_info['result_packets'][0])
 
     emit('join', lobby_info)
     join_room(session[3])
