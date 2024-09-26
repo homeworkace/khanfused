@@ -1,7 +1,7 @@
 import { getSession, getName } from './utility';
 
 async function checkSession() {
-    let response = await fetch("http://localhost:5000/check-session", {
+    let response = await fetch("/check-session", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -27,7 +27,7 @@ async function checkSession() {
 }
 
 async function startLobby(password = "") {
-    let response = await fetch("http://localhost:5000/create-lobby", {
+    let response = await fetch("/create-lobby", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -43,7 +43,7 @@ async function startLobby(password = "") {
 }
 
 async function joinLobby(lobbyCode, password = "") {
-    let response = await fetch("http://localhost:5000/join-lobby", {
+    let response = await fetch("/join-lobby", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -60,7 +60,7 @@ async function joinLobby(lobbyCode, password = "") {
 }
 
 async function leaveLobby() {
-    let response = await fetch("http://localhost:5000/leave-lobby", {
+    let response = await fetch("/leave-lobby", {
         method: "POST",
         headers: {
             "Accept": "application/json",
