@@ -1,22 +1,26 @@
 import logo from "./Assets/Khanfused.svg";
 import './Role.css'
+import { getSession } from './utility.js'
 
-function Role({ players, king }) {
+function Role({ players, roles }) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const displayKing = () => {
-        const kingName = players.find(p => p.session === king);
+    const displayRole = () => {
+        const role = roles[players.map(p => p.session).indexOf(Number(getSession()))];
 
-        if (kingName) {
-
-            return kingName.name;
+        if (role === 0) {
+            return "KING";
         }
-
-        return;
+        else if (role === 1) {
+            return "LORD"
+        }
+        else {
+            return "KHAN"
+        }
     };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,8 +31,15 @@ function Role({ players, king }) {
     return (
         <div className="rolePage">
             <div className="rolePage-container">
-                <h4>Our King will be</h4>
-                <h1 className="fade-in-text">{ displayKing() }</h1>
+                <h4>You are a</h4>
+                <h1>{displayRole()}</h1>
+                {
+                    displayRole() !== "KING" &&
+                    <>
+                        <h4>Our King will be</h4>
+                        <h1 className="fade-in-text">{players[roles.indexOf(0)].name}</h1>
+                    </>
+                }
             </div>
         </div>
     );

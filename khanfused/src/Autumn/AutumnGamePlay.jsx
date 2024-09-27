@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './AutumnGamePlay.css'; 
+import './AutumnGamePlay.css';
+import kingIcon from "../Assets/king.svg";
+import lordIcon from "../Assets/lord.svg";
+import khanIcon from "../Assets/khan.svg";
+import unknownIcon from "../Assets/unknown.svg";
 import { getSession } from '../utility.js';
 import HelpButton from '../Helper/Instructions.jsx';
 import Timer from '../Helper/Timer.jsx';
 import GrainList from "../Helper/PlayerList.jsx";
 
-function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) {
-  const [isBanishListOpen, setBanishListOpen] = useState(false);
+function AutumnGamePlay({grain, status, socket, role, roleArray, statusArray, players, currentSeason }) {
   const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
   const [isReady, setIsReady] = useState(false);
 
@@ -34,48 +37,83 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
             };
     }
 
-
-  const toggleBanishList = () => {
-    setBanishListOpen(!isBanishListOpen);
-  };
-
   const handleTimeUp = () => {
 
   }
 
-  const handlePlayerSelect = (player) => {
-    setSelectedPlayerSession(player.session);
-  };
+    const handlePlayerSelect = (playerSession) => {
+        setSelectedPlayerSession(playerSession);
+      if (isReady) {
+          autumnReadyClick();
+      }
+    };
+
+    const roleIcon = (index) => {
+        switch (roleArray[index]) {
+            case -1:
+                return unknownIcon;
+            case 0:
+                return kingIcon;
+            case 1:
+                return lordIcon;
+            case 2:
+                return khanIcon;
+        }
+    };
 
   const renderRoleSpecificContent = () => {
-    if (role === "king" ) {
-      return (
-        <div>
-          <button className="banish-button" onClick={toggleBanishList}>Banish</button>
-          {isBanishListOpen && (
-            <div className="banish-list active">
-              <ul>
-                {players.filter(player => player.session != getSession()).map((player) => (
-                  <li 
-                    key={player.session} 
-                    onClick={() => handlePlayerSelect(player)}
-                    className={selectedPlayerSession === player.session ? "selected" : ""}
+      if (role === "king") {
+          return (
+              <div className="banish-container">
+                  {players.map((player, index) => (
+                      <button
+                          key={player.session}
+                          onClick={() => handlePlayerSelect(player.session)}
+                          className={"banish-button" +
+                              (selectedPlayerSession === player.session ? " selected" : "") +
+                              (roleArray[index] !== -1 ? " ineligible" : "") +
+                              (statusArray[index] == 1 ? " pillaged" : "") +
+                              (statusArray[index] == 2 ? " banished" : "")
+                          }
+                          disabled={roleArray[index] !== -1 || statusArray[index] !== 0}
+                      >
+                          <img src={roleIcon(index)} />
+                          {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                      </button>
+                  ))}
+                  <button
+                      key={-1}
+                      onClick={() => handlePlayerSelect(-1)}
+                      className={"banish-button" +
+                          (selectedPlayerSession === -1 ? " selected" : "")
+                      }
+                      disabled={status !== 0}
                   >
-                    {player.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      );
-    } else if (status === 2) {
-      return (
-      <div className = "banished">
-        <p className="banished-text">YOU HAVE BEEN BANISHED</p>
-      </div>
-      )
-    }
+                      Don't banish
+                  </button>
+              </div>
+          );
+      }
+      else {
+          return (
+              <div className="player-container">
+                  {players.map((player, index) => (
+                      <button
+                          key={player.session}
+                          className={"player-button" +
+                              (statusArray[index] == 1 ? " pillaged" : "") +
+                              (statusArray[index] == 2 ? " banished" : "")
+                          }
+                          disabled={true}
+                      >
+                          <img src={roleIcon(index)} />
+                          {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                      </button>
+                  ))}
+              </div>
+          );
+      }
+
   };
 
   return (
@@ -87,17 +125,18 @@ function AutumnGamePlay({grain, status, socket, role, players, currentSeason }) 
             <p className="autumn-subtitle">The King makes a choice...</p>
       </div>
 
-        <div className="autumn-button-bar">
-          <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
           {renderRoleSpecificContent()} 
 
-          <HelpButton role={role}/>
-          {status !== 2 && (
+          {status === 0 && (
+        <div className="autumn-button-bar">
             <button onClick={autumnReadyClick}>
             {isReady ? "Unready" : "Ready"}
             </button>
-          )}
         </div>
+          )}
+              <HelpButton role={role} />
+
+        <GrainList grain = {grain.initial_grain} />
 
         <Timer duration={60} onTimeUp={handleTimeUp} />
       </div>

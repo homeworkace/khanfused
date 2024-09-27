@@ -9,12 +9,9 @@ import HelpButton from '../Helper/Instructions.jsx';
 import Timer from '../Helper/Timer.jsx';
 import GrainList from "../Helper/PlayerList.jsx";
 
-function SummerGamePlay({ grain, status, socket, choices, setChoices, players, role, roleArray, statusArray, currentSeason }) {
-  const [isScoutListOpen, setIsScoutListOpen] = useState(false);
-  const [selectedPlayerSession, setSelectedPlayerSession] = useState(null);
-  const [isFarm, setIsFarm] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
+function SummerGamePlay({ grain, status, socket, choices, players, role, roleArray, statusArray, currentSeason }) {
+  const [selectedPlayerSession, setSelectedPlayerSession] = useState(choices);
+  const [isReady, setIsReady] = useState(players.find((p) => p.session === Number(getSession())).ready);
   const selectedPlayerSessionRef = useRef(selectedPlayerSession);
 
   useEffect(() => {
@@ -26,6 +23,9 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
 
     const handlePlayerSelect = (playerSession) => {
         setSelectedPlayerSession(playerSession);
+        if (isReady) {
+            summerReadyClick();
+        }
     };
 
     const summerReadyClick = () => {
@@ -66,24 +66,6 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
     };
 
     const renderRoleSpecificContent = () => {
-        let infoText = "";
-        switch (status) {
-            case 1:
-                infoText = "YOU HAVE BEEN PILLAGED";
-                break;
-            case 2:
-                infoText = "YOU HAVE BEEN BANISHED";
-                break;
-            case 3:
-                infoText = "You have been chosen for double harvest";
-                break;
-        }
-        let result = (
-            <div className="banished">
-                <p className="banished-text">{ infoText }</p>
-            </div>
-        );
-
         if (role === "lord" && status === 0) {
             return (
                 <div className="scout-container">
@@ -97,7 +79,7 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
                                 (statusArray[index] == 1 ? " pillaged" : "") +
                                 (statusArray[index] == 2 ? " banished" : "")
                             }
-                            disabled={ roleArray[index] !== -1 || statusArray[index] !== 0}
+                            disabled={roleArray[index] !== -1 || statusArray[index] !== 0}
                         >
                             <img src={roleIcon(index)} />
                             {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
@@ -115,9 +97,49 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
                     </button>
                 </div>
             );
-        } 
-      };
+        }
+        else {
+            return (
+                <div className="player-container">
+                    {players.map((player, index) => (
+                        <button
+                            key={player.session}
+                            className={"player-button" +
+                                (role === "king" && choices === player.session ? " selected" : "") +
+                                (statusArray[index] == 1 ? " pillaged" : "") +
+                                (statusArray[index] == 2 ? " banished" : "")
+                            }
+                            disabled={true}
+                        >
+                            <img src={roleIcon(index)} />
+                            {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                        </button>
+                    ))}
+                </div>
+            );
+        }
 
+    };
+
+    const renderStatusSpecificContent = () => {
+        let infoText = "";
+        switch (status) {
+            case 1:
+                infoText = "YOU HAVE BEEN PILLAGED";
+                break;
+            case 2:
+                infoText = "YOU HAVE BEEN BANISHED";
+                break;
+            case 3:
+                infoText = "You have been chosen for double harvest";
+                break;
+        }
+        return (
+            <div className="banished">
+                <p className="banished-text">{infoText}</p>
+            </div>
+        );
+    }
 
   return (
     <div className="summer">
@@ -136,11 +158,12 @@ function SummerGamePlay({ grain, status, socket, choices, setChoices, players, r
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>
-        )}
+              )}
+              {renderStatusSpecificContent() }
 
         <HelpButton role={role}/>
 
-        <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+        <GrainList grain = {grain.initial_grain} />
 
         <Timer duration={30} onTimeUp={handleTimeUp} />
       </div>

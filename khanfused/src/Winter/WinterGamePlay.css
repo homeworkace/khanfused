@@ -36,12 +36,6 @@
     background-color: #e0e0e0;
 }
 
-.winter-player-list {
-    position: absolute;
-    top: 1rem;
-    left: 5rem;
-}
-
 .player-button {
     width: 100%; /* Align with Ready button */
     height: 2lh;
@@ -56,6 +50,18 @@
 
 .player-button img {
     height: 100%;
+}
+
+.player-button.banished {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through double 1px;
+}
+
+.player-button.pillaged {
+    color: black;
+    background-color: grey;
+    text-decoration: line-through 2px;
 }
 
 .pillage-button {

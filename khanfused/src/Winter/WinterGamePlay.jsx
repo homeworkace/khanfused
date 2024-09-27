@@ -37,6 +37,9 @@ function WinterGamePlay({ grain ,role, roleArray, status, statusArray, players, 
             session: getSession(),
             pillage: playerSession,
         });
+        if (isReady) {
+            handleReadyClick();
+        }
     };
     const handleReadyClick = () => {
         if (!isReady) {
@@ -139,7 +142,7 @@ function WinterGamePlay({ grain ,role, roleArray, status, statusArray, players, 
 
                     <HelpButton role={role}/>
 
-                    <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+                    <GrainList grain = {grain.initial_grain} />
 
                     <Timer duration={30} onTimeUp={handleTimeUp} />
 

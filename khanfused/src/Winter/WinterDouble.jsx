@@ -1,4 +1,5 @@
 import './WinterDouble.css';
+import HelpButton from '../Helper/Instructions';
 
 function PillageResult ({players, socket, role, pillaged, status}) {
 
@@ -39,6 +40,7 @@ function PillageResult ({players, socket, role, pillaged, status}) {
             <div className="winterDouble-container">
                 {renderRoleSpecificContent()}
             </div>
+            <HelpButton role={role} />
         </div>
     );
 }       

@@ -36,6 +36,25 @@
     background-color: #e0e0e0;
 }
 
+.player-button {
+    width: 100%; /* Align with Ready button */
+    height: 2lh;
+    color: black;
+    background-color: grey;
+    display: inline-flex;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0.05rem;
+    white-space: pre;
+}
+
+.player-button img {
+    height: 100%;
+}
+
+    .player-button.selected {
+        font-weight: bold;
+    }
 
 .scout-button {
     width: 100%; /* Align with Ready button */

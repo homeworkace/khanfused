@@ -91,12 +91,9 @@ function RoomPage() {
                 case "reveal_role":
                     return <Role 
                         players={players}
-                        king={king}
-                        roleArray={roleArray}
-                        statusArray={statusArray}
+                        roles={roleArray}
                 />
 
-                // grain deduction per year
                 case "spring":
                     return <SpringGamePlay
                         players={players}
@@ -233,31 +230,130 @@ function RoomPage() {
         // Receives all relevant information to start the client off.
         const handleJoin = (data) => {
             let _players = [];
-            for (let i = 0; i < data['players'].length; ++i) {
-                let thePlayer = {};
-                thePlayer.session = data['players'][i][0];
-                thePlayer.name = data['players'][i][1];
-                thePlayer.ready = data['ready'][i];
-                _players.push(thePlayer);
-                //if (data['state'] !== 'waiting' && data['state'] !== 'instructions' && data['state'] !== 'role_assignment') {
-                //    _players
-            }
-            setPlayers(_players);
+            let roleInt = 0;
+            switch (data["state"]) {
+                case "waiting":
+                    for (let i = 0; i < data['players'].length; ++i) {
+                        let thePlayer = {};
+                        thePlayer.session = data['players'][i][0];
+                        thePlayer.name = data['players'][i][1];
+                        thePlayer.ready = data['ready'][i];
+                        _players.push(thePlayer);
+                    }
+                    setPlayers(_players);
+                    break;
 
-            let roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
-            if (roleInt === 0) {
-                setRole("king");
-            }
-            else if (roleInt === 1) {
-                setRole("lord");
-            }
-            else {
-                setRole("khan");
-            }
-            setRoleArray(data['roles']);
+                case "role_assignment":
+                    for (let i = 0; i < data['players'].length; ++i) {
+                        let thePlayer = {};
+                        thePlayer.session = data['players'][i][0];
+                        thePlayer.name = data['players'][i][1];
+                        thePlayer.ready = true;
+                        _players.push(thePlayer);
+                    }
+                    setPlayers(_players);
 
-            setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
-            setStatusArray(data['status']);
+                    roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+                    if (roleInt === 0) {
+                        setRole("king");
+                    }
+                    else if (roleInt === 1) {
+                        setRole("lord");
+                    }
+                    else {
+                        setRole("khan");
+                    }
+                    setRoleArray(data['roles']);
+
+                    setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
+                    setStatusArray(data['status']);
+
+                    setKing(data['players'][data['roles'].indexOf(0)]['session']);
+                    setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
+                    break;
+
+                case "spring":
+                    for (let i = 0; i < data['players'].length; ++i) {
+                        let thePlayer = {};
+                        thePlayer.session = data['players'][i][0];
+                        thePlayer.name = data['players'][i][1];
+                        thePlayer.ready = data['ready'][i];
+                        _players.push(thePlayer);
+                    }
+                    setPlayers(_players);
+
+                    roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+                    if (roleInt === 0) {
+                        setRole("king");
+                    }
+                    else if (roleInt === 1) {
+                        setRole("lord");
+                    }
+                    else {
+                        setRole("khan");
+                    }
+                    setRoleArray(data['roles']);
+
+                    setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
+                    setStatusArray(data['status']);
+
+                    setKing(data['players'][data['roles'].indexOf(0)]['session']);
+                    setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
+
+                    if (roleInt === 0) {
+                        setChoices(data["choices"]);
+                    }
+                    break;
+                case "summer":
+                    for (let i = 0; i < data['players'].length; ++i) {
+                        let thePlayer = {};
+                        thePlayer.session = data['players'][i][0];
+                        thePlayer.name = data['players'][i][1];
+                        if (thePlayer.session === Number(getSession())) {
+                            thePlayer.ready = data['ready'];
+                        }
+                        else {
+                            thePlayer.ready = true;
+                        }
+                        _players.push(thePlayer);
+                    }
+                    setPlayers(_players);
+
+                    roleInt = data['roles'][data['players'].map(p => p[0]).indexOf(Number(getSession()))];
+                    if (roleInt === 0) {
+                        setRole("king");
+                    }
+                    else if (roleInt === 1) {
+                        setRole("lord");
+                    }
+                    else {
+                        setRole("khan");
+                    }
+                    setRoleArray(data['roles']);
+
+                    setStatus(data['status'][data['players'].map(p => p[0]).indexOf(Number(getSession()))]);
+                    setStatusArray(data['status']);
+
+                    setKing(data['players'][data['roles'].indexOf(0)]['session']);
+                    setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
+
+                    if (roleInt === 0) {
+                        // the king should know who they have chosen for double harvest
+                        setChoices(data["choices"]);
+                    }
+                    if (roleInt === 1) {
+                       // being chosen for double harvest is indicated in the lord's choice
+                       if (data["choices"] === -2) {
+                           setStatus(3);
+                       }
+                       else {
+                           setChoices(data["choices"]);
+                       }
+                    }
+
+                case "summer_result":
+                    break;
+            }
 
             // renders page based on current state for joining players
             setCurrentSeason(data['state']);
@@ -516,7 +612,7 @@ function RoomPage() {
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
             // update 'grains' of how much of grains to be deducted every loop
-            setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
+            setGrain({ initial_grain: 0, added_grain: 0, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
             // store the array 'role'
             setRoleArray(data['role']);
@@ -622,16 +718,16 @@ function RoomPage() {
             setPlayers(updated_players);
 
             // if key "double_harvest" is found in data
+            setChoices(null);
             if ("double_harvest" in data) {
 
-                // if current player role is not lord
-                if (role !== "lord") return;
-
+                if (role === "king") {
+                    setChoices(data['double_harvest']);
+                }
                 // check if the key is a boolean true, then set the player as double harvest status
-                if (data['double_harvest']) {
+                else {
                     setStatus(3);
                 }
-
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -753,6 +849,9 @@ function RoomPage() {
             if (data['state'] === "autumn") {
                 // set current state to "autumn"
                 setCurrentSeason(data['state']);
+
+                // recalculate grain after the cutscene
+                setGrain({ ...grain, initial_grain: grain.initial_grain + grain.added_grain - grain.yearly_deduction });
 
                 // ready everyone who is banished and unready everyone else
                 let updated_players = players.map((player, index) => {
