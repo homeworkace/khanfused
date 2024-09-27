@@ -1,24 +1,28 @@
 {
   "files": {
-    "main.css": "/static/css/main.5a0c7131.css",
-    "main.js": "/static/js/main.51f4970b.js",
+    "main.css": "/static/css/main.594225c9.css",
+    "main.js": "/static/js/main.1cb836fc.js",
     "static/js/453.3ac068e3.chunk.js": "/static/js/453.3ac068e3.chunk.js",
     "static/media/AUTUMN CUTSCENE.svg": "/static/media/AUTUMN CUTSCENE.5b763947536da71303f1.svg",
     "static/media/SUMMER CUTSCENE.svg": "/static/media/SUMMER CUTSCENE.c22d521af4529d2fa2b7.svg",
     "static/media/SPRING CUTSCENE.svg": "/static/media/SPRING CUTSCENE.9d824c22cb8af6c2ad6b.svg",
     "static/media/WINTER CUTSCENE.svg": "/static/media/WINTER CUTSCENE.7f280d7ca5cf9c7babd8.svg",
-    "static/media/player_icon.svg": "/static/media/player_icon.6f23e4eb75fbe6767e6192e3881393ee.svg",
+    "static/media/bread.svg": "/static/media/bread.7a3d3af6d9f0e1b169072a984e39d3af.svg",
     "static/media/Khanfused.svg": "/static/media/Khanfused.481761707707ab88a889178b72d4d5e6.svg",
+    "static/media/king.svg": "/static/media/king.20e971ee5961b898d7bf7c387d28e272.svg",
+    "static/media/khan.svg": "/static/media/khan.eb3b32bdda4eafb3d960929131cfffb5.svg",
     "static/media/timer.svg": "/static/media/timer.b5e973f67f4e7bbb8c90ca06fdc606c3.svg",
     "static/media/help.svg": "/static/media/help.57f460ece64f96f992f6bdc752aeacb7.svg",
     "index.html": "/index.html",
+    "static/media/lord.svg": "/static/media/lord.5f23ac00fed46a56d443c847ee729323.svg",
     "static/media/tick.svg": "/static/media/tick.006f0cf389ab91884ba4aaa2de6d943e.svg",
-    "main.5a0c7131.css.map": "/static/css/main.5a0c7131.css.map",
-    "main.51f4970b.js.map": "/static/js/main.51f4970b.js.map",
+    "static/media/unknown.svg": "/static/media/unknown.1378f795ac617b9576b42397632b8b27.svg",
+    "main.594225c9.css.map": "/static/css/main.594225c9.css.map",
+    "main.1cb836fc.js.map": "/static/js/main.1cb836fc.js.map",
     "453.3ac068e3.chunk.js.map": "/static/js/453.3ac068e3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5a0c7131.css",
-    "static/js/main.51f4970b.js"
+    "static/css/main.594225c9.css",
+    "static/js/main.1cb836fc.js"
   ]
 }
