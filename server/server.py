@@ -221,9 +221,12 @@ def socket_on_join(data):
             lobby_info['choices'] = choices[0]
     # summer: lords choose what to do. session id for scout, -1 for farm, -2 for double
     elif lobby_info['state'] == 'summer' :
-        if lobby_info['roles'][player_index] == 1 and lobby_info['status'][player_index] == 0:
-            lobby_info['choices'] = choices[player_index]
-            if lobby_info['status'][player_index] == 3 :
+        if lobby_info['roles'][player_index] == 0 :
+            lobby_info['choices'] = lobby_info['players'][lobby_info['status'].index(3)][0]
+        elif lobby_info['roles'][player_index] == 1:
+            if lobby_info['status'][player_index] == 0 :
+                lobby_info['choices'] = choices[player_index]
+            elif lobby_info['status'][player_index] == 3 :
                 lobby_info['choices'] = -2
         lobby_info['status'] = [(status if status < 3 else 0) for status in lobby_info['status']]
     # summer result: resend the data that wouldve been sent for state change

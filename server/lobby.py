@@ -161,7 +161,7 @@ class lobby :
                 continue
             eligible_choices = [j for j in range(len(self.roles)) if j != i and self.status[j] == 0]
             self.choices = [self.players[random.choice(eligible_choices)][0]]
-            self.socket.emit('change_state', { 'state' : 'spring', 'choices' : self.choices }, room = str(self.players[i][0]), namespace = '/') # Emit change in state.
+            self.socket.emit('change_state', { 'state' : 'spring', 'choice' : self.choices }, room = str(self.players[i][0]), namespace = '/') # Emit change in state.
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
@@ -206,10 +206,12 @@ class lobby :
 
         # Emit change in state.
         for player in range(len(self.players)) :
-            if self.status[player] == 3 :
+            if self.roles[player] == 0 :
+                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : self.players[self.status.index(3)][0] }, room = str(self.players[player][0]), namespace = '/')
+            elif self.status[player] == 3 :
                 self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
             elif not self.choices[player] is None :
-                self.socket.emit('change_state', { 'state' : 'summer',  'choice' : self.choices[player]}, room = str(self.players[player][0]), namespace = '/')
+                self.socket.emit('change_state', { 'state' : 'summer', 'choices' : self.choices[player]}, room = str(self.players[player][0]), namespace = '/')
             else :
                 self.socket.emit('change_state', { 'state' : 'summer' }, room = str(self.players[player][0]), namespace = '/')
 

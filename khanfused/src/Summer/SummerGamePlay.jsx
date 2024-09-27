@@ -94,7 +94,7 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
                                 (statusArray[index] == 1 ? " pillaged" : "") +
                                 (statusArray[index] == 2 ? " banished" : "")
                             }
-                            disabled={ roleArray[index] !== -1 || statusArray[index] !== 0}
+                            disabled={roleArray[index] !== -1 || statusArray[index] !== 0}
                         >
                             <img src={roleIcon(index)} />
                             {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
@@ -112,8 +112,29 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
                     </button>
                 </div>
             );
-        } 
-      };
+        }
+        else {
+            return (
+                <div className="player-container">
+                    {players.map((player, index) => (
+                        <button
+                            key={player.session}
+                            className={"player-button" +
+                                (role === "king" && choices === player.session ? " selected" : "") +
+                                (statusArray[index] == 1 ? " pillaged" : "") +
+                                (statusArray[index] == 2 ? " banished" : "")
+                            }
+                            disabled={true}
+                        >
+                            <img src={roleIcon(index)} />
+                            {player.name + (player.session === Number(getSession()) ? " (You)" : "")}
+                        </button>
+                    ))}
+                </div>
+            );
+        }
+
+    };
 
 
   return (

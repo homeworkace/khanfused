@@ -338,14 +338,17 @@ function RoomPage() {
                     setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
 
                     // todo: the king should know who they have chosen for double harvest
+                    if (roleInt === 0) {
+
+                    }
                     if (roleInt === 1) {
-                        // being chosen for double harvest is indicated in the lord's choice
-                        if (data["choices"] === -2) {
-                            setStatus(3);
-                        }
-                        else {
-                            setChoices(data["choices"]);
-                        }
+                       // being chosen for double harvest is indicated in the lord's choice
+                       if (data["choices"] === -2) {
+                           setStatus(3);
+                       }
+                       else {
+                           setChoices(data["choices"]);
+                       }
                     }
 
                 case "summer_result":
