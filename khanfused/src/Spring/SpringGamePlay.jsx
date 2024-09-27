@@ -97,7 +97,7 @@ function SpringGamePlay({ grain, status, socket, role, players, currentSeason}) 
         
         <div className="spring-button-bar">
 
-          <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+          <GrainList grain = {grain.initial_grain} />
 
           {renderRoleSpecificContent()} 
 

@@ -337,9 +337,9 @@ function RoomPage() {
                     setKing(data['players'][data['roles'].indexOf(0)]['session']);
                     setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
 
-                    // todo: the king should know who they have chosen for double harvest
                     if (roleInt === 0) {
-
+                        // the king should know who they have chosen for double harvest
+                        setChoices(data["choices"]);
                     }
                     if (roleInt === 1) {
                        // being chosen for double harvest is indicated in the lord's choice
@@ -612,7 +612,7 @@ function RoomPage() {
             // set state to "role_assignment"
             setCurrentSeason(data['state']);
             // update 'grains' of how much of grains to be deducted every loop
-            setGrain({ ...grain, yearly_deduction: data['game_rules']['yearly_deduction'] });
+            setGrain({ initial_grain: 0, added_grain: 0, yearly_deduction: data['game_rules']['yearly_deduction'] });
             
             // store the array 'role'
             setRoleArray(data['role']);
@@ -718,16 +718,16 @@ function RoomPage() {
             setPlayers(updated_players);
 
             // if key "double_harvest" is found in data
+            setChoices(null);
             if ("double_harvest" in data) {
 
-                // if current player role is not lord
-                if (role !== "lord") return;
-
+                if (role === "king") {
+                    setChoices(data['double_harvest']);
+                }
                 // check if the key is a boolean true, then set the player as double harvest status
-                if (data['double_harvest']) {
+                else {
                     setStatus(3);
                 }
-
             }
         }
         socket.current.on("change_state", handleChangeState);
@@ -849,6 +849,9 @@ function RoomPage() {
             if (data['state'] === "autumn") {
                 // set current state to "autumn"
                 setCurrentSeason(data['state']);
+
+                // recalculate grain after the cutscene
+                setGrain({ ...grain, initial_grain: grain.initial_grain + grain.added_grain - grain.yearly_deduction });
 
                 // ready everyone who is banished and unready everyone else
                 let updated_players = players.map((player, index) => {

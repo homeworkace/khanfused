@@ -177,6 +177,9 @@ class lobby :
             if self.roles[player] == 1 and self.status[player] == 0 :
                 self.status[player] = 3
             break
+
+        # Save the king's choice so they remember who they selected.
+        kings_choice = self.choices[0]
         
         # Reset the list of choices so that it represents the lords' decisions.
         self.choices = [(-1 if self.status[player] == 0 and self.roles[player] == 1 else None) for player in range(len(self.status))]
@@ -189,6 +192,7 @@ class lobby :
             scouting_lords -= 1
         random.shuffle(eligible_lords)
         self.choices = [(None if self.choices[i] is None else eligible_lords.pop()) for i in range(len(self.choices))] # Put the choices back in place.
+        self.choices[self.roles.index(0)] = kings_choice
 
         # Of the scouting lords, pick an eligible candidate.
         for i in range(len(self.choices)) :
@@ -207,7 +211,7 @@ class lobby :
         # Emit change in state.
         for player in range(len(self.players)) :
             if self.roles[player] == 0 :
-                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : self.players[self.status.index(3)][0] }, room = str(self.players[player][0]), namespace = '/')
+                self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : kings_choice }, room = str(self.players[player][0]), namespace = '/')
             elif self.status[player] == 3 :
                 self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
             elif not self.choices[player] is None :
@@ -275,7 +279,7 @@ class lobby :
         
         # Finally, set a callback for the next state.
         self.next_job.remove()
-        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 60, id = 'banish_result_start' + self.lobby_code)
+        self.next_job = self.timer.add_job(func = self.banish_result_start, trigger = 'interval', seconds = 600, id = 'banish_result_start' + self.lobby_code)
 
     def banish_result_start(self) :
         self.state = 'banish_result'
@@ -446,7 +450,6 @@ class lobby :
                 self.choices[player_index] = data['choice'] # -1 if farming
             
             # If all players are ready, skip the timer.
-            print(self.ready)
             if not False in self.ready :
                 self.summer_result_start()
 

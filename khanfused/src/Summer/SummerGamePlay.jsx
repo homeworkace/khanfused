@@ -23,6 +23,9 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
 
     const handlePlayerSelect = (playerSession) => {
         setSelectedPlayerSession(playerSession);
+        if (isReady) {
+            summerReadyClick();
+        }
     };
 
     const summerReadyClick = () => {
@@ -63,24 +66,6 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
     };
 
     const renderRoleSpecificContent = () => {
-        let infoText = "";
-        switch (status) {
-            case 1:
-                infoText = "YOU HAVE BEEN PILLAGED";
-                break;
-            case 2:
-                infoText = "YOU HAVE BEEN BANISHED";
-                break;
-            case 3:
-                infoText = "You have been chosen for double harvest";
-                break;
-        }
-        let result = (
-            <div className="banished">
-                <p className="banished-text">{ infoText }</p>
-            </div>
-        );
-
         if (role === "lord" && status === 0) {
             return (
                 <div className="scout-container">
@@ -136,6 +121,25 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
 
     };
 
+    const renderStatusSpecificContent = () => {
+        let infoText = "";
+        switch (status) {
+            case 1:
+                infoText = "YOU HAVE BEEN PILLAGED";
+                break;
+            case 2:
+                infoText = "YOU HAVE BEEN BANISHED";
+                break;
+            case 3:
+                infoText = "You have been chosen for double harvest";
+                break;
+        }
+        return (
+            <div className="banished">
+                <p className="banished-text">{infoText}</p>
+            </div>
+        );
+    }
 
   return (
     <div className="summer">
@@ -154,11 +158,12 @@ function SummerGamePlay({ grain, status, socket, choices, players, role, roleArr
             {isReady ? "Unready" : "Ready"}
           </button>
         </div>
-        )}
+              )}
+              {renderStatusSpecificContent() }
 
         <HelpButton role={role}/>
 
-        <GrainList grain = {grain.initial_grain + grain.added_grain - grain.yearly_deduction} />
+        <GrainList grain = {grain.initial_grain} />
 
         <Timer duration={30} onTimeUp={handleTimeUp} />
       </div>
