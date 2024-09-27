@@ -91,9 +91,7 @@ function RoomPage() {
                 case "reveal_role":
                     return <Role 
                         players={players}
-                        king={king}
-                        roleArray={roleArray}
-                        statusArray={statusArray}
+                        roles={roleArray}
                 />
 
                 case "spring":

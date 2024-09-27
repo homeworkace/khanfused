@@ -208,8 +208,8 @@ class lobby :
         for player in range(len(self.players)) :
             if self.status[player] == 3 :
                 self.socket.emit('change_state', { 'state' : 'summer', 'double_harvest' : True }, room = str(self.players[player][0]), namespace = '/')
-            elif not self.choice[player] is None :
-                self.socket.emit('change_state', { 'state' : 'summer',  'choice' : self.choice[player]}, room = str(self.players[player][0]), namespace = '/')
+            elif not self.choices[player] is None :
+                self.socket.emit('change_state', { 'state' : 'summer',  'choice' : self.choices[player]}, room = str(self.players[player][0]), namespace = '/')
             else :
                 self.socket.emit('change_state', { 'state' : 'summer' }, room = str(self.players[player][0]), namespace = '/')
 
